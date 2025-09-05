@@ -1,0 +1,172 @@
+import React, { useMemo } from 'react';
+import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { ExcelData, DataType } from '../types/excel';
+import { LoadingSpinner } from './ui/LoadingSpinner';
+import { clsx } from 'clsx';
+
+interface DataTableProps {
+  data: ExcelData | null;
+  filteredRows?: any[][];
+  onSort?: (column: string, direction: 'asc' | 'desc') => void;
+  isLoading?: boolean;
+  sortColumn?: string;
+  sortDirection?: 'asc' | 'desc';
+}
+
+function formatCellValue(value: any, type: DataType): string {
+  if (value === null || value === undefined || value === '') {
+    return '';
+  }
+
+  switch (type) {
+    case 'date':
+      if (value instanceof Date) {
+        return value.toLocaleDateString();
+      }
+      // Try to parse as date if it's a string or number
+      const date = new Date(value);
+      return isNaN(date.getTime()) ? String(value) : date.toLocaleDateString();
+    
+    case 'number':
+      const num = Number(value);
+      return isNaN(num) ? String(value) : num.toLocaleString();
+    
+    case 'boolean':
+      return String(value);
+    
+    default:
+      return String(value);
+  }
+}
+
+
+export function DataTable({ 
+  data, 
+  filteredRows, 
+  onSort, 
+  isLoading = false,
+  sortColumn,
+  sortDirection 
+}: DataTableProps) {
+  const displayRows = filteredRows || data?.rows || [];
+  const headers = data?.headers || [];
+  
+  const columnTypes = useMemo(() => {
+    if (!data?.metadata?.columns) return [];
+    return data.metadata.columns.map(col => col.type);
+  }, [data?.metadata?.columns]);
+
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64 bg-white rounded-lg border border-gray-200">
+        <div className="flex flex-col items-center space-y-4">
+          <LoadingSpinner size="lg" />
+          <p className="text-sm text-gray-600">Loading data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data || headers.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64 bg-white rounded-lg border border-gray-200">
+        <div className="text-center">
+          <div className="text-gray-400 mb-2">
+            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3 className="text-sm font-medium text-gray-900">No data to display</h3>
+          <p className="mt-1 text-sm text-gray-500">Upload an Excel or CSV file to get started</p>
+        </div>
+      </div>
+    );
+  }
+
+
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="px-4 py-3 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-medium text-gray-900">Data Table</h3>
+            <p className="text-sm text-gray-500">
+              Showing {displayRows.length.toLocaleString()} rows × {headers.length} columns
+            </p>
+          </div>
+          {data?.metadata && (
+            <div className="text-sm text-gray-500">
+              <span className="font-medium">{data.metadata.fileName}</span>
+              {data.metadata.activeSheet && (
+                <span className="ml-2">• Sheet: {data.metadata.activeSheet}</span>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="overflow-auto" style={{ maxHeight: '600px' }}>
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50 sticky top-0">
+            <tr>
+              {headers.map((header, index) => (
+                <th
+                  key={header}
+                  className={clsx(
+                    'px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100',
+                    onSort && 'select-none'
+                  )}
+                  onClick={() => onSort && onSort(header, sortColumn === header && sortDirection === 'asc' ? 'desc' : 'asc')}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>{header}</span>
+                    {onSort && (
+                      <div className="flex flex-col">
+                        <ChevronUpIcon 
+                          className={clsx('h-3 w-3', 
+                            sortColumn === header && sortDirection === 'asc' ? 'text-primary-600' : 'text-gray-300'
+                          )} 
+                        />
+                        <ChevronDownIcon 
+                          className={clsx('h-3 w-3 -mt-1', 
+                            sortColumn === header && sortDirection === 'desc' ? 'text-primary-600' : 'text-gray-300'
+                          )} 
+                        />
+                      </div>
+                    )}
+                  </div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {displayRows.map((row, rowIndex) => (
+              <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                {row.map((cell, cellIndex) => {
+                  const cellType = columnTypes[cellIndex] || 'string';
+                  const formattedValue = formatCellValue(cell, cellType);
+                  return (
+                    <td key={cellIndex} className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
+                      <div className="max-w-xs truncate" title={formattedValue}>
+                        {formattedValue}
+                      </div>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      
+      {displayRows.length > 1000 && (
+        <div className="px-4 py-2 bg-gray-50 border-t border-gray-200">
+          <p className="text-xs text-gray-600">
+            ⚡ Virtual scrolling is enabled for optimal performance with large datasets
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}

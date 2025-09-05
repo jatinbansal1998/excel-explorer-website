@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Read(//Users/jatinbansal/.claude/**)",
+      "Bash(cat:*)",
+      "Bash(npm run build:*)",
+      "WebFetch(domain:headlessui.com)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -6,7 +6,8 @@
       "Bash(cat:*)",
       "Bash(npm run build:*)",
       "WebFetch(domain:headlessui.com)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(npx husky init:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,302 +1,360 @@
 # Plan 05: Data Visualization & Charts
 
 ## Engineer Assignment
+
 **Primary Engineer**: Data Visualization/Frontend Engineer
 **Dependencies**: Plan 02 (Data Processing) must be completed first
-**Estimated Time**: 3-4 days
+**Estimated Time**: 4-5 days ✅ **COMPLETED**
 **Can work in parallel with**: Plans 03, 04 after Plan 02
 
 ## Overview
-Implement dynamic chart generation system that automatically suggests and creates appropriate visualizations based on data types, with real-time updates when filters change.
+
+Implement advanced pie chart visualization system with intelligent data handling, particularly optimized for financial data. Features sophisticated range management, smart search functionality, and context-aware error handling for professional data analysis.
 
 ## Deliverables
 
-### 1. Chart Generation Engine
-- [ ] Automatic chart type suggestion based on data
-- [ ] Data aggregation and preparation for charts
-- [ ] Real-time chart updates with filter changes
-- [ ] Interactive chart controls and configuration
+### 1. Advanced Chart Generation Engine ✅
 
-### 2. Chart Components
-- [ ] Pie chart for categorical data distribution
-- [ ] Bar chart for categorical comparisons
-- [ ] Line chart for time series data
-- [ ] Histogram for numeric distribution
-- [ ] Scatter plot for correlation analysis
+- [x] **Smart Chart Suggestions**: Intelligent pie chart recommendations based on data types
+- [x] **Financial Data Recognition**: Specialized handling for financial, percentage, and demographic data
+- [x] **Intelligent Data Processing**: Custom range generation with financial industry heuristics
+- [x] **Real-time Updates**: Charts automatically update when filters change
+- [x] **Context-Aware Configuration**: Dynamic controls based on data characteristics
 
-### 3. Chart Management System
-- [ ] Chart configuration interface
-- [ ] Multiple chart support
-- [ ] Chart export functionality
-- [ ] Chart responsiveness and optimization
+### 2. Sophisticated Pie Chart System ✅
 
-## Dependencies to Install
+- [x] **Advanced Pie Charts**: Professional-grade pie charts with customizable segmentation
+- [x] **Smart Segment Management**: User-configurable max segments (3-20) with automatic "Others" grouping
+- [x] **Numerical Range Processing**: Custom range definitions for meaningful data visualization
+- [x] **Categorical Data Handling**: Optimized processing for text/boolean data types
+- [x] **Performance Optimization**: Efficient handling of large financial datasets
+
+### 3. Numerical Range Management System ✅
+
+- [x] **Intelligent Range Generation**: Auto-creates financial brackets, percentage ranges, age groups
+- [x] **Custom Range Editor**: Visual interface for creating/editing custom ranges
+- [x] **Boundary Control**: Precise inclusive/exclusive boundary management (≥/≤ vs >/< )
+- [x] **Range Validation**: Overlap detection and real-time error feedback
+- [x] **Smart Defaults**: One-click range generation based on data analysis
+
+### 4. Enhanced Search & Selection System ✅
+
+- [x] **Intelligent Column Search**: Real-time fuzzy matching with synonym recognition
+- [x] **Smart Ranking**: Exact → starts with → contains → fuzzy match scoring
+- [x] **Interactive Selection**: Click-to-select interface with metadata display
+- [x] **Financial Term Recognition**: Matches related terms (price/cost/value/amount)
+- [x] **Visual Search Experience**: Search icons, clear buttons, and no-results messaging
+
+### 5. Professional Error Handling ✅
+
+- [x] **Context-Aware Messages**: Specific errors with actionable solutions
+- [x] **User-Friendly Language**: Clear explanations for data type issues
+- [x] **Visual Error States**: Professional error styling and guidance
+- [x] **Validation Pipeline**: Multi-layer validation from UI to data processing
+
+## Dependencies Installed ✅
+
 ```json
 {
   "chart.js": "^4.4.0",
   "react-chartjs-2": "^5.2.0",
-  "chartjs-adapter-date-fns": "^3.0.0",
-  "date-fns": "^2.30.0"
+  "uuid": "^9.0.0"
 }
 ```
 
 ## Core Interfaces
 
-### Chart Configuration (src/types/chart.ts)
+### Chart Configuration (src/types/chart.ts) ✅
+
 ```typescript
 export interface ChartConfig {
-  id: string;
-  title: string;
-  type: ChartType;
-  dataColumn: string;
-  labelColumn?: string;
-  aggregation: AggregationType;
-  options: ChartOptions;
-  position: ChartPosition;
+  id: string
+  title: string
+  type: ChartType
+  dataColumn: string
+  labelColumn?: string
+  aggregation: AggregationType
+  options: ChartOptions
+  position: ChartPosition
+  maxSegments?: number // User-configurable segment limits
+  numericRanges?: NumericRange[] // Custom range definitions
 }
 
-export type ChartType = 
-  | 'pie' 
-  | 'doughnut'
-  | 'bar' 
-  | 'horizontalBar'
-  | 'line'
-  | 'area'
-  | 'scatter'
-  | 'histogram';
+export type ChartType = 'pie' // Focused implementation
 
-export type AggregationType = 
-  | 'count'        // Count occurrences
-  | 'sum'          // Sum numeric values
-  | 'average'      // Average numeric values
-  | 'min'          // Minimum value
-  | 'max'          // Maximum value
-  | 'median'       // Median value
-  | 'distinct';    // Count distinct values
+export interface NumericRange {
+  id: string
+  label: string
+  min: number
+  max: number
+  includeMin: boolean // ≥ vs >
+  includeMax: boolean // ≤ vs <
+}
+
+export type AggregationType =
+  | 'count' // Count occurrences
+  | 'sum' // Sum numeric values
+  | 'average' // Average numeric values
+  | 'min' // Minimum value
+  | 'max' // Maximum value
+  | 'median' // Median value
+  | 'distinct' // Count distinct values
 
 export interface ChartOptions {
-  responsive: boolean;
-  maintainAspectRatio: boolean;
+  responsive: boolean
+  maintainAspectRatio: boolean
   plugins: {
     legend: {
-      display: boolean;
-      position: 'top' | 'bottom' | 'left' | 'right';
-    };
+      display: boolean
+      position: 'top' | 'bottom' | 'left' | 'right'
+    }
     title: {
-      display: boolean;
-      text: string;
-    };
+      display: boolean
+      text: string
+    }
     tooltip: {
-      enabled: boolean;
-      callbacks?: any;
-    };
-  };
-  scales?: any;
+      enabled: boolean
+      callbacks?: any
+    }
+  }
+  scales?: any
   animation?: {
-    duration: number;
-    easing: string;
-  };
+    duration: number
+    easing: string
+  }
 }
 
 export interface ChartData {
-  labels: string[];
+  labels: string[]
   datasets: {
-    label: string;
-    data: number[];
-    backgroundColor: string | string[];
-    borderColor: string | string[];
-    borderWidth: number;
-  }[];
+    label: string
+    data: number[]
+    backgroundColor: string | string[]
+    borderColor: string | string[]
+    borderWidth: number
+  }[]
 }
 
 export type ChartPosition = {
-  row: number;
-  column: number;
-  width: number;
-  height: number;
-};
+  row: number
+  column: number
+  width: number
+  height: number
+}
 ```
 
-## Services to Implement
+## Key Services Implemented ✅
 
-### 1. Chart Suggestion Engine (src/services/chartSuggestion.ts)
+### 1. Numeric Range Generator (src/services/numericRangeGenerator.ts) ✅
+
+```typescript
+export class NumericRangeGenerator {
+  generateDefaultRanges(values: number[], columnName: string): NumericRange[] {
+    // Financial data heuristics
+    if (this.isFinancialData(columnName, min, max)) {
+      return this.generateFinancialRanges(min, max)
+    }
+    // Age, percentage, and quantile-based ranges
+  }
+
+  private isFinancialData(columnName: string, min: number, max: number): boolean
+  private generateFinancialRanges(min: number, max: number): NumericRange[]
+  private generatePercentageRanges(min: number, max: number): NumericRange[]
+  private generateAgeRanges(min: number, max: number): NumericRange[]
+}
+```
+
+### 2. Enhanced Chart Data Processor (src/services/chartDataProcessor.ts) ✅
+
+```typescript
+export class ChartDataProcessor {
+  prepareChartData(data: any[][], config: ChartConfig, columnInfo: ColumnInfo[]): ChartData {
+    // Custom range support for numerical pie charts
+    if (config.numericRanges?.length > 0) {
+      return this.prepareDataWithCustomRanges(data, config, columnInfo)
+    }
+    // Standard processing with automatic range generation
+  }
+
+  private assignToCustomRange(value: number, ranges: NumericRange[]): string
+}
+```
+
+### 3. Chart Suggestion Engine (src/services/chartSuggestion.ts) ✅
+
 ```typescript
 export class ChartSuggestionEngine {
-  suggestCharts(
-    columns: ColumnInfo[], 
-    filteredData: any[][]
-  ): ChartSuggestion[] {
-    const suggestions: ChartSuggestion[] = [];
-    
+  suggestCharts(columns: ColumnInfo[], filteredData: any[][]): ChartSuggestion[] {
+    const suggestions: ChartSuggestion[] = []
+
     // Analyze data characteristics
-    const categoricalColumns = columns.filter(c => c.type === 'string');
-    const numericColumns = columns.filter(c => c.type === 'number');
-    const dateColumns = columns.filter(c => c.type === 'date');
-    
+    const categoricalColumns = columns.filter((c) => c.type === 'string')
+    const numericColumns = columns.filter((c) => c.type === 'number')
+    const dateColumns = columns.filter((c) => c.type === 'date')
+
     // Generate suggestions based on data types
-    suggestions.push(...this.suggestCategoricalCharts(categoricalColumns));
-    suggestions.push(...this.suggestNumericCharts(numericColumns));
-    suggestions.push(...this.suggestTimeSeriesCharts(dateColumns, numericColumns));
-    suggestions.push(...this.suggestCorrelationCharts(numericColumns));
-    
-    return suggestions.sort((a, b) => b.confidence - a.confidence);
+    suggestions.push(...this.suggestCategoricalCharts(categoricalColumns))
+    suggestions.push(...this.suggestNumericCharts(numericColumns))
+    suggestions.push(...this.suggestTimeSeriesCharts(dateColumns, numericColumns))
+    suggestions.push(...this.suggestCorrelationCharts(numericColumns))
+
+    return suggestions.sort((a, b) => b.confidence - a.confidence)
   }
 
   private suggestCategoricalCharts(columns: ColumnInfo[]): ChartSuggestion[] {
-    return columns.map(column => ({
+    return columns.map((column) => ({
       type: 'pie',
       title: `Distribution of ${column.name}`,
       dataColumn: column.name,
       aggregation: 'count',
       confidence: this.calculateConfidence(column),
-      reason: 'Categorical data is ideal for pie charts'
-    }));
+      reason: 'Categorical data is ideal for pie charts',
+    }))
   }
 
   private suggestNumericCharts(columns: ColumnInfo[]): ChartSuggestion[] {
-    return columns.map(column => ({
+    return columns.map((column) => ({
       type: 'histogram',
       title: `Distribution of ${column.name}`,
       dataColumn: column.name,
       aggregation: 'count',
       confidence: this.calculateConfidence(column),
-      reason: 'Numeric data distribution analysis'
-    }));
+      reason: 'Numeric data distribution analysis',
+    }))
   }
 
-  private calculateConfidence(column: ColumnInfo): number;
+  private calculateConfidence(column: ColumnInfo): number
 }
 
 interface ChartSuggestion {
-  type: ChartType;
-  title: string;
-  dataColumn: string;
-  labelColumn?: string;
-  aggregation: AggregationType;
-  confidence: number; // 0-1
-  reason: string;
+  type: ChartType
+  title: string
+  dataColumn: string
+  labelColumn?: string
+  aggregation: AggregationType
+  confidence: number // 0-1
+  reason: string
 }
 ```
 
 ### 2. Chart Data Processor (src/services/chartDataProcessor.ts)
+
 ```typescript
 export class ChartDataProcessor {
-  prepareChartData(
-    data: any[][], 
-    config: ChartConfig, 
-    columnInfo: ColumnInfo[]
-  ): ChartData {
-    const columnIndex = this.findColumnIndex(config.dataColumn, columnInfo);
-    const labelIndex = config.labelColumn 
-      ? this.findColumnIndex(config.labelColumn, columnInfo) 
-      : null;
+  prepareChartData(data: any[][], config: ChartConfig, columnInfo: ColumnInfo[]): ChartData {
+    const columnIndex = this.findColumnIndex(config.dataColumn, columnInfo)
+    const labelIndex = config.labelColumn
+      ? this.findColumnIndex(config.labelColumn, columnInfo)
+      : null
 
     switch (config.type) {
       case 'pie':
       case 'doughnut':
-        return this.preparePieData(data, columnIndex, labelIndex, config);
+        return this.preparePieData(data, columnIndex, labelIndex, config)
       case 'bar':
       case 'horizontalBar':
-        return this.prepareBarData(data, columnIndex, labelIndex, config);
+        return this.prepareBarData(data, columnIndex, labelIndex, config)
       case 'line':
       case 'area':
-        return this.prepareLineData(data, columnIndex, labelIndex, config);
+        return this.prepareLineData(data, columnIndex, labelIndex, config)
       case 'scatter':
-        return this.prepareScatterData(data, columnIndex, labelIndex, config);
+        return this.prepareScatterData(data, columnIndex, labelIndex, config)
       case 'histogram':
-        return this.prepareHistogramData(data, columnIndex, config);
+        return this.prepareHistogramData(data, columnIndex, config)
       default:
-        throw new Error(`Unsupported chart type: ${config.type}`);
+        throw new Error(`Unsupported chart type: ${config.type}`)
     }
   }
 
   private preparePieData(
-    data: any[][], 
-    dataColumn: number, 
-    labelColumn: number | null, 
-    config: ChartConfig
+    data: any[][],
+    dataColumn: number,
+    labelColumn: number | null,
+    config: ChartConfig,
   ): ChartData {
-    const aggregated = this.aggregateData(data, dataColumn, labelColumn, config.aggregation);
-    
+    const aggregated = this.aggregateData(data, dataColumn, labelColumn, config.aggregation)
+
     return {
-      labels: aggregated.map(item => item.label),
-      datasets: [{
-        label: config.title,
-        data: aggregated.map(item => item.value),
-        backgroundColor: this.generateColors(aggregated.length),
-        borderColor: this.generateBorderColors(aggregated.length),
-        borderWidth: 2
-      }]
-    };
+      labels: aggregated.map((item) => item.label),
+      datasets: [
+        {
+          label: config.title,
+          data: aggregated.map((item) => item.value),
+          backgroundColor: this.generateColors(aggregated.length),
+          borderColor: this.generateBorderColors(aggregated.length),
+          borderWidth: 2,
+        },
+      ],
+    }
   }
 
   private aggregateData(
-    data: any[][], 
-    dataColumn: number, 
-    labelColumn: number | null, 
-    aggregation: AggregationType
+    data: any[][],
+    dataColumn: number,
+    labelColumn: number | null,
+    aggregation: AggregationType,
   ): AggregatedItem[] {
-    const groups = new Map<string, number[]>();
-    
-    data.forEach(row => {
-      const label = labelColumn !== null 
-        ? String(row[labelColumn] || 'Unknown')
-        : 'Value';
-      const value = row[dataColumn];
-      
+    const groups = new Map<string, number[]>()
+
+    data.forEach((row) => {
+      const label = labelColumn !== null ? String(row[labelColumn] || 'Unknown') : 'Value'
+      const value = row[dataColumn]
+
       if (!groups.has(label)) {
-        groups.set(label, []);
+        groups.set(label, [])
       }
-      groups.get(label)!.push(value);
-    });
+      groups.get(label)!.push(value)
+    })
 
     return Array.from(groups.entries()).map(([label, values]) => ({
       label,
-      value: this.applyAggregation(values, aggregation)
-    }));
+      value: this.applyAggregation(values, aggregation),
+    }))
   }
 
   private applyAggregation(values: any[], type: AggregationType): number {
     switch (type) {
       case 'count':
-        return values.length;
+        return values.length
       case 'sum':
-        return values.reduce((sum, val) => sum + (Number(val) || 0), 0);
+        return values.reduce((sum, val) => sum + (Number(val) || 0), 0)
       case 'average':
-        const validValues = values.filter(v => !isNaN(Number(v)));
-        return validValues.length > 0 
-          ? validValues.reduce((sum, val) => sum + Number(val), 0) / validValues.length 
-          : 0;
+        const validValues = values.filter((v) => !isNaN(Number(v)))
+        return validValues.length > 0
+          ? validValues.reduce((sum, val) => sum + Number(val), 0) / validValues.length
+          : 0
       case 'min':
-        return Math.min(...values.map(v => Number(v)).filter(v => !isNaN(v)));
+        return Math.min(...values.map((v) => Number(v)).filter((v) => !isNaN(v)))
       case 'max':
-        return Math.max(...values.map(v => Number(v)).filter(v => !isNaN(v)));
+        return Math.max(...values.map((v) => Number(v)).filter((v) => !isNaN(v)))
       case 'median':
-        const sorted = values.map(v => Number(v)).filter(v => !isNaN(v)).sort();
-        const mid = Math.floor(sorted.length / 2);
-        return sorted.length % 2 === 0 
-          ? (sorted[mid - 1] + sorted[mid]) / 2 
-          : sorted[mid];
+        const sorted = values
+          .map((v) => Number(v))
+          .filter((v) => !isNaN(v))
+          .sort()
+        const mid = Math.floor(sorted.length / 2)
+        return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid]
       case 'distinct':
-        return new Set(values).size;
+        return new Set(values).size
       default:
-        return 0;
+        return 0
     }
   }
 
-  generateColors(count: number): string[];
-  generateBorderColors(count: number): string[];
+  generateColors(count: number): string[]
+  generateBorderColors(count: number): string[]
 }
 
 interface AggregatedItem {
-  label: string;
-  value: number;
+  label: string
+  value: number
 }
 ```
 
 ## Chart Components
 
 ### 1. Chart Container (src/components/ChartView.tsx)
+
 ```typescript
 interface ChartViewProps {
   filteredData: any[][];
@@ -305,11 +363,11 @@ interface ChartViewProps {
   onChartRemove?: (chartId: string) => void;
 }
 
-export function ChartView({ 
-  filteredData, 
-  columnInfo, 
-  onChartAdd, 
-  onChartRemove 
+export function ChartView({
+  filteredData,
+  columnInfo,
+  onChartAdd,
+  onChartRemove
 }: ChartViewProps) {
   const [charts, setCharts] = useState<ChartConfig[]>([]);
   const [suggestions, setSuggestions] = useState<ChartSuggestion[]>([]);
@@ -318,12 +376,12 @@ export function ChartView({
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Data Visualization</h2>
-        <ChartControls 
+        <ChartControls
           suggestions={suggestions}
           onAddChart={handleAddChart}
         />
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {charts.map(chart => (
           <ChartContainer
@@ -336,9 +394,9 @@ export function ChartView({
           />
         ))}
       </div>
-      
+
       {charts.length === 0 && (
-        <EmptyChartState 
+        <EmptyChartState
           suggestions={suggestions.slice(0, 3)}
           onAddChart={handleAddChart}
         />
@@ -349,6 +407,7 @@ export function ChartView({
 ```
 
 ### 2. Individual Chart Component (src/components/charts/ChartContainer.tsx)
+
 ```typescript
 interface ChartContainerProps {
   config: ChartConfig;
@@ -374,7 +433,7 @@ export function ChartContainer({
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-medium">{config.title}</h3>
         <div className="flex gap-2">
-          <ChartConfigButton 
+          <ChartConfigButton
             config={config}
             onConfigChange={onConfigChange}
           />
@@ -384,7 +443,7 @@ export function ChartContainer({
           </Button>
         </div>
       </div>
-      
+
       <div className="relative h-64">
         {config.type === 'pie' || config.type === 'doughnut' ? (
           <Pie data={chartData} options={config.options} />
@@ -406,6 +465,7 @@ export function ChartContainer({
 ```
 
 ### 3. Chart Configuration Modal (src/components/charts/ChartConfigModal.tsx)
+
 ```typescript
 interface ChartConfigModalProps {
   isOpen: boolean;
@@ -434,7 +494,7 @@ export function ChartConfigModal({
             className="w-full border rounded px-3 py-2"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium mb-2">Chart Type</label>
           <select
@@ -449,7 +509,7 @@ export function ChartConfigModal({
             <option value="histogram">Histogram</option>
           </select>
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium mb-2">Data Column</label>
           <select
@@ -464,7 +524,7 @@ export function ChartConfigModal({
             ))}
           </select>
         </div>
-        
+
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel
@@ -482,68 +542,64 @@ export function ChartConfigModal({
 ## Real-time Updates Hook
 
 ### Chart Data Management (src/hooks/useCharts.ts)
+
 ```typescript
-export function useCharts(
-  filteredData: any[][], 
-  columnInfo: ColumnInfo[]
-) {
-  const [charts, setCharts] = useState<ChartConfig[]>([]);
-  const [suggestions, setSuggestions] = useState<ChartSuggestion[]>([]);
+export function useCharts(filteredData: any[][], columnInfo: ColumnInfo[]) {
+  const [charts, setCharts] = useState<ChartConfig[]>([])
+  const [suggestions, setSuggestions] = useState<ChartSuggestion[]>([])
 
   // Generate suggestions when data changes
   useEffect(() => {
     if (filteredData.length > 0 && columnInfo.length > 0) {
-      const newSuggestions = chartSuggestionEngine.suggestCharts(
-        columnInfo, 
-        filteredData
-      );
-      setSuggestions(newSuggestions);
+      const newSuggestions = chartSuggestionEngine.suggestCharts(columnInfo, filteredData)
+      setSuggestions(newSuggestions)
     }
-  }, [filteredData, columnInfo]);
+  }, [filteredData, columnInfo])
 
   // Auto-create default chart if none exist
   useEffect(() => {
     if (charts.length === 0 && suggestions.length > 0) {
-      const defaultChart = createChartFromSuggestion(suggestions[0]);
-      setCharts([defaultChart]);
+      const defaultChart = createChartFromSuggestion(suggestions[0])
+      setCharts([defaultChart])
     }
-  }, [suggestions, charts.length]);
+  }, [suggestions, charts.length])
 
   const addChart = useCallback((suggestion: ChartSuggestion) => {
-    const newChart = createChartFromSuggestion(suggestion);
-    setCharts(prev => [...prev, newChart]);
-  }, []);
+    const newChart = createChartFromSuggestion(suggestion)
+    setCharts((prev) => [...prev, newChart])
+  }, [])
 
   const updateChart = useCallback((chartId: string, updates: Partial<ChartConfig>) => {
-    setCharts(prev => prev.map(chart => 
-      chart.id === chartId ? { ...chart, ...updates } : chart
-    ));
-  }, []);
+    setCharts((prev) =>
+      prev.map((chart) => (chart.id === chartId ? { ...chart, ...updates } : chart)),
+    )
+  }, [])
 
   const removeChart = useCallback((chartId: string) => {
-    setCharts(prev => prev.filter(chart => chart.id !== chartId));
-  }, []);
+    setCharts((prev) => prev.filter((chart) => chart.id !== chartId))
+  }, [])
 
   return {
     charts,
     suggestions,
     addChart,
     updateChart,
-    removeChart
-  };
+    removeChart,
+  }
 }
 ```
 
 ## Export Functionality
 
 ### Chart Export Service (src/services/chartExport.ts)
+
 ```typescript
 export class ChartExportService {
   exportToPNG(chartElement: HTMLCanvasElement, title: string): void {
-    const link = document.createElement('a');
-    link.download = `${title}.png`;
-    link.href = chartElement.toDataURL();
-    link.click();
+    const link = document.createElement('a')
+    link.download = `${title}.png`
+    link.href = chartElement.toDataURL()
+    link.click()
   }
 
   exportToSVG(chartData: ChartData, config: ChartConfig): void {
@@ -551,23 +607,24 @@ export class ChartExportService {
   }
 
   exportChartData(chartData: ChartData, title: string): void {
-    const csv = this.convertToCSV(chartData);
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    
-    const link = document.createElement('a');
-    link.download = `${title}-data.csv`;
-    link.href = url;
-    link.click();
-    
-    URL.revokeObjectURL(url);
+    const csv = this.convertToCSV(chartData)
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+
+    const link = document.createElement('a')
+    link.download = `${title}-data.csv`
+    link.href = url
+    link.click()
+
+    URL.revokeObjectURL(url)
   }
 
-  private convertToCSV(chartData: ChartData): string;
+  private convertToCSV(chartData: ChartData): string
 }
 ```
 
 ## Files to Create
+
 - [ ] `src/services/chartSuggestion.ts`
 - [ ] `src/services/chartDataProcessor.ts`
 - [ ] `src/services/chartExport.ts`
@@ -579,6 +636,7 @@ export class ChartExportService {
 - [ ] `src/types/chart.ts`
 
 ## Performance Considerations
+
 - [ ] Memoize chart data processing
 - [ ] Debounce chart updates during filtering
 - [ ] Optimize chart rendering for large datasets
@@ -586,12 +644,14 @@ export class ChartExportService {
 - [ ] Efficient color generation and caching
 
 ## Integration Points
+
 - **Filter Team**: Subscribe to filtered data changes
 - **Data Team**: Use column information and statistics
 - **UI Team**: Integrate into ChartView component slot
 - **Utils Team**: Export functionality integration
 
 ## Validation Criteria
+
 - [ ] Charts render correctly for all data types
 - [ ] Real-time updates work smoothly with filters
 - [ ] Chart suggestions are relevant and accurate
@@ -600,6 +660,7 @@ export class ChartExportService {
 - [ ] Charts are responsive and accessible
 
 ## Notes for Integration Teams
+
 - **Filter Team**: Charts will automatically update when `filteredData` changes
 - **UI Team**: ChartView component fits into your grid layout system
 - **Data Team**: Chart suggestions use your ColumnInfo statistics

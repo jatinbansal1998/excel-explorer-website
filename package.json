@@ -8,7 +8,7 @@
     "start": "next start",
     "export": "next build && next export",
     "lint": "next lint",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc --noEmit -p tsconfig.json",
     "prepare": "husky"
   },
   "dependencies": {
@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.0",
+    "@types/react-dom": "^18.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.6",
     "postcss": "^8.4.0"
@@ -51,7 +52,7 @@
       "prettier --write"
     ],
     "*.{js,jsx,ts,tsx}": [
-      "npm run type-check"
+      "sh -c \"tsc -p tsconfig.json --noEmit\""
     ],
     "*.{css,scss,md,json}": [
       "prettier --write"

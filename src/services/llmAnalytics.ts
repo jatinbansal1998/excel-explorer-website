@@ -111,7 +111,7 @@ async function loadTemplate(path: string): Promise<string> {
 
 async function buildSystemInstruction(): Promise<string> {
   const md = await loadTemplate('/prompts/analytics_system.md')
-  return md.replace('{{SCHEMA}}', LLM_ANALYTICS_SCHEMA_TEXT)
+  return md.replace('<SCHEMA>', LLM_ANALYTICS_SCHEMA_TEXT)
 }
 
 async function buildSuggestUser(context: string): Promise<string> {

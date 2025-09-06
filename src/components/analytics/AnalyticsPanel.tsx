@@ -6,6 +6,7 @@ import type { ExcelData } from '../../types/excel'
 import type { ChartConfig } from '../../types/chart'
 import type { FilterConfig } from '../../types/filter'
 import { Button } from '../ui/Button'
+import { ArrowPathIcon } from '@heroicons/react/24/outline'
 import { useOpenRouter } from '../../hooks/useOpenRouter'
 import { buildDatasetContext } from '../../services/llmAnalytics'
 
@@ -120,10 +121,13 @@ export function AnalyticsPanel({ excelData, onApplyChart, onApplyFilters }: Prop
             <div className="flex items-center gap-2">
               <Button
                 variant="secondary"
+                size="icon"
                 onClick={() => reloadSuggestions()}
                 disabled={!canRun || suggestionsLoading}
+                aria-label="Reload suggestions"
+                title="Reload suggestions"
               >
-                Reload
+                <ArrowPathIcon className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -180,7 +184,7 @@ export function AnalyticsPanel({ excelData, onApplyChart, onApplyFilters }: Prop
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Ask a question about your data or paste a suggestion…"
-            className="w-full h-24 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+            className="w-full h-24 rounded-md border border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-3 py-2"
           />
           <div className="flex justify-end">
             <Button

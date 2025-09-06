@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from 'react'
 import { Button } from './ui/Button'
+import { ChevronUpIcon, ChevronDownIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
 import { Modal } from './ui/Modal'
 import {
   FilterConfig,
@@ -53,37 +54,51 @@ export function FilterPanel({
       style={collapsed ? undefined : { height: 'calc(100vh - 200px)', minHeight: '500px' }}
     >
       <div className="px-3 py-2 border-b border-gray-200 bg-gray-50">
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-semibold mr-auto">Filters</h3>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold">Filters</h3>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setCollapsed((v) => !v)}
+              className="whitespace-nowrap"
+              aria-label={collapsed ? 'Expand filters' : 'Collapse filters'}
+              title={collapsed ? 'Expand filters' : 'Collapse filters'}
+            >
+              {collapsed ? (
+                <ChevronDownIcon className="h-4 w-4" />
+              ) : (
+                <ChevronUpIcon className="h-4 w-4" />
+              )}
+            </Button>
+            {!collapsed && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={onResetAll}
+                className="whitespace-nowrap"
+                aria-label="Reset all filters"
+                title="Reset all filters"
+              >
+                <ArrowPathIcon className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
           {!collapsed && (
             <input
               type="text"
-              className="border rounded px-2 py-1 text-sm w-full sm:w-64"
+              className="border rounded px-2 py-1 text-sm w-full"
               placeholder="Search filters..."
               value={filterListQuery}
               onChange={(e) => setFilterListQuery(e.target.value)}
             />
-          )}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCollapsed((v) => !v)}
-            className="whitespace-nowrap"
-          >
-            {collapsed ? 'Expand' : 'Collapse'}
-          </Button>
-          {!collapsed && (
-            <Button variant="outline" size="sm" onClick={onResetAll} className="whitespace-nowrap">
-              <span className="sm:hidden">Reset</span>
-              <span className="hidden sm:inline">Reset All</span>
-            </Button>
           )}
         </div>
       </div>
 
       {!collapsed && (
         <div className="overflow-auto flex-1 px-3 py-2">
-          <div className="space-y-2">
+          <div className="grid grid-cols-1 gap-2">
             {filters.length === 0 ? (
               <div className="flex items-center justify-center h-32">
                 <p className="text-sm text-gray-500">
@@ -93,19 +108,32 @@ export function FilterPanel({
             ) : (
               visibleFilters.map((filter) => (
                 <div key={filter.id} className="border border-gray-200 rounded-md p-2 bg-gray-50">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-2">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
                         checked={filter.active}
                         onChange={(e) => onFilterChange(filter.id, { active: e.target.checked })}
                       />
-                      <span className="font-medium">{filter.displayName}</span>
-                      <span className="text-xs text-gray-500">({filter.type})</span>
+                      <span
+                        className="font-medium text-sm text-gray-500 truncate"
+                        title={filter.displayName}
+                      >
+                        {filter.displayName}
+                      </span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-600 border border-gray-200 uppercase">
+                        {filter.type}
+                      </span>
                     </div>
-                    <div className="space-x-2">
-                      <Button variant="ghost" size="sm" onClick={() => onFilterReset(filter.id)}>
-                        Reset
+                    <div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onFilterReset(filter.id)}
+                        aria-label="Reset filter"
+                        title="Reset filter"
+                      >
+                        <ArrowPathIcon className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>

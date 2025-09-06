@@ -104,7 +104,13 @@ export function ChartControls({
 
       {/* Clear All Button */}
       {onClearCharts && (
-        <Button variant="outline" size="sm" onClick={onClearCharts} aria-label="Remove all charts">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onClearCharts}
+          aria-label="Remove all charts"
+          className="text-red-600 border-red-300 hover:bg-red-50"
+        >
           <TrashIcon className="w-4 h-4 mr-2" />
           Remove all
         </Button>

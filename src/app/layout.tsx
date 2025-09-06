@@ -11,13 +11,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen bg-gray-50" suppressHydrationWarning>
         <ToastProvider>
           <OpenRouterProvider>
             <div className="min-h-screen bg-gray-50">
               <Header />
-              <main className="w-full max-w-none px-2 py-3 xl:px-4 min-h-screen">{children}</main>
+              <main className="w-full max-w-none px-2 py-3 xl:px-4 min-h-screen text-gray-900">
+                {children}
+              </main>
             </div>
           </OpenRouterProvider>
         </ToastProvider>

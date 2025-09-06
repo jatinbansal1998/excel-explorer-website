@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
+import { ChevronUpIcon, ChevronDownIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { ExcelData, DataType } from '../types/excel'
 import { LoadingSpinner } from './ui/LoadingSpinner'
 import { clsx } from 'clsx'
@@ -177,13 +177,13 @@ export function DataTable({
         style={{ maxHeight: 'calc(100vh - 350px)', minHeight: '400px' }}
       >
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50 sticky top-0">
+          <thead className="bg-gray-50 sticky top-0 z-10">
             <tr>
               {headers.map((header, index) => (
                 <th
                   key={`${header}-${index}`}
                   className={clsx(
-                    'px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
+                    'px-2 py-1.5 text-left text-xs font-bold text-gray-600 uppercase tracking-wider',
                     (onSort || onDeleteColumn) && 'hover:bg-gray-100',
                   )}
                 >
@@ -230,14 +230,15 @@ export function DataTable({
                       )}
                       {onDeleteColumn && (
                         <button
-                          className="text-red-500 hover:text-red-600 text-xs ml-2"
+                          className="text-red-600 hover:text-red-700 ml-2"
                           title="Delete column"
+                          aria-label="Delete column"
                           onClick={(e) => {
                             e.stopPropagation()
                             onDeleteColumn?.(index)
                           }}
                         >
-                          ✕
+                          <TrashIcon className="h-4 w-4" />
                         </button>
                       )}
                     </div>
@@ -259,7 +260,7 @@ export function DataTable({
                   return (
                     <td
                       key={cellIndex}
-                      className="px-2 py-1 whitespace-nowrap text-sm text-gray-900"
+                      className="px-2 py-0.5 whitespace-nowrap text-sm text-gray-900"
                     >
                       <div className="max-w-xs truncate" title={formattedValue}>
                         {formattedValue}

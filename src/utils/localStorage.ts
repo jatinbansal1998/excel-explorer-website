@@ -42,6 +42,7 @@ export class LocalStorageManager {
     SESSION_DATA: 'session-data',
     APP_STATE: 'app-state',
     OPENROUTER_API_KEY_ENC: 'openrouter-api-key-enc',
+    OPENROUTER_NAMED_KEYS: 'openrouter-named-keys',
     OPENROUTER_SETTINGS: 'openrouter-settings',
   }
 
@@ -392,10 +393,55 @@ export class LocalStorageManager {
     this.remove(this.KEYS.OPENROUTER_API_KEY_ENC)
   }
 
+  static hasOpenRouterEncryptedKey(): boolean {
+    return this.getOpenRouterEncryptedKey() != null
+  }
+
+  // Named OpenRouter encrypted keys
+  private static getOpenRouterNamedKeysMap(): Record<string, string> {
+    const map = this.load<Record<string, string>>(this.KEYS.OPENROUTER_NAMED_KEYS)
+    return map || {}
+  }
+
+  private static setOpenRouterNamedKeysMap(map: Record<string, string>): void {
+    this.save(this.KEYS.OPENROUTER_NAMED_KEYS, map)
+  }
+
+  static saveOpenRouterNamedKey(name: string, payloadB64: string): void {
+    const trimmed = name.trim()
+    if (!trimmed) return
+    const map = this.getOpenRouterNamedKeysMap()
+    map[trimmed] = payloadB64
+    this.setOpenRouterNamedKeysMap(map)
+  }
+
+  static getOpenRouterNamedKeyPayload(name: string): string | null {
+    const trimmed = name.trim()
+    if (!trimmed) return null
+    const map = this.getOpenRouterNamedKeysMap()
+    return map[trimmed] ?? null
+  }
+
+  static getOpenRouterNamedKeyNames(): string[] {
+    const map = this.getOpenRouterNamedKeysMap()
+    return Object.keys(map).sort()
+  }
+
+  static removeOpenRouterNamedKey(name: string): void {
+    const trimmed = name.trim()
+    if (!trimmed) return
+    const map = this.getOpenRouterNamedKeysMap()
+    if (Object.prototype.hasOwnProperty.call(map, trimmed)) {
+      delete map[trimmed]
+      this.setOpenRouterNamedKeysMap(map)
+    }
+  }
+
   static saveOpenRouterSettings(settings: {
     selectedModelId?: string
     lastConnectedAt?: string
     analysisEnabled?: boolean
+    lastUsedKeyName?: string
   }): void {
     this.save(this.KEYS.OPENROUTER_SETTINGS, settings)
   }
@@ -404,6 +450,7 @@ export class LocalStorageManager {
     selectedModelId?: string
     lastConnectedAt?: string
     analysisEnabled?: boolean
+    lastUsedKeyName?: string
   } | null {
     return this.load(this.KEYS.OPENROUTER_SETTINGS)
   }

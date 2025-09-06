@@ -40,7 +40,7 @@ export default function HomePage() {
   return (
     <div className="space-y-3 xl:space-y-2 h-full flex flex-col">
       {session.showRestoreBanner && session.lastSessionSummary && (
-        <div className="border border-blue-200 bg-blue-50 text-blue-900 rounded p-3 flex items-center justify-between">
+        <div className="border border-primary-200 bg-primary-50 text-primary-900 rounded p-3 flex items-center justify-between">
           <div className="text-sm">
             <span className="font-medium">Restore last session</span> –{' '}
             {session.lastSessionSummary.fileName} ({session.lastSessionSummary.totalRows} rows ×{' '}
@@ -48,13 +48,13 @@ export default function HomePage() {
           </div>
           <div className="space-x-2">
             <button
-              className="px-3 py-1 text-sm bg-blue-600 text-white rounded"
+              className="px-3 py-1 text-sm bg-primary-600 hover:bg-primary-700 text-white rounded"
               onClick={session.restoreLastSession}
             >
               Restore
             </button>
             <button
-              className="px-3 py-1 text-sm border rounded"
+              className="px-3 py-1 text-sm border border-gray-300 rounded"
               onClick={session.dismissRestoreBanner}
             >
               Dismiss
@@ -115,59 +115,11 @@ export default function HomePage() {
               />
             </>
           )}
-          <div className="flex justify-end">
-            <ManageSessionsButton session={session} />
-          </div>
+          <div className="flex justify-end"></div>
         </div>
       </div>
     </div>
   )
 }
 
-function ManageSessionsButton({ session }: { session: ReturnType<typeof useSessionPersistence> }) {
-  const [open, setOpen] = useState(false)
-  return (
-    <>
-      <button className="px-3 py-2 text-sm border rounded" onClick={() => setOpen(true)}>
-        Manage sessions
-      </button>
-      <SessionManager open={open} onClose={() => setOpen(false)} session={session} />
-    </>
-  )
-}
-
-function SessionManager({
-  open,
-  onClose,
-  session,
-}: {
-  open: boolean
-  onClose: () => void
-  session: ReturnType<typeof useSessionPersistence>
-}) {
-  const [isOpen, setIsOpen] = useState(open)
-  useEffect(() => setIsOpen(open), [open])
-  return (
-    <SessionManagerModal
-      isOpen={isOpen}
-      onClose={() => {
-        setIsOpen(false)
-        onClose()
-      }}
-      sessions={session.sessions}
-      onRestore={async (id) => {
-        await session.restoreSession(id)
-        setIsOpen(false)
-        onClose()
-      }}
-      onDelete={async (id) => {
-        await session.deleteSession(id)
-      }}
-      onClearAll={async () => {
-        await session.clearAll()
-        setIsOpen(false)
-        onClose()
-      }}
-    />
-  )
-}
+// Sessions are now managed from the Header

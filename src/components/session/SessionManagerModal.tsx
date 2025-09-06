@@ -160,7 +160,7 @@ export function SessionManagerModal({
               Cancel
             </button>
             <button
-              className="px-3 py-2 text-sm bg-blue-600 text-white rounded disabled:opacity-60"
+              className="px-3 py-2 text-sm bg-primary-600 text-white rounded disabled:opacity-60"
               disabled={!selected}
               onClick={() => selected && onRestore(selected)}
             >

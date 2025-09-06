@@ -1,17 +1,25 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-html, body {
+@import 'tailwindcss';
+
+/* Dark mode temporarily disabled */
+
+html,
+body {
   height: 100%;
 }
 
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
 }
 
 /* Custom scrollbar styles */
@@ -26,7 +34,7 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -40,18 +48,22 @@ body {
 
 /* Animation utilities */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { 
-    opacity: 0; 
-    transform: translateY(10px); 
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -69,7 +81,34 @@ body {
 }
 
 .data-header {
-  @apply px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50 border-b border-gray-200;
+  @apply px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-100 border-b border-gray-200;
+}
+
+@theme {
+  /* Map primary to Tailwind teal scale */
+  --color-primary-50: #f0fdfa;
+  --color-primary-200: #99f6e4;
+  --color-primary-300: #5eead4;
+  --color-primary-500: #14b8a6;
+  --color-primary-600: #0d9488;
+  --color-primary-700: #0f766e;
+  --color-primary-900: #134e4a;
+
+  /* Map gray tokens (v4) to our zinc-like palette */
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f4f4f5;
+  --color-gray-200: #e4e4e7;
+  --color-gray-300: #d4d4d8;
+  --color-gray-400: #a1a1aa;
+  --color-gray-500: #71717a;
+  --color-gray-600: #52525b;
+  --color-gray-700: #3f3f46;
+  --color-gray-800: #27272a;
+  --color-gray-900: #18181b;
+
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
 }
 
 /* Loading states */
@@ -95,4 +134,11 @@ body {
 
 .drag-reject {
   @apply border-red-300 bg-red-50;
+}
+
+/* Global textarea baseline padding and border */
+textarea {
+  padding: 0.5rem 0.75rem; /* py-2 px-3 */
+  border: 1px solid #d1d5db; /* gray-300 */
+  border-radius: 0.375rem; /* rounded-md */
 }

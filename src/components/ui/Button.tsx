@@ -1,10 +1,10 @@
-import React from 'react';
-import { clsx } from 'clsx';
+import React from 'react'
+import { clsx } from 'clsx'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
-  isLoading?: boolean;
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost'
+  size?: 'sm' | 'md' | 'lg' | 'icon'
+  isLoading?: boolean
 }
 
 export function Button({
@@ -16,29 +16,26 @@ export function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const baseStyles = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50';
-  
+  const baseStyles =
+    'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
+
   const variants = {
     primary: 'bg-primary-600 text-white hover:bg-primary-700',
     secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300',
     outline: 'border border-gray-300 bg-transparent text-gray-700 hover:bg-gray-50',
     ghost: 'text-gray-700 hover:bg-gray-100',
-  };
-  
+  } as const
+
   const sizes = {
     sm: 'h-8 px-3 text-sm',
     md: 'h-10 px-4 py-2',
     lg: 'h-12 px-8 text-lg',
-  };
+    icon: 'h-8 w-8 p-0',
+  } as const
 
   return (
     <button
-      className={clsx(
-        baseStyles,
-        variants[variant],
-        sizes[size],
-        className
-      )}
+      className={clsx(baseStyles, variants[variant], sizes[size], className)}
       disabled={disabled || isLoading}
       {...props}
     >
@@ -66,5 +63,5 @@ export function Button({
       )}
       {children}
     </button>
-  );
+  )
 }

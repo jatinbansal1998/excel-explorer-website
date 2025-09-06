@@ -1,7 +1,6 @@
 'use client'
 
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { PassphraseModal } from '../components/openrouter/PassphraseModal'
+import React, { createContext, useCallback, useContext, useRef, useState } from 'react'
 import {
   OpenRouterChatRequest,
   OpenRouterChatResponse,
@@ -21,6 +20,8 @@ export interface OpenRouterState {
   filter: 'all' | 'free' | 'paid'
   error: string | null
   selectedModelId?: string
+  namedKeyNames?: string[]
+  lastUsedKeyName?: string
 }
 
 export interface OpenRouterContextValue {
@@ -28,8 +29,10 @@ export interface OpenRouterContextValue {
   setSearchQuery: (q: string) => void
   setFilter: (f: 'all' | 'free' | 'paid') => void
   connectWithPlainKey: (key: string) => Promise<boolean>
-  saveEncryptedKey: (key: string, passphrase: string) => Promise<void>
-  loadEncryptedKey: (passphrase: string) => Promise<string | null>
+  saveEncryptedKeyNamed: (key: string, passphrase: string, name: string) => Promise<void>
+  loadEncryptedKeyByName: (name: string, passphrase: string) => Promise<string | null>
+  refreshNamedKeyNames: () => void
+  deleteNamedKey: (name: string) => void
   disconnect: () => void
   refreshModels: () => Promise<void>
   selectModel: (modelId: string) => void
@@ -61,6 +64,8 @@ export function OpenRouterProvider({ children }: { children: React.ReactNode }) 
     filter: 'all',
     error: null,
     selectedModelId: LocalStorageManager.getOpenRouterSettings()?.selectedModelId,
+    namedKeyNames: LocalStorageManager.getOpenRouterNamedKeyNames(),
+    lastUsedKeyName: LocalStorageManager.getOpenRouterSettings()?.lastUsedKeyName,
   })
   const hasAttemptedAutoLoadRef = useRef<boolean>(false)
 
@@ -114,17 +119,29 @@ export function OpenRouterProvider({ children }: { children: React.ReactNode }) 
       try {
         setApiKey(key)
         const models = await serviceRef.current.listModels(key)
-        setState((prev) => ({
-          ...prev,
-          isConnected: true,
-          models,
-          filteredModels: applyFilter(models, prev.searchQuery, prev.filter),
-          error: null,
-        }))
+        let selectedId: string | undefined = undefined
+        setState((prev) => {
+          const prevSelected = prev.selectedModelId
+          if (prevSelected && models.some((m) => m.id === prevSelected)) {
+            selectedId = prevSelected
+          } else {
+            const free = models.find((m) => isModelFree(m))
+            selectedId = free?.id || models[0]?.id
+          }
+          return {
+            ...prev,
+            isConnected: true,
+            models,
+            filteredModels: applyFilter(models, prev.searchQuery, prev.filter),
+            selectedModelId: selectedId,
+            error: null,
+          }
+        })
         const settings = LocalStorageManager.getOpenRouterSettings() || {}
         LocalStorageManager.saveOpenRouterSettings({
           ...settings,
           lastConnectedAt: new Date().toISOString(),
+          selectedModelId: selectedId || settings.selectedModelId,
         })
         return true
       } catch (e: any) {
@@ -139,26 +156,63 @@ export function OpenRouterProvider({ children }: { children: React.ReactNode }) 
     [applyFilter],
   )
 
-  const saveEncryptedKey = useCallback(async (key: string, passphrase: string) => {
-    const payload = await encryptString(key, passphrase)
-    LocalStorageManager.saveOpenRouterEncryptedKey(payload)
-    passphraseRef.current = passphrase
-    setApiKey(key)
+  // No unnamed key support; saving/loading requires a name
+
+  const refreshNamedKeyNames = useCallback(() => {
+    const names = LocalStorageManager.getOpenRouterNamedKeyNames()
+    setState((prev) => ({ ...prev, namedKeyNames: names }))
   }, [])
 
-  const loadEncryptedKey = useCallback(async (passphrase: string): Promise<string | null> => {
-    const payload = LocalStorageManager.getOpenRouterEncryptedKey()
-    if (!payload) return null
-    try {
-      const key = await decryptString(payload, passphrase)
+  const saveEncryptedKeyNamed = useCallback(
+    async (key: string, passphrase: string, name: string) => {
+      const payload = await encryptString(key, passphrase)
+      LocalStorageManager.saveOpenRouterNamedKey(name, payload)
       passphraseRef.current = passphrase
       setApiKey(key)
-      return key
-    } catch (e) {
-      setState((prev) => ({ ...prev, error: 'Failed to decrypt API key' }))
-      return null
-    }
-  }, [])
+      refreshNamedKeyNames()
+    },
+    [refreshNamedKeyNames],
+  )
+
+  const loadEncryptedKeyByName = useCallback(
+    async (name: string, passphrase: string): Promise<string | null> => {
+      const payload = LocalStorageManager.getOpenRouterNamedKeyPayload(name)
+      if (!payload) {
+        setState((prev) => ({ ...prev, error: `Saved key not found: ${name}` }))
+        return null
+      }
+      try {
+        const key = await decryptString(payload, passphrase)
+        passphraseRef.current = passphrase
+        setApiKey(key)
+        const settings = LocalStorageManager.getOpenRouterSettings() || {}
+        LocalStorageManager.saveOpenRouterSettings({
+          ...settings,
+          lastUsedKeyName: name,
+        })
+        setState((prev) => ({ ...prev, lastUsedKeyName: name }))
+        return key
+      } catch (e) {
+        setState((prev) => ({ ...prev, error: 'Failed to decrypt API key' }))
+        return null
+      }
+    },
+    [],
+  )
+
+  const deleteNamedKey = useCallback(
+    (name: string) => {
+      const trimmed = (name || '').trim()
+      if (trimmed.length === 0) return
+      LocalStorageManager.removeOpenRouterNamedKey(trimmed)
+      refreshNamedKeyNames()
+      const settings = LocalStorageManager.getOpenRouterSettings() || {}
+      if (settings.lastUsedKeyName === trimmed) {
+        LocalStorageManager.saveOpenRouterSettings({ ...settings, lastUsedKeyName: undefined })
+      }
+    },
+    [refreshNamedKeyNames],
+  )
 
   const disconnect = useCallback(() => {
     setApiKey(null)
@@ -169,12 +223,28 @@ export function OpenRouterProvider({ children }: { children: React.ReactNode }) 
   const refreshModels = useCallback(async () => {
     try {
       const models = await serviceRef.current.listModels(apiKey || undefined)
-      setState((prev) => ({
-        ...prev,
-        models,
-        filteredModels: applyFilter(models, prev.searchQuery, prev.filter),
-        error: null,
-      }))
+      let selectedId: string | undefined = undefined
+      setState((prev) => {
+        const prevSelected = prev.selectedModelId
+        if (prevSelected && models.some((m) => m.id === prevSelected)) {
+          selectedId = prevSelected
+        } else {
+          const free = models.find((m) => isModelFree(m))
+          selectedId = free?.id || models[0]?.id
+        }
+        return {
+          ...prev,
+          models,
+          filteredModels: applyFilter(models, prev.searchQuery, prev.filter),
+          selectedModelId: selectedId,
+          error: null,
+        }
+      })
+      const settings = LocalStorageManager.getOpenRouterSettings() || {}
+      LocalStorageManager.saveOpenRouterSettings({
+        ...settings,
+        selectedModelId: selectedId || settings.selectedModelId,
+      })
     } catch (e: any) {
       setState((prev) => ({
         ...prev,
@@ -202,71 +272,17 @@ export function OpenRouterProvider({ children }: { children: React.ReactNode }) 
     setSearchQuery,
     setFilter,
     connectWithPlainKey,
-    saveEncryptedKey,
-    loadEncryptedKey,
+    saveEncryptedKeyNamed,
+    loadEncryptedKeyByName,
+    refreshNamedKeyNames,
+    deleteNamedKey: (name: string) => deleteNamedKey(name),
     disconnect,
     refreshModels,
     selectModel,
     sendChat,
   }
 
-  // On first mount in browser: if an encrypted API key exists but we're not connected,
-  // prompt the user for a passphrase to decrypt and connect automatically.
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    if (hasAttemptedAutoLoadRef.current) return
-    hasAttemptedAutoLoadRef.current = true
-    if (apiKey || state.isConnected) return
-
-    const enc = LocalStorageManager.getOpenRouterEncryptedKey()
-    if (!enc) return
-
-    setPassphraseModalOpen(true)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const handleSubmitPassphrase = useCallback(
-    async (p: string) => {
-      setBusy(true)
-      setPassphraseError(null)
-      try {
-        const key = await loadEncryptedKey(p)
-        if (!key) {
-          setPassphraseError('Failed to decrypt API key')
-          return
-        }
-        const ok = await connectWithPlainKey(key)
-        if (!ok) {
-          setPassphraseError('Failed to connect with decrypted key')
-          return
-        }
-        await refreshModels()
-        setPassphraseModalOpen(false)
-      } finally {
-        setBusy(false)
-      }
-    },
-    [connectWithPlainKey, loadEncryptedKey, refreshModels],
-  )
-
-  return React.createElement(
-    OpenRouterContext.Provider,
-    { value },
-    React.createElement(
-      React.Fragment,
-      null,
-      children as any,
-      passphraseModalOpen
-        ? React.createElement(PassphraseModal, {
-            isOpen: passphraseModalOpen,
-            onSubmit: handleSubmitPassphrase,
-            onClose: () => setPassphraseModalOpen(false),
-            error: passphraseError,
-            busy,
-          })
-        : null,
-    ),
-  )
+  return React.createElement(OpenRouterContext.Provider, { value }, children as any)
 }
 
 export function useOpenRouter(): OpenRouterContextValue {

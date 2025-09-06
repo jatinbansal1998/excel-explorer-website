@@ -34,9 +34,9 @@ export function ModelList({ models, selectedModelId, onSelect }: Props) {
   const rows = useMemo(() => models, [models])
 
   return (
-    <div className="border rounded-md overflow-auto max-h-80">
+    <div className="border border-gray-200 rounded-md overflow-auto max-h-80">
       <div className="min-w-[1280px]">
-        <div className="grid grid-cols-[320px_160px_140px_140px_160px_140px_420px] px-3 py-2 text-xs font-medium text-gray-600 bg-gray-50">
+        <div className="grid grid-cols-[320px_160px_140px_140px_160px_140px_420px] px-3 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 sticky top-0 z-10 uppercase tracking-wider border-b border-gray-200">
           <div>Name</div>
           <div>Provider</div>
           <div>Context Length</div>
@@ -45,7 +45,7 @@ export function ModelList({ models, selectedModelId, onSelect }: Props) {
           <div>Request</div>
           <div>ID</div>
         </div>
-        <ul role="list" className="divide-y">
+        <ul role="list" className="divide-y divide-gray-200">
           {rows.map((m) => {
             const provider = m.id.includes('/') ? m.id.split('/')[0] : '—'
             const selected = selectedModelId === m.id

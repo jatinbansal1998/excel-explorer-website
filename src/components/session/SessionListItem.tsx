@@ -15,7 +15,7 @@ export function SessionListItem({ session, isActive, onSelect, onDelete }: Sessi
   return (
     <div
       className={`flex items-center justify-between px-3 py-2 rounded cursor-pointer border ${
-        isActive ? 'bg-blue-50 border-blue-300' : 'bg-white border-gray-200'
+        isActive ? 'bg-primary-50 border-primary-300' : 'bg-white border-gray-200'
       }`}
       onClick={() => onSelect(session.id)}
       role="button"

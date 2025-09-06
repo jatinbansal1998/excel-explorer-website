@@ -58,7 +58,7 @@ export function DataAnalysisPanel({ datasetContext }: Props) {
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="Ask for insights, suggestions, or chart explanations..."
-          className="w-full h-24 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+          className="w-full h-24 rounded-md border border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-3 py-2"
         />
         <div className="flex justify-between items-center">
           <div className="text-xs text-gray-500">

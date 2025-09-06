@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { Button } from '../ui/Button'
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 
 interface PassphraseModalProps {
   isOpen: boolean
@@ -14,6 +15,7 @@ interface PassphraseModalProps {
 
 export function PassphraseModal({ isOpen, onSubmit, onClose, error, busy }: PassphraseModalProps) {
   const [passphrase, setPassphrase] = useState('')
+  const [showPassphrase, setShowPassphrase] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,14 +32,27 @@ export function PassphraseModal({ isOpen, onSubmit, onClose, error, busy }: Pass
         </p>
         <label className="block">
           <span className="text-sm text-gray-700">Passphrase</span>
-          <input
-            type="password"
-            value={passphrase}
-            onChange={(e) => setPassphrase(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
-            placeholder="Enter passphrase"
-            autoComplete="current-password"
-          />
+          <div className="relative">
+            <input
+              type={showPassphrase ? 'text' : 'password'}
+              value={passphrase}
+              onChange={(e) => setPassphrase(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm pr-10"
+              placeholder="Enter passphrase"
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassphrase(!showPassphrase)}
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+            >
+              {showPassphrase ? (
+                <EyeSlashIcon className="h-4 w-4" />
+              ) : (
+                <EyeIcon className="h-4 w-4" />
+              )}
+            </button>
+          </div>
         </label>
         {error && <div className="text-sm text-red-600">{error}</div>}
         <div className="flex justify-end gap-2">

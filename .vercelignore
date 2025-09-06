@@ -1,0 +1,4 @@
+# Exclude local test assets from Vercel CLI uploads
+test_sheets/
+
+

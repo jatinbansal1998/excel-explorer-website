@@ -7,7 +7,15 @@ import {
   ValidationResult,
   ParseOptions,
 } from '../types/excel'
-import { coerceToType, detectTypeForValues, isNullLike } from '../utils/dataTypes'
+import {
+  isNullLike,
+  isBooleanLike,
+  isNumberLike,
+  isDateLike,
+  coerceBoolean,
+  coerceNumber,
+  parseDateFlexible,
+} from '../utils/dataTypes'
 import { validateFile } from '../utils/fileValidation'
 
 export class ExcelParser {
@@ -59,8 +67,14 @@ export class ExcelParser {
 
     progress?.({ stage: 'parsing_workbook', message: 'Parsing workbook' })
     const workbook = isCsv
-      ? XLSX.read(content as string, { type: 'string' })
-      : XLSX.read(content as ArrayBuffer, { type: 'array' })
+      ? XLSX.read(content as string, { type: 'string', dense: true })
+      : XLSX.read(content as ArrayBuffer, {
+          type: 'array',
+          dense: true,
+          cellDates: true,
+          cellNF: false,
+          cellText: false,
+        })
     const data = this.parseWorkbook(workbook, options.sheetName, options)
     // Fill file metadata details
     data.metadata.fileName = file.name
@@ -95,7 +109,12 @@ export class ExcelParser {
 
     const sheet = workbook.Sheets[activeSheet]
     const utils: any = this.getXLSXUtils()
-    const aoa: any[][] = utils.sheet_to_json(sheet, { header: 1, raw: true, defval: null })
+    const aoa: any[][] = utils.sheet_to_json(sheet, {
+      header: 1,
+      raw: true,
+      defval: null,
+      blankrows: false,
+    })
 
     const firstRow = (aoa[0] || []) as any[]
     options.progress?.({
@@ -177,25 +196,107 @@ export class ExcelParser {
     const trackingCap = options.uniqueValuesTrackingCap ?? 2000
     const returnLimit = options.uniqueValuesReturnLimit ?? 50
     const sampleCount = options.sampleValuesCount ?? 5
-    for (let c = 0; c < colCount; c++) {
-      const colValues = rows.map((r) => r?.[c])
-      const type: DataType = detectTypeForValues(colValues)
-      const coerced = colValues.map((v) => coerceToType(v, type))
+    const sampleRows = Math.min(rows.length, 1000)
 
+    // Helper to choose type from sample counts
+    const chooseType = (num: number, bool: number, date: number, str: number): DataType => {
+      const total = num + bool + date + str
+      if (total === 0) return 'string'
+      const entries: Array<[DataType, number]> = [
+        ['number', num],
+        ['boolean', bool],
+        ['date', date],
+        ['string', str],
+      ]
+      const nonZero = entries.filter(([, c]) => c > 0)
+      if (nonZero.length === 1) return nonZero[0][0]
+      const dominant = nonZero.reduce((a, b) => (a[1] > b[1] ? a : b))
+      return dominant[1] / total >= 0.8 ? dominant[0] : 'mixed'
+    }
+
+    for (let c = 0; c < colCount; c++) {
+      // 1) Detect type from a bounded sample
+      let num = 0,
+        bool = 0,
+        date = 0,
+        str = 0
+      for (let r = 0; r < sampleRows; r++) {
+        const v = rows[r]?.[c]
+        if (isNullLike(v)) continue
+        if (isBooleanLike(v)) bool++
+        else if (isDateLike(v)) date++
+        else if (isNumberLike(v)) num++
+        else str++
+      }
+      const type: DataType = chooseType(num, bool, date, str)
+
+      // 2) Single pass over all rows to collect metadata cheaply
       const uniqueSet = new Set<any>()
       let nullCount = 0
       const sampleValues: any[] = []
-      for (let i = 0; i < coerced.length; i++) {
-        const v = coerced[i]
-        if (isNullLike(v)) {
+
+      // Lightweight stats
+      let minNumber: number | undefined = undefined
+      let maxNumber: number | undefined = undefined
+      let sumNumber = 0
+      let countNumber = 0
+
+      let minDateMs: number | undefined = undefined
+      let maxDateMs: number | undefined = undefined
+
+      for (let r = 0; r < rows.length; r++) {
+        const raw = rows[r]?.[c]
+        if (isNullLike(raw)) {
           nullCount++
-        } else {
-          if (uniqueSet.size < trackingCap) uniqueSet.add(this.keyForUnique(v)) // cap memory
-          if (sampleValues.length < sampleCount) sampleValues.push(v)
+          continue
+        }
+
+        let v: any = raw
+        if (type === 'boolean') v = coerceBoolean(raw)
+        else if (type === 'number') v = coerceNumber(raw)
+        else if (type === 'date') v = parseDateFlexible(raw)
+        else v = typeof raw === 'string' ? raw : String(raw)
+
+        if (v == null) {
+          nullCount++
+          continue
+        }
+
+        if (uniqueSet.size < trackingCap) uniqueSet.add(this.keyForUnique(v))
+        if (sampleValues.length < sampleCount) sampleValues.push(v)
+
+        if (type === 'number' && typeof v === 'number' && Number.isFinite(v)) {
+          if (minNumber === undefined || v < minNumber) minNumber = v
+          if (maxNumber === undefined || v > maxNumber) maxNumber = v
+          sumNumber += v
+          countNumber++
+        } else if (type === 'date' && v instanceof Date && !isNaN(v.getTime())) {
+          const ms = v.getTime()
+          if (minDateMs === undefined || ms < minDateMs) minDateMs = ms
+          if (maxDateMs === undefined || ms > maxDateMs) maxDateMs = ms
         }
       }
 
-      const uniqueValues = Array.from(uniqueSet).slice(0, returnLimit) // limit returned
+      const uniqueValues = Array.from(uniqueSet).slice(0, returnLimit)
+
+      let statistics: ColumnStatistics | undefined = undefined
+      // Only compute lightweight stats by default; heavier ones must be opted-in
+      const shouldCompute = options.computeStatistics === true
+      if (type === 'number') {
+        const stats: ColumnStatistics = {}
+        if (minNumber !== undefined) stats.min = minNumber
+        if (maxNumber !== undefined) stats.max = maxNumber
+        if (shouldCompute && countNumber > 0) {
+          stats.average = sumNumber / countNumber
+        }
+        statistics = stats
+      } else if (type === 'date') {
+        const stats: ColumnStatistics = {}
+        if (minDateMs !== undefined) stats.min = new Date(minDateMs)
+        if (maxDateMs !== undefined) stats.max = new Date(maxDateMs)
+        statistics = stats
+      }
+
       const info: ColumnInfo = {
         name: headers[c],
         index: c,
@@ -205,8 +306,7 @@ export class ExcelParser {
         hasNulls: nullCount > 0,
         nullCount,
         sampleValues,
-        statistics:
-          options.computeStatistics === false ? undefined : this.calculateStatistics(coerced, type),
+        statistics,
       }
       columns.push(info)
     }

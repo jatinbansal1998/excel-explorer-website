@@ -1,4 +1,5 @@
 import { ExcelData } from '../types/excel'
+import { parseDateFlexible } from '../utils/dataTypes'
 import {
   FilterConfig,
   FilterValue,
@@ -110,7 +111,8 @@ export class DataFilter {
     range: DateRangeFilter,
     operator: FilterConfig['operator'],
   ): boolean {
-    const date = value instanceof Date ? value : new Date(value)
+    const parsed = value instanceof Date ? value : parseDateFlexible(value)
+    const date = parsed instanceof Date && !isNaN(parsed.getTime()) ? parsed : new Date(NaN)
     if (isNaN(date.getTime())) return false
     const inRange = date >= range.currentStart && date <= range.currentEnd
     if (operator === 'not_between') return !inRange

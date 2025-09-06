@@ -3,6 +3,7 @@ import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
 import { ExcelData, DataType } from '../types/excel'
 import { LoadingSpinner } from './ui/LoadingSpinner'
 import { clsx } from 'clsx'
+import { parseDateFlexible } from '../utils/dataTypes'
 
 interface DataTableProps {
   data: ExcelData | null
@@ -16,19 +17,38 @@ interface DataTableProps {
   onToggleDataTypes?: (show: boolean) => void
 }
 
-function formatCellValue(value: any, type: DataType): string {
+function formatCellValue(value: any, type: DataType, showTime: boolean): string {
   if (value === null || value === undefined || value === '') {
     return ''
   }
 
   switch (type) {
     case 'date':
-      if (value instanceof Date) {
-        return value.toLocaleDateString()
+      // Parse using flexible parser (handles Excel serials, strings, Date)
+      const d = parseDateFlexible(value)
+      if (!d) return String(value)
+      // Heuristic: if time is essentially midnight (within threshold) show only date
+      const secondsSinceMidnight = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds()
+      const secondsUntilMidnight = 24 * 3600 - secondsSinceMidnight
+      const nearMidnightThreshold = 30 * 60 // 30 minutes
+      const isNearMidnight =
+        secondsSinceMidnight <= nearMidnightThreshold ||
+        secondsUntilMidnight <= nearMidnightThreshold
+      if (!showTime || isNearMidnight) {
+        return d.toLocaleDateString(undefined, {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        })
       }
-      // Try to parse as date if it's a string or number
-      const date = new Date(value)
-      return isNaN(date.getTime()) ? String(value) : date.toLocaleDateString()
+      return d.toLocaleString(undefined, {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      })
 
     case 'number':
       const num = Number(value)
@@ -59,6 +79,26 @@ export function DataTable({
   const columnTypes = useMemo(() => {
     if (!data?.metadata?.columns) return []
     return data.metadata.columns.map((col) => col.type)
+  }, [data?.metadata?.columns])
+
+  const dateColumnHasTime = useMemo(() => {
+    if (!data?.metadata?.columns) return [] as boolean[]
+    return data.metadata.columns.map((col) => {
+      if (col.type !== 'date') return false
+      const samples = (col.sampleValues || []) as any[]
+      const nearMidnightThreshold = 30 * 60 // 30 minutes
+      for (let i = 0; i < samples.length; i++) {
+        const d = parseDateFlexible(samples[i])
+        if (!d) continue
+        const secondsSinceMidnight = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds()
+        const secondsUntilMidnight = 24 * 3600 - secondsSinceMidnight
+        const isNearMidnight =
+          secondsSinceMidnight <= nearMidnightThreshold ||
+          secondsUntilMidnight <= nearMidnightThreshold
+        if (!isNearMidnight) return true // significant time present in samples
+      }
+      return false // all samples near midnight → treat as date-only
+    })
   }, [data?.metadata?.columns])
 
   if (isLoading) {
@@ -211,7 +251,11 @@ export function DataTable({
               <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                 {row.map((cell, cellIndex) => {
                   const cellType = columnTypes[cellIndex] || 'string'
-                  const formattedValue = formatCellValue(cell, cellType)
+                  const formattedValue = formatCellValue(
+                    cell,
+                    cellType,
+                    cellType === 'date' ? dateColumnHasTime[cellIndex] === true : false,
+                  )
                   return (
                     <td
                       key={cellIndex}

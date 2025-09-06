@@ -4,12 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { ChartSuggestion, ChartType } from '../../types/chart'
 import { ColumnInfo, ExcelData } from '../../types/excel'
 import { Button } from '../ui/Button'
-import {
-  InformationCircleIcon,
-  TrashIcon,
-  ChevronDownIcon,
-  PlusIcon,
-} from '@heroicons/react/24/outline'
+import { TrashIcon, ChevronDownIcon, PlusIcon } from '@heroicons/react/24/outline'
 import { ChartCreationModal } from './ChartCreationModal'
 
 interface ChartControlsProps {
@@ -114,16 +109,6 @@ export function ChartControls({
           Remove all
         </Button>
       )}
-
-      {/* Info */}
-      <div className="flex items-center text-sm text-gray-500">
-        <InformationCircleIcon className="w-4 h-4 mr-1" />
-        <span title="Suggestions are automatically generated chart ideas based on your columns and filtered data.">
-          {suggestions.length > 0
-            ? `${suggestions.length} suggestions available`
-            : 'No suggestions available'}
-        </span>
-      </div>
 
       {/* Chart Creation Modal */}
       <ChartCreationModal

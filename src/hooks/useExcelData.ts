@@ -20,6 +20,11 @@ export function useExcelData() {
       try {
         const data = await parser.parseFile(file, {
           ...options,
+          // Default to lightweight metadata for responsiveness; caller can override
+          computeStatistics: options.computeStatistics ?? false,
+          uniqueValuesTrackingCap: options.uniqueValuesTrackingCap ?? 2000,
+          uniqueValuesReturnLimit: options.uniqueValuesReturnLimit ?? 50,
+          sampleValuesCount: options.sampleValuesCount ?? 5,
           progress: (ev) => {
             setProgress(ev)
             options.progress?.(ev)

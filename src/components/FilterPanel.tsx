@@ -31,59 +31,97 @@ export function FilterPanel({
   columnInfo,
   filteredData,
 }: FilterPanelProps) {
+  const [filterListQuery, setFilterListQuery] = useState('')
+  const [collapsed, setCollapsed] = useState(false)
+  const normalizedQuery = filterListQuery.trim().toLowerCase()
+  const visibleFilters = useMemo(() => {
+    if (!normalizedQuery) return filters
+    return filters.filter((f) => {
+      const name = (f.displayName || '').toString().toLowerCase()
+      const col = (f.column || '').toString().toLowerCase()
+      const type = (f.type || '').toString().toLowerCase()
+      return (
+        name.includes(normalizedQuery) ||
+        col.includes(normalizedQuery) ||
+        type.includes(normalizedQuery)
+      )
+    })
+  }, [filters, normalizedQuery])
   return (
     <div
       className="bg-white rounded-lg border border-gray-200 overflow-hidden flex flex-col"
-      style={{ height: 'calc(100vh - 200px)', minHeight: '500px' }}
+      style={collapsed ? undefined : { height: 'calc(100vh - 200px)', minHeight: '500px' }}
     >
       <div className="px-3 py-2 border-b border-gray-200 bg-gray-50">
-        <div className="flex justify-between items-center">
-          <h3 className="font-semibold">Filters</h3>
-          <Button variant="outline" size="sm" onClick={onResetAll}>
-            Reset All
+        <div className="flex flex-wrap items-center gap-2">
+          <h3 className="font-semibold mr-auto">Filters</h3>
+          {!collapsed && (
+            <input
+              type="text"
+              className="border rounded px-2 py-1 text-sm w-full sm:w-64"
+              placeholder="Search filters..."
+              value={filterListQuery}
+              onChange={(e) => setFilterListQuery(e.target.value)}
+            />
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCollapsed((v) => !v)}
+            className="whitespace-nowrap"
+          >
+            {collapsed ? 'Expand' : 'Collapse'}
           </Button>
-        </div>
-      </div>
-
-      <div className="overflow-auto flex-1 px-3 py-2">
-        <div className="space-y-2">
-          {filters.length === 0 ? (
-            <div className="flex items-center justify-center h-32">
-              <p className="text-sm text-gray-500">
-                No filters available. Upload data to create filters.
-              </p>
-            </div>
-          ) : (
-            filters.map((filter) => (
-              <div key={filter.id} className="border border-gray-200 rounded-md p-2 bg-gray-50">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={filter.active}
-                      onChange={(e) => onFilterChange(filter.id, { active: e.target.checked })}
-                    />
-                    <span className="font-medium">{filter.displayName}</span>
-                    <span className="text-xs text-gray-500">({filter.type})</span>
-                  </div>
-                  <div className="space-x-2">
-                    <Button variant="ghost" size="sm" onClick={() => onFilterReset(filter.id)}>
-                      Reset
-                    </Button>
-                  </div>
-                </div>
-
-                <FilterComponent
-                  filter={filter}
-                  onChange={(updates) => onFilterChange(filter.id, updates)}
-                  columnInfo={columnInfo}
-                  filteredData={filteredData}
-                />
-              </div>
-            ))
+          {!collapsed && (
+            <Button variant="outline" size="sm" onClick={onResetAll} className="whitespace-nowrap">
+              <span className="sm:hidden">Reset</span>
+              <span className="hidden sm:inline">Reset All</span>
+            </Button>
           )}
         </div>
       </div>
+
+      {!collapsed && (
+        <div className="overflow-auto flex-1 px-3 py-2">
+          <div className="space-y-2">
+            {filters.length === 0 ? (
+              <div className="flex items-center justify-center h-32">
+                <p className="text-sm text-gray-500">
+                  No filters available. Upload data to create filters.
+                </p>
+              </div>
+            ) : (
+              visibleFilters.map((filter) => (
+                <div key={filter.id} className="border border-gray-200 rounded-md p-2 bg-gray-50">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={filter.active}
+                        onChange={(e) => onFilterChange(filter.id, { active: e.target.checked })}
+                      />
+                      <span className="font-medium">{filter.displayName}</span>
+                      <span className="text-xs text-gray-500">({filter.type})</span>
+                    </div>
+                    <div className="space-x-2">
+                      <Button variant="ghost" size="sm" onClick={() => onFilterReset(filter.id)}>
+                        Reset
+                      </Button>
+                    </div>
+                  </div>
+
+                  <FilterComponent
+                    filter={filter}
+                    onChange={(updates) => onFilterChange(filter.id, updates)}
+                    columnInfo={columnInfo}
+                    filteredData={filteredData}
+                  />
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -132,24 +170,41 @@ function SelectFilterView({
   onChange: (updates: Partial<FilterConfig>) => void
 }) {
   const values = filter.values as FilterValue[]
+  const [query, setQuery] = useState('')
+  const normalized = query.trim().toLowerCase()
+  const filteredValues = useMemo(() => {
+    if (!normalized) return values
+    return values.filter((v) => String(v.value).toLowerCase().includes(normalized))
+  }, [values, normalized])
   const toggle = (idx: number) => {
     const next = values.map((v, i) => (i === idx ? { ...v, selected: !v.selected } : v))
     onChange({ values: next, active: true })
   }
   return (
-    <div className="max-h-40 overflow-auto space-y-1">
-      {values.length === 0 && <div className="text-sm text-gray-500">No options available</div>}
-      {values.map((v, i) => (
-        <label key={i} className="flex items-center space-x-2 text-sm">
-          <input type="checkbox" checked={!!v.selected} onChange={() => toggle(i)} />
-          <span className="truncate" title={String(v.value)}>
-            {String(v.value)}
-          </span>
-          {typeof v.count === 'number' && (
-            <span className="text-xs text-gray-400">({v.count})</span>
-          )}
-        </label>
-      ))}
+    <div className="space-y-2">
+      <input
+        type="text"
+        className="border rounded px-2 py-1 w-full text-sm"
+        placeholder="Search options..."
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+      <div className="max-h-40 overflow-auto space-y-1">
+        {filteredValues.length === 0 && (
+          <div className="text-sm text-gray-500">No options match your search</div>
+        )}
+        {filteredValues.map((v, i) => (
+          <label key={`${String(v.value)}-${i}`} className="flex items-center space-x-2 text-sm">
+            <input type="checkbox" checked={!!v.selected} onChange={() => toggle(i)} />
+            <span className="truncate" title={String(v.value)}>
+              {String(v.value)}
+            </span>
+            {typeof v.count === 'number' && (
+              <span className="text-xs text-gray-400">({v.count})</span>
+            )}
+          </label>
+        ))}
+      </div>
     </div>
   )
 }

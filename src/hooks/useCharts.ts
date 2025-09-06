@@ -11,11 +11,24 @@ import {
 import { ColumnInfo } from '../types/excel'
 import { chartSuggestionEngine } from '../services/chartSuggestion'
 import { v4 as uuidv4 } from 'uuid'
+import { useSessionPersistence } from './useSessionPersistence'
+import type { UseSessionPersistenceReturn } from './useSessionPersistence'
 
-export function useCharts(filteredData: any[][], columnInfo: ColumnInfo[]) {
+export function useCharts(
+  filteredData: any[][],
+  columnInfo: ColumnInfo[],
+  sessionExt?: UseSessionPersistenceReturn,
+) {
   const [charts, setCharts] = useState<ChartConfig[]>([])
   const [suggestions, setSuggestions] = useState<ChartSuggestion[]>([])
   const [autoCreateDefault, setAutoCreateDefault] = useState(false)
+  const defaultSession = useSessionPersistence()
+  const session = sessionExt ?? defaultSession
+
+  // Register restore handler when persistence is available
+  useEffect(() => {
+    session.registerOnLoadCharts?.((c) => setCharts(c))
+  }, [session])
 
   useEffect(() => {
     if (filteredData?.length && columnInfo?.length) {
@@ -86,6 +99,24 @@ export function useCharts(filteredData: any[][], columnInfo: ColumnInfo[]) {
     },
     [],
   )
+
+  // Persist charts when they change and a session exists
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      ;(async () => {
+        const svc = session.service
+        if (!svc) return
+        const active = await session.getActiveSessionId?.()
+        if (!active) return
+        try {
+          await svc.saveCharts(active, charts)
+        } catch (e) {
+          console.warn('Persist charts failed', e)
+        }
+      })()
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [charts, session])
 
   return {
     charts,

@@ -181,7 +181,7 @@ export function DataTable({
             <tr>
               {headers.map((header, index) => (
                 <th
-                  key={header}
+                  key={`${header}-${index}`}
                   className={clsx(
                     'px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
                     (onSort || onDeleteColumn) && 'hover:bg-gray-100',

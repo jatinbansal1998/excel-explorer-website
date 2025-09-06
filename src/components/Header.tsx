@@ -1,6 +1,10 @@
-import React from 'react'
+'use client'
+
+import React, { useState } from 'react'
+import { OpenRouterSettingsModal } from './openrouter/OpenRouterSettingsModal'
 
 export function Header() {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
       <div className="w-full max-w-none px-2 py-2 xl:px-4">
@@ -13,6 +17,12 @@ export function Header() {
           </div>
 
           <nav className="flex items-center space-x-6">
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              OpenRouter
+            </button>
             <a
               href="https://www.linkedin.com/in/bansal-jatin"
               target="_blank"
@@ -24,6 +34,7 @@ export function Header() {
           </nav>
         </div>
       </div>
+      <OpenRouterSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </header>
   )
 }

@@ -5,12 +5,34 @@ import { ExcelData } from '../types/excel'
 import { FilterConfig, FilterState } from '../types/filter'
 import { filterGenerator } from '../services/filterGenerator'
 import { DataFilter } from '../services/dataFilter'
+import { useSessionPersistence } from './useSessionPersistence'
+import type { UseSessionPersistenceReturn } from './useSessionPersistence'
 
-export function useFilters(excelData: ExcelData | null) {
+export function useFilters(excelData: ExcelData | null, sessionExt?: UseSessionPersistenceReturn) {
   const [filters, setFilters] = useState<FilterConfig[]>([])
   const [filteredData, setFilteredData] = useState<any[][]>([])
   const [isFiltering, setIsFiltering] = useState(false)
   const engineRef = useRef<DataFilter | null>(null)
+  const defaultSession = useSessionPersistence()
+  const session = sessionExt ?? defaultSession
+
+  // Register restore handler when persistence service becomes available
+  useEffect(() => {
+    session.registerOnLoadFilters?.((state) => {
+      if (!engineRef.current) return
+      engineRef.current.importFilterState(state)
+      // Sync filters from engine
+      const exported = engineRef.current.exportFilterState()
+      setFilters((prev) =>
+        prev.map((f) => {
+          const s = exported.find((e) => e.id === f.id)
+          return s
+            ? ({ ...f, active: s.active, values: s.values, operator: s.operator } as FilterConfig)
+            : f
+        }),
+      )
+    })
+  }, [session])
 
   // Generate filters when data changes
   useEffect(() => {
@@ -31,10 +53,27 @@ export function useFilters(excelData: ExcelData | null) {
       const result = engineRef.current.applyFilters(excelData)
       setFilteredData(result)
       setIsFiltering(false)
+      // Persist filter state (debounced at call sites is optional; here we simply save on change)
+      try {
+        const state = engineRef.current.exportFilterState()
+        const timer = setTimeout(() => {
+          ;(async () => {
+            const svc = session.service
+            if (!svc) return
+            const active = await svc.getActiveSession()
+            if (active) await svc.saveFilters(active.id, state)
+          })()
+        }, 300)
+        return () => clearTimeout(timer)
+      } catch (e) {
+        console.warn('Persist filters failed', e)
+      }
     } else {
       setFilteredData(excelData?.rows || [])
     }
-  }, [excelData, filters])
+  }, [excelData, filters, session?.service])
+
+  // Expose importer for AI apply filters MVP via global shim
 
   const updateFilter = (filterId: string, updates: Partial<FilterConfig>) => {
     if (!engineRef.current) return
@@ -96,6 +135,16 @@ export function useFilters(excelData: ExcelData | null) {
       }),
     )
   }
+
+  // Expose importer for AI apply filters MVP via global shim
+  useEffect(() => {
+    ;(window as any).__importFiltersFromAI = (state: FilterState) => {
+      importState(state)
+    }
+    return () => {
+      if ((window as any).__importFiltersFromAI) delete (window as any).__importFiltersFromAI
+    }
+  }, [])
 
   const getFilterSummary = () => ({
     totalFilters: filters.length,

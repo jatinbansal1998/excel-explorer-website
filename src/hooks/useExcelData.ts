@@ -1,16 +1,25 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, useEffect } from 'react'
 import type { ExcelData, ParseOptions, ParseProgressEvent } from '../types/excel'
 import { ExcelParser } from '../services/excelParser'
+import { useSessionPersistence } from './useSessionPersistence'
+import type { UseSessionPersistenceReturn } from './useSessionPersistence'
 
-export function useExcelData() {
+export function useExcelData(sessionExt?: UseSessionPersistenceReturn) {
   const [currentData, setCurrentData] = useState<ExcelData | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [progress, setProgress] = useState<ParseProgressEvent | null>(null)
 
   const parser = useMemo(() => new ExcelParser(), [])
+  const defaultSession = useSessionPersistence()
+  const session = sessionExt ?? defaultSession
+
+  // Register loader callback for restore when persistence becomes available
+  useEffect(() => {
+    session.registerOnLoadDataset?.((d) => setCurrentData(d))
+  }, [session])
 
   const parseFile = useCallback(
     async (file: File, options: ParseOptions = {}): Promise<ExcelData> => {
@@ -31,6 +40,25 @@ export function useExcelData() {
           },
         })
         setCurrentData(data)
+        // Save session summary and dataset snapshot
+        try {
+          if (!session.service) {
+            console.warn('Persistence service not ready; skipping dataset save')
+            return data
+          }
+          const summary = {
+            fileName: data.metadata.fileName,
+            sheetName: data.metadata.activeSheet,
+            totalRows: data.metadata.totalRows,
+            totalColumns: data.metadata.totalColumns,
+            columns: (data.metadata.columns || []).map((c) => c.name).slice(0, 50),
+          }
+          const s = await session.service.createOrUpdateSession(summary)
+          await session.service.saveDataset(s.id, data)
+        } catch (e) {
+          // Non-blocking persistence errors
+          console.warn('Dataset persistence failed', e)
+        }
         return data
       } catch (e: any) {
         const msg = e?.message || 'Failed to parse file'
@@ -40,7 +68,7 @@ export function useExcelData() {
         setIsLoading(false)
       }
     },
-    [parser],
+    [parser, session.service],
   )
 
   const reset = useCallback(() => {

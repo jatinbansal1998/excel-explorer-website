@@ -7,6 +7,7 @@ import { ChartConfig } from '@/types/chart'
 import ChartContainer from './charts/ChartContainer'
 import ChartControls from './charts/ChartControls'
 import { Chart, ArcElement, Tooltip, Legend, Title, PieController } from 'chart.js'
+import type { UseSessionPersistenceReturn } from '@/hooks/useSessionPersistence'
 
 Chart.register(ArcElement, Tooltip, Legend, Title, PieController)
 
@@ -15,9 +16,18 @@ interface ChartViewProps {
   columnInfo: ColumnInfo[]
   onChartAdd?: (config: ChartConfig) => void
   onChartRemove?: (chartId: string) => void
+  registerExternalApplyChart?: (fn: (config: ChartConfig) => void) => void
+  session?: UseSessionPersistenceReturn
 }
 
-export function ChartView({ filteredData, columnInfo, onChartAdd, onChartRemove }: ChartViewProps) {
+export function ChartView({
+  filteredData,
+  columnInfo,
+  onChartAdd,
+  onChartRemove,
+  registerExternalApplyChart,
+  session,
+}: ChartViewProps) {
   const {
     charts,
     suggestions,
@@ -26,7 +36,7 @@ export function ChartView({ filteredData, columnInfo, onChartAdd, onChartRemove 
     removeChart,
     clearCharts,
     createManualChart,
-  } = useCharts(filteredData, columnInfo)
+  } = useCharts(filteredData, columnInfo, session)
 
   useEffect(() => {
     // Optionally notify parent when charts change
@@ -35,6 +45,25 @@ export function ChartView({ filteredData, columnInfo, onChartAdd, onChartRemove 
   const handleAddChart = (sugg: any) => {
     addChart(sugg)
   }
+
+  useEffect(() => {
+    if (!registerExternalApplyChart) return
+    registerExternalApplyChart((cfg: ChartConfig) => {
+      try {
+        createManualChart({
+          type: cfg.type,
+          dataColumn: cfg.dataColumn,
+          labelColumn: cfg.labelColumn,
+          aggregation: cfg.aggregation,
+          title: cfg.title,
+          maxSegments: cfg.maxSegments,
+          numericRanges: cfg.numericRanges,
+        })
+      } catch (e) {
+        console.warn('Failed to apply chart from external payload', e)
+      }
+    })
+  }, [registerExternalApplyChart, createManualChart])
 
   return (
     <div className="space-y-8">

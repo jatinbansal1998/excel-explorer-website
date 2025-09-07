@@ -9,15 +9,22 @@ import { useOpenRouter } from '../hooks/useOpenRouter'
 export function Header() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isSessionsOpen, setIsSessionsOpen] = useState(false)
+  const [hasAutoOpened, setHasAutoOpened] = useState(false)
   const session = useSessionPersistence({ enabled: true })
   const { state: orState } = useOpenRouter()
 
   // On reload, if saved OpenRouter keys exist and we're not connected, prompt user
   useEffect(() => {
-    if (!isSettingsOpen && !orState.isConnected && (orState.namedKeyNames?.length || 0) > 0) {
+    if (
+      !hasAutoOpened &&
+      !isSettingsOpen &&
+      !orState.isConnected &&
+      (orState.namedKeyNames?.length || 0) > 0
+    ) {
       setIsSettingsOpen(true)
+      setHasAutoOpened(true)
     }
-  }, [isSettingsOpen, orState.isConnected, orState.namedKeyNames])
+  }, [hasAutoOpened, isSettingsOpen, orState.isConnected, orState.namedKeyNames])
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
       <div className="w-full max-w-none px-2 py-1.5 xl:px-3">

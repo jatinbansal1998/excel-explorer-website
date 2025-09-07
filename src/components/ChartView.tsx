@@ -6,7 +6,7 @@ import { ColumnInfo, ExcelData } from '@/types/excel'
 import { ChartConfig } from '@/types/chart'
 import ChartContainer from './charts/ChartContainer'
 import ChartControls from './charts/ChartControls'
-import { Chart, ArcElement, Tooltip, Legend, Title, PieController } from 'chart.js'
+import { ArcElement, Chart, Legend, PieController, Title, Tooltip } from 'chart.js'
 import type { UseSessionPersistenceReturn } from '@/hooks/useSessionPersistence'
 
 Chart.register(ArcElement, Tooltip, Legend, Title, PieController)
@@ -66,7 +66,7 @@ export function ChartView({
   }, [registerExternalApplyChart, createManualChart])
 
   return (
-    <div className="space-y-8">
+    <div className="section-container p-4 space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Data Visualization</h2>
         <ChartControls
@@ -79,7 +79,7 @@ export function ChartView({
         />
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {charts.map((chart) => (
           <ChartContainer
             key={chart.id}
@@ -93,9 +93,7 @@ export function ChartView({
       </div>
 
       {charts.length === 0 && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6 text-gray-500">
-          No charts yet. Use suggestions to add one.
-        </div>
+        <div className="text-gray-500">No charts yet. Use suggestions to add one.</div>
       )}
     </div>
   )

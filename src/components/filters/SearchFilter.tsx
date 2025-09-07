@@ -40,6 +40,7 @@ export function SearchFilter({ filter, onChange }: SearchFilterProps) {
                 exactMatch: search.exactMatch,
               })
             }
+            className="mr-2"
           />
           <span>Case sensitive</span>
         </label>
@@ -53,6 +54,7 @@ export function SearchFilter({ filter, onChange }: SearchFilterProps) {
                 exactMatch: e.target.checked,
               })
             }
+            className="mr-2"
           />
           <span>Exact match</span>
         </label>

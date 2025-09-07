@@ -132,35 +132,46 @@ function pickSampleRows(rows: any[][], limit: number): any[][] {
   return [...head, ...tail]
 }
 
-export function buildDatasetContext(data: ExcelData | null, sampleRowLimit: number = 100): string {
+export function buildDatasetContext(
+  data: ExcelData | null,
+  sampleRowLimit: number = 100,
+  rowsOverride?: any[][],
+): string {
   if (!data) return 'No dataset provided.'
   const meta = data.metadata
   const headers = data.headers || []
-  const sample = pickSampleRows(data.rows || [], sampleRowLimit)
-  const cols = (meta.columns || []).map((c) => ({
-    name: c.name,
-    index: c.index,
-    type: c.type,
-    uniqueCount: c.uniqueCount,
-    hasNulls: c.hasNulls,
-    nullCount: c.nullCount,
-    sampleValues: (c.sampleValues || []).slice(0, 5),
-  }))
+  const rows = rowsOverride !== undefined ? rowsOverride : data.rows || []
+  const sample = pickSampleRows(rows, sampleRowLimit)
+  const cols = (meta.columns || []).map((c) => {
+    const sampleValues = rowsOverride
+      ? sample
+          .map((r) => (Array.isArray(r) ? r[c.index] : undefined))
+          .filter((v) => v !== undefined)
+          .slice(0, 5)
+      : (c.sampleValues || []).slice(0, 5)
+    return {
+      name: c.name,
+      index: c.index,
+      type: c.type,
+      uniqueCount: c.uniqueCount,
+      hasNulls: c.hasNulls,
+      nullCount: c.nullCount,
+      sampleValues,
+    }
+  })
   const payload = {
     fileName: meta.fileName,
     sheet: meta.activeSheet,
-    totalRows: meta.totalRows,
+    totalRows: rows.length,
     totalColumns: meta.totalColumns,
     headers,
     columns: cols,
     sampleRows: sample,
-    note: 'This is a bounded sample for privacy and token limits.',
+    note: rowsOverride
+      ? 'This is a bounded sample of the currently filtered view for privacy and token limits.'
+      : 'This is a bounded sample for privacy and token limits.',
   }
   return JSON.stringify(payload)
-}
-
-function isOpenRouterError(response: any): boolean {
-  return response && typeof response === 'object' && response.error && response.error.message
 }
 
 function normalizeResponseShape(maybeJson: any): LLMAnalyticsResponse {

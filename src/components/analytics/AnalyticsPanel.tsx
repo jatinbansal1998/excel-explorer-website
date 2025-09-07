@@ -13,21 +13,40 @@ import { OpenRouterSettingsModal } from '../openrouter/OpenRouterSettingsModal'
 
 interface Props {
   excelData: ExcelData | null
+  filteredRows?: any[][]
+  filtersActive?: boolean
   onApplyChart?: (config: ChartConfig) => void
   onApplyFilters?: (filters: FilterConfig[] | FilterConfig) => void
 }
 
-export function AnalyticsPanel({ excelData, onApplyChart, onApplyFilters }: Readonly<Props>) {
+export function AnalyticsPanel({
+  excelData,
+  filteredRows,
+  filtersActive,
+  onApplyChart,
+  onApplyFilters,
+}: Readonly<Props>) {
   const { state: orState } = useOpenRouter()
 
   const [prompt, setPrompt] = useState('')
   const [activeTab, setActiveTab] = useState<'suggestions' | 'prompt'>('suggestions')
   const [sliceForPrompt, setSliceForPrompt] = useState(true)
   const [isORSettingsOpen, setIsORSettingsOpen] = useState(false)
+  const [useFilteredForLLM, setUseFilteredForLLM] = useState<boolean>(filtersActive === true)
+
+  // Keep toggle logically in sync when filters turn off; don't auto-enable when filters become active
+  useEffect(() => {
+    if (!filtersActive) setUseFilteredForLLM(false)
+  }, [filtersActive])
 
   const contextOverride = useMemo(
-    () => buildDatasetContext(excelData, sliceForPrompt ? 100 : Number.POSITIVE_INFINITY),
-    [excelData, sliceForPrompt],
+    () =>
+      buildDatasetContext(
+        excelData,
+        sliceForPrompt ? 100 : Number.POSITIVE_INFINITY,
+        useFilteredForLLM && filtersActive ? filteredRows : undefined,
+      ),
+    [excelData, sliceForPrompt, filteredRows, useFilteredForLLM, filtersActive],
   )
 
   const {
@@ -48,11 +67,6 @@ export function AnalyticsPanel({ excelData, onApplyChart, onApplyFilters }: Read
   )
   const selectedModelLabel = selectedModel?.name || orState.selectedModelId
 
-  // Refresh suggestions when toggling slice mode so the context matches
-  useEffect(() => {
-    reloadSuggestions()
-  }, [sliceForPrompt, reloadSuggestions])
-
   const groupedSuggestions = useMemo(() => {
     const groups: Record<string, typeof suggestions> = {}
     for (const s of suggestions) {
@@ -64,10 +78,20 @@ export function AnalyticsPanel({ excelData, onApplyChart, onApplyFilters }: Read
   }, [suggestions])
 
   return (
-    <div className="border rounded-md p-3 space-y-3">
+    <div className="section-container p-3 space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="text-sm font-medium">AI Insights</div>
+          {useFilteredForLLM && filtersActive && (
+            <span
+              className="text-[10px] px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200"
+              title={`Using filtered view: ${
+                Array.isArray(filteredRows) ? filteredRows.length.toLocaleString() : '0'
+              } rows`}
+            >
+              Using filtered view
+            </span>
+          )}
           {orState.selectedModelId && (
             <button
               type="button"
@@ -97,15 +121,27 @@ export function AnalyticsPanel({ excelData, onApplyChart, onApplyFilters }: Read
 
       {/* Controls row */}
       <div className="flex items-center justify-between">
-        <label className="flex items-center gap-2 text-xs text-gray-600">
-          <input
-            type="checkbox"
-            checked={sliceForPrompt}
-            onChange={(e) => setSliceForPrompt(e.target.checked)}
-            className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-          />
-          <span>Slice data table for prompts (recommended)</span>
-        </label>
+        <div className="flex items-center gap-4">
+          <label className="flex items-center gap-2 text-xs text-gray-600">
+            <input
+              type="checkbox"
+              checked={sliceForPrompt}
+              onChange={(e) => setSliceForPrompt(e.target.checked)}
+              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            />
+            <span>Slice data table for prompts (recommended)</span>
+          </label>
+          <label className="flex items-center gap-2 text-xs text-gray-600">
+            <input
+              type="checkbox"
+              checked={useFilteredForLLM}
+              onChange={(e) => setUseFilteredForLLM(e.target.checked)}
+              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              disabled={!filtersActive}
+            />
+            <span className={filtersActive ? '' : 'text-gray-400'}>Use filtered view for LLM</span>
+          </label>
+        </div>
       </div>
 
       {activeTab === 'suggestions' && (
@@ -159,7 +195,7 @@ export function AnalyticsPanel({ excelData, onApplyChart, onApplyFilters }: Read
                         )}
                       </div>
                       <Button
-                        variant="secondary"
+                        variant="primaryOutline"
                         onClick={() => {
                           setPrompt(s.prompt)
                           setActiveTab('prompt')

@@ -38,7 +38,12 @@ export function SelectFilter({ filter, onChange, maxDisplayValues = 1000 }: Sele
         )}
         {filteredValues.map((v, i) => (
           <label key={`${String(v.value)}-${i}`} className="flex items-center space-x-2 text-sm">
-            <input type="checkbox" checked={v.selected} onChange={() => toggle(i)} />
+            <input
+              className="mr-2"
+              type="checkbox"
+              checked={v.selected}
+              onChange={() => toggle(i)}
+            />
             <span className="truncate" title={String(v.value)}>
               {String(v.value)}
             </span>

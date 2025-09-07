@@ -63,7 +63,7 @@ export function SessionManagerModal({
       <div
         role="dialog"
         aria-modal="true"
-        className="relative bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4"
+        className="relative bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 section-container"
       >
         <div className="flex items-center justify-between px-4 py-3 border-b">
           <h2 className="text-lg font-semibold">Manage Sessions</h2>

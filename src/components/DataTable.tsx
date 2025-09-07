@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
-import { ChevronUpIcon, ChevronDownIcon, TrashIcon } from '@heroicons/react/24/outline'
-import { ExcelData, DataType } from '@/types/excel'
+import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { DataType, ExcelData } from '@/types/excel'
 import { LoadingSpinner } from './ui/LoadingSpinner'
 import { clsx } from 'clsx'
 import { parseDateFlexible } from '@/utils/dataTypes'
@@ -103,7 +103,7 @@ export function DataTable({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64 bg-white rounded-lg border border-gray-200">
+      <div className="section-container p-6 flex items-center justify-center h-64">
         <div className="flex flex-col items-center space-y-4">
           <LoadingSpinner size="lg" />
           <p className="text-sm text-gray-600">Loading data...</p>
@@ -114,7 +114,7 @@ export function DataTable({
 
   if (!data || headers.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 bg-white rounded-lg border border-gray-200">
+      <div className="section-container p-6 flex items-center justify-center h-64">
         <div className="text-center">
           <div className="text-gray-400 mb-2">
             <svg
@@ -139,7 +139,7 @@ export function DataTable({
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <div className="section-container overflow-hidden">
       <div className="px-3 py-2 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div>

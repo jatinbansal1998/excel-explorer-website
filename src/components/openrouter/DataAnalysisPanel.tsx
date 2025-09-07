@@ -36,7 +36,7 @@ export function DataAnalysisPanel({ datasetContext }: Props) {
   }
 
   return (
-    <div className="border rounded-md p-3 space-y-3">
+    <div className="section-container p-3 space-y-3">
       <div className="flex items-center gap-2">
         <div className="text-sm font-medium">AI Analysis</div>
         {state.selectedModelId &&

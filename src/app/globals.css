@@ -87,11 +87,14 @@ body {
 @theme {
   /* Map primary to Tailwind teal scale */
   --color-primary-50: #f0fdfa;
+  --color-primary-100: #ccfbf1;
   --color-primary-200: #99f6e4;
   --color-primary-300: #5eead4;
+  --color-primary-400: #2dd4bf;
   --color-primary-500: #14b8a6;
   --color-primary-600: #0d9488;
   --color-primary-700: #0f766e;
+  --color-primary-800: #115e59;
   --color-primary-900: #134e4a;
 
   /* Map gray tokens (v4) to our zinc-like palette */
@@ -108,7 +111,7 @@ body {
 
   --radius-md: 8px;
   --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-xl: 18px;
 }
 
 /* Loading states */
@@ -136,9 +139,115 @@ body {
   @apply border-red-300 bg-red-50;
 }
 
-/* Global textarea baseline padding and border */
+/* Global form input baseline styles */
+input[type='text'],
+input[type='password'],
+input[type='email'],
+input[type='number'],
+input[type='search'],
+input[type='url'],
+input[type='tel'],
+select,
 textarea {
   padding: 0.5rem 0.75rem; /* py-2 px-3 */
-  border: 1px solid #d1d5db; /* gray-300 */
+  border: 1px solid var(--color-gray-300);
   border-radius: 0.375rem; /* rounded-md */
+  background-color: #ffffff;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+input[type='text']:focus,
+input[type='password']:focus,
+input[type='email']:focus,
+input[type='number']:focus,
+input[type='search']:focus,
+input[type='url']:focus,
+input[type='tel']:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary-600);
+  box-shadow: 0 0 0 1px var(--color-primary-500);
+}
+
+/* Section frame utility for thick black borders around main panels */
+.section-frame {
+  @apply border-2 border-black;
+}
+
+/* Default section container: consistent surface styling for major panels */
+.section-container {
+  @apply border-2 border-black bg-white rounded-md;
+}
+
+/* Custom checkboxes and radios with white glyphs */
+input[type='checkbox'],
+input[type='radio'] {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  display: inline-grid;
+  place-content: center;
+  vertical-align: middle;
+  background-color: #ffffff;
+}
+
+/* Checkbox */
+input[type='checkbox'] {
+  width: 1rem; /* 16px */
+  height: 1rem; /* 16px */
+  border: 1px solid var(--color-gray-300);
+  border-radius: 0.25rem; /* 4px */
+}
+
+input[type='checkbox']:checked {
+  background-color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+}
+
+input[type='checkbox']:checked::after {
+  content: '';
+  width: 0.25rem; /* 4px */
+  height: 0.5rem; /* 8px */
+  border: solid #ffffff;
+  border-width: 0 2px 2px 0;
+  transform: translateY(-1px) rotate(45deg);
+}
+
+/* Radio */
+input[type='radio'] {
+  width: 1rem; /* 16px */
+  height: 1rem; /* 16px */
+  border: 1px solid var(--color-gray-300);
+  border-radius: 9999px;
+}
+
+input[type='radio']:checked {
+  background-color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+}
+
+input[type='radio']:checked::after {
+  content: '';
+  width: 0.5rem; /* 8px */
+  height: 0.5rem; /* 8px */
+  background-color: #ffffff; /* white bullet */
+  border-radius: 9999px;
+}
+
+/* Focus states */
+input[type='checkbox']:focus-visible,
+input[type='radio']:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-primary-500);
+}
+
+/* Disabled */
+input[type='checkbox']:disabled,
+input[type='radio']:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

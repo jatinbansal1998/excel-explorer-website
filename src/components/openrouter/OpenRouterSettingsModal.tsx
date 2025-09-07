@@ -3,7 +3,7 @@ import { Modal } from '../ui/Modal'
 import { Button } from '../ui/Button'
 import { ModelList } from './ModelList'
 import { useOpenRouter } from '@/hooks/useOpenRouter'
-import { EyeIcon, EyeSlashIcon, ArrowPathIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { ArrowPathIcon, EyeIcon, EyeSlashIcon, TrashIcon } from '@heroicons/react/24/outline'
 
 interface Props {
   isOpen: boolean
@@ -308,7 +308,7 @@ export function OpenRouterSettingsModal({ isOpen, onClose }: Props) {
                     </button>
                   </div>
                 </label>
-                <Button type="submit" variant="secondary" disabled={!loadPassphrase || busy}>
+                <Button type="submit" variant="primary" disabled={!loadPassphrase || busy}>
                   Load & Connect
                 </Button>
               </form>

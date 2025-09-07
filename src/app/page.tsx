@@ -95,6 +95,8 @@ export default function HomePage() {
               />
               <AnalyticsPanel
                 excelData={currentData}
+                filteredRows={filteredData}
+                filtersActive={filters.some((f) => f.active)}
                 onApplyChart={(cfg) => {
                   try {
                     const apply = (window as any).__applyChartFromAI

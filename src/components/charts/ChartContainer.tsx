@@ -109,7 +109,7 @@ export function ChartContainer({
   }
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow border">
+    <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-medium">{config.title}</h3>
         <div className="flex gap-2">

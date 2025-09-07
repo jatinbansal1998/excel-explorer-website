@@ -2,7 +2,7 @@ import React from 'react'
 import { clsx } from 'clsx'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost'
+  variant?: 'primary' | 'secondary' | 'outline' | 'primaryOutline' | 'ghost'
   size?: 'sm' | 'md' | 'lg' | 'icon'
   isLoading?: boolean
 }
@@ -15,7 +15,7 @@ export function Button({
   className,
   disabled,
   ...props
-}: ButtonProps) {
+}: Readonly<ButtonProps>) {
   const baseStyles =
     'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
 
@@ -23,6 +23,8 @@ export function Button({
     primary: 'bg-primary-600 text-white hover:bg-primary-700',
     secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300',
     outline: 'border border-gray-300 bg-transparent text-gray-700 hover:bg-gray-50',
+    primaryOutline:
+      'border border-primary-600 bg-transparent text-primary-700 hover:bg-primary-50 hover:border-primary-700 hover:text-primary-900',
     ghost: 'text-gray-700 hover:bg-gray-100',
   } as const
 

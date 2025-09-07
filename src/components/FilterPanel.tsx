@@ -2,13 +2,13 @@
 
 import React, { useMemo, useState } from 'react'
 import { Button } from './ui/Button'
-import { ChevronUpIcon, ChevronDownIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
+import { ArrowPathIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
 import { Modal } from './ui/Modal'
 import {
+  DateRangeFilter,
   FilterConfig,
   FilterValue,
   RangeFilter,
-  DateRangeFilter,
   SearchFilter,
 } from '@/types/filter'
 import type { NumericRange } from '@/types/chart'
@@ -50,39 +50,41 @@ export function FilterPanel({
   }, [filters, normalizedQuery])
   return (
     <div
-      className="bg-white rounded-lg border border-gray-200 overflow-hidden flex flex-col"
+      className="section-container overflow-hidden flex flex-col"
       style={collapsed ? undefined : { height: 'calc(100vh - 200px)', minHeight: '500px' }}
     >
       <div className="px-3 py-2 border-b border-gray-200 bg-gray-50">
         <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center">
             <h3 className="font-semibold">Filters</h3>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setCollapsed((v) => !v)}
-              className="whitespace-nowrap"
-              aria-label={collapsed ? 'Expand filters' : 'Collapse filters'}
-              title={collapsed ? 'Expand filters' : 'Collapse filters'}
-            >
-              {collapsed ? (
-                <ChevronDownIcon className="h-4 w-4" />
-              ) : (
-                <ChevronUpIcon className="h-4 w-4" />
-              )}
-            </Button>
-            {!collapsed && (
+            <div className="ml-auto flex items-center gap-2">
               <Button
                 variant="outline"
                 size="icon"
-                onClick={onResetAll}
+                onClick={() => setCollapsed((v) => !v)}
                 className="whitespace-nowrap"
-                aria-label="Reset all filters"
-                title="Reset all filters"
+                aria-label={collapsed ? 'Expand filters' : 'Collapse filters'}
+                title={collapsed ? 'Expand filters' : 'Collapse filters'}
               >
-                <ArrowPathIcon className="h-4 w-4" />
+                {collapsed ? (
+                  <ChevronDownIcon className="h-4 w-4" />
+                ) : (
+                  <ChevronUpIcon className="h-4 w-4" />
+                )}
               </Button>
-            )}
+              {!collapsed && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={onResetAll}
+                  className="whitespace-nowrap"
+                  aria-label="Reset all filters"
+                  title="Reset all filters"
+                >
+                  <ArrowPathIcon className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
           {!collapsed && (
             <input
@@ -114,6 +116,7 @@ export function FilterPanel({
                         type="checkbox"
                         checked={filter.active}
                         onChange={(e) => onFilterChange(filter.id, { active: e.target.checked })}
+                        className="mr-2"
                       />
                       <span
                         className="font-medium text-sm text-gray-500 truncate"
@@ -193,10 +196,10 @@ function FilterComponent({
 function SelectFilterView({
   filter,
   onChange,
-}: {
+}: Readonly<{
   filter: FilterConfig
   onChange: (updates: Partial<FilterConfig>) => void
-}) {
+}>) {
   const values = filter.values as FilterValue[]
   const [query, setQuery] = useState('')
   const normalized = query.trim().toLowerCase()
@@ -222,7 +225,7 @@ function SelectFilterView({
           <div className="text-sm text-gray-500">No options match your search</div>
         )}
         {filteredValues.map((v, i) => (
-          <label key={`${String(v.value)}-${i}`} className="flex items-center space-x-2 text-sm">
+          <label key={`${String(v.value)}-${i}`} className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={v.selected} onChange={() => toggle(i)} />
             <span className="truncate" title={String(v.value)}>
               {String(v.value)}
@@ -242,12 +245,12 @@ function RangeFilterView({
   onChange,
   columnInfo,
   filteredData,
-}: {
+}: Readonly<{
   filter: FilterConfig
   onChange: (updates: Partial<FilterConfig>) => void
   columnInfo: ColumnInfo[]
   filteredData: any[][]
-}) {
+}>) {
   const range = (filter.values as RangeFilter) || ({} as RangeFilter)
   const [showEditBins, setShowEditBins] = useState(false)
 
@@ -323,7 +326,12 @@ function RangeFilterView({
             const label = `${r.includeMin ? '≥' : '>'}${r.min} & ${r.includeMax ? '≤' : '<'}${r.max} (${r.label})`
             return (
               <label key={r.id} className="flex items-center space-x-2">
-                <input type="checkbox" checked={checked} onChange={() => toggleBin(r.id)} />
+                <input
+                  className="mr-2"
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggleBin(r.id)}
+                />
                 <span className="truncate" title={label}>
                   {label}
                 </span>
@@ -356,14 +364,14 @@ function EditBinsModal({
   onChange,
   columnInfo,
   filteredData,
-}: {
+}: Readonly<{
   isOpen: boolean
   onClose: () => void
   filter: FilterConfig
   onChange: (updates: Partial<FilterConfig>) => void
   columnInfo: ColumnInfo[]
   filteredData: any[][]
-}) {
+}>) {
   const range = (filter.values as RangeFilter) || ({} as RangeFilter)
   const col = columnInfo.find((c) => c.index === filter.columnIndex)
   const sampleValues = useMemo(() => {
@@ -405,10 +413,10 @@ function EditBinsModal({
 function SearchFilterView({
   filter,
   onChange,
-}: {
+}: Readonly<{
   filter: FilterConfig
   onChange: (updates: Partial<FilterConfig>) => void
-}) {
+}>) {
   const search = filter.values as SearchFilter
   const update = (patch: Partial<SearchFilter>) => {
     const next = { ...search, ...patch } as SearchFilter
@@ -456,10 +464,10 @@ function toDateInputValue(d: Date): string {
 function DateRangeFilterView({
   filter,
   onChange,
-}: {
+}: Readonly<{
   filter: FilterConfig
   onChange: (updates: Partial<FilterConfig>) => void
-}) {
+}>) {
   const range = filter.values as DateRangeFilter
   const update = (key: 'currentStart' | 'currentEnd', val: string) => {
     const next = { ...range, [key]: val ? new Date(val) : range[key] } as DateRangeFilter
@@ -487,10 +495,10 @@ function DateRangeFilterView({
 function BooleanFilterView({
   filter,
   onChange,
-}: {
+}: Readonly<{
   filter: FilterConfig
   onChange: (updates: Partial<FilterConfig>) => void
-}) {
+}>) {
   const val = filter.values as boolean | null
   const setVal = (v: boolean | null) => onChange({ values: v, active: true, operator: 'equals' })
   return (
@@ -529,10 +537,10 @@ function BooleanFilterView({
 function NullFilterView({
   filter,
   onChange,
-}: {
+}: Readonly<{
   filter: FilterConfig
   onChange: (updates: Partial<FilterConfig>) => void
-}) {
+}>) {
   // values boolean not used in engine; we drive via operator
   const includeNulls = filter.operator === 'is_null'
   const toggle = (checked: boolean) => {
@@ -541,7 +549,12 @@ function NullFilterView({
   return (
     <div className="flex items-center space-x-2 text-sm">
       <label className="flex items-center space-x-2">
-        <input type="checkbox" checked={includeNulls} onChange={(e) => toggle(e.target.checked)} />
+        <input
+          className="mr-2"
+          type="checkbox"
+          checked={includeNulls}
+          onChange={(e) => toggle(e.target.checked)}
+        />
         <span>Include only nulls</span>
       </label>
     </div>

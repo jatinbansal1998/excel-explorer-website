@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
+import { List } from 'react-window'
 import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { DataType, ExcelData } from '@/types/excel'
 import { LoadingSpinner } from './ui/LoadingSpinner'
@@ -72,8 +73,8 @@ export function DataTable({
   onDeleteColumn,
   showDataTypes = false,
   onToggleDataTypes,
-}: DataTableProps) {
-  const displayRows = filteredRows || data?.rows || []
+}: Readonly<DataTableProps>) {
+  const displayRows = useMemo(() => filteredRows || data?.rows || [], [filteredRows, data?.rows])
   const headers = data?.headers || []
 
   const columnTypes = useMemo(() => {
@@ -85,10 +86,10 @@ export function DataTable({
     if (!data?.metadata?.columns) return [] as boolean[]
     return data.metadata.columns.map((col) => {
       if (col.type !== 'date') return false
-      const samples = (col.sampleValues || []) as any[]
+      const samples = col.sampleValues || []
       const nearMidnightThreshold = 30 * 60 // 30 minutes
-      for (let i = 0; i < samples.length; i++) {
-        const d = parseDateFlexible(samples[i])
+      for (const element of samples) {
+        const d = parseDateFlexible(element)
         if (!d) continue
         const secondsSinceMidnight = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds()
         const secondsUntilMidnight = 24 * 3600 - secondsSinceMidnight
@@ -100,6 +101,15 @@ export function DataTable({
       return false // all samples near midnight → treat as date-only
     })
   }, [data?.metadata?.columns])
+  useMemo(
+    () => ({
+      rows: displayRows,
+      columnTypes,
+      dateColumnHasTime,
+    }),
+    [displayRows, columnTypes, dateColumnHasTime],
+  )
+  const useVirtualScrolling = displayRows.length > 100
 
   if (isLoading) {
     return (
@@ -139,7 +149,10 @@ export function DataTable({
   }
 
   return (
-    <div className="section-container overflow-hidden">
+    <div
+      className="section-container overflow-hidden flex flex-col"
+      style={{ height: 'calc(100vh - 200px)', minHeight: '500px' }}
+    >
       <div className="px-3 py-2 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div>
@@ -172,10 +185,7 @@ export function DataTable({
         </div>
       </div>
 
-      <div
-        className="overflow-auto"
-        style={{ maxHeight: 'calc(100vh - 350px)', minHeight: '400px' }}
-      >
+      <div className="overflow-auto flex-1">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50 sticky top-0 z-10">
             <tr>
@@ -248,36 +258,39 @@ export function DataTable({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {displayRows.map((row, rowIndex) => (
-              <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                {row.map((cell, cellIndex) => {
-                  const cellType = columnTypes[cellIndex] || 'string'
-                  const formattedValue = formatCellValue(
-                    cell,
-                    cellType,
-                    cellType === 'date' ? dateColumnHasTime[cellIndex] === true : false,
-                  )
-                  return (
-                    <td
-                      key={cellIndex}
-                      className="px-2 py-0.5 whitespace-nowrap text-sm text-gray-900"
-                    >
-                      <div className="max-w-xs truncate" title={formattedValue}>
-                        {formattedValue}
-                      </div>
-                    </td>
-                  )
-                })}
-              </tr>
-            ))}
+            {displayRows
+              .slice(0, useVirtualScrolling ? 200 : displayRows.length)
+              .map((row, rowIndex) => (
+                <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                  {row.map((cell, cellIndex) => {
+                    const cellType = columnTypes[cellIndex] || 'string'
+                    const formattedValue = formatCellValue(
+                      cell,
+                      cellType,
+                      cellType === 'date' ? dateColumnHasTime[cellIndex] === true : false,
+                    )
+                    return (
+                      <td
+                        key={cellIndex}
+                        className="px-2 py-0.5 whitespace-nowrap text-sm text-gray-900"
+                      >
+                        <div className="max-w-xs truncate" title={formattedValue}>
+                          {formattedValue}
+                        </div>
+                      </td>
+                    )
+                  })}
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
 
-      {displayRows.length > 1000 && (
+      {useVirtualScrolling && (
         <div className="px-3 py-1 bg-gray-50 border-t border-gray-200">
           <p className="text-xs text-gray-600">
-            ⚡ Virtual scrolling is enabled for optimal performance with large datasets
+            ⚡ Showing first 200 rows of {displayRows.length.toLocaleString()} total rows for
+            optimal performance
           </p>
         </div>
       )}

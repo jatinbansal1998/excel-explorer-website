@@ -160,6 +160,22 @@ export function useLLMAnalytics(
     fetchSuggestions(true)
   }, [fetchSuggestions])
 
+  const cancelSuggestions = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+      abortControllerRef.current = null
+      setSuggestionsState((prev) => ({ ...prev, isLoading: false }))
+    }
+  }, [])
+
+  const cancelAnalysis = useCallback(() => {
+    if (analysisAbortControllerRef.current) {
+      analysisAbortControllerRef.current.abort()
+      analysisAbortControllerRef.current = null
+      setAnalysisState((prev) => ({ ...prev, isLoading: false }))
+    }
+  }, [])
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -183,7 +199,9 @@ export function useLLMAnalytics(
     analysisError: analysisState.error,
     fetchSuggestions,
     reloadSuggestions,
+    cancelSuggestions,
     runAnalysis,
+    cancelAnalysis,
   } as const
 }
 

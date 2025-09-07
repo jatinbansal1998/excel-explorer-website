@@ -1,87 +1,133 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { DocumentArrowUpIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { Button } from './ui/Button';
-import { LoadingSpinner } from './ui/LoadingSpinner';
-import { clsx } from 'clsx';
+import React, { useState, useRef, useCallback } from 'react'
+import { DocumentArrowUpIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { Button } from './ui/Button'
+import { LoadingSpinner } from './ui/LoadingSpinner'
+import { clsx } from 'clsx'
 
 interface FileUploaderProps {
-  onFileSelect: (file: File) => void;
-  isLoading?: boolean;
-  acceptedTypes?: string[];
-  maxSize?: number; // in bytes
-  className?: string;
+  onFileSelect: (file: File) => void
+  isLoading?: boolean
+  acceptedTypes?: string[]
+  maxSize?: number // in bytes
+  className?: string
+  progress?: {
+    stage: string
+    message?: string
+    percent?: number
+    loaded?: number
+    total?: number
+  }
 }
 
 function validateFile(file: File, maxSize: number, acceptedTypes: string[]): string | null {
   // Check file size
   if (file.size > maxSize) {
-    return `File size (${(file.size / 1024 / 1024).toFixed(1)}MB) exceeds the maximum allowed size of ${(maxSize / 1024 / 1024).toFixed(1)}MB`;
+    return `File size (${(file.size / 1024 / 1024).toFixed(1)}MB) exceeds the maximum allowed size of ${(maxSize / 1024 / 1024).toFixed(1)}MB`
   }
 
   // Check file type
-  const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+  const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase()
   if (!acceptedTypes.includes(fileExtension)) {
-    return `File type "${fileExtension}" is not supported. Please upload: ${acceptedTypes.join(', ')}`;
+    return `File type "${fileExtension}" is not supported. Please upload: ${acceptedTypes.join(', ')}`
   }
 
-  return null;
+  return null
 }
 
-export function FileUploader({ 
-  onFileSelect, 
+function formatProgressMessage(progress?: FileUploaderProps['progress']): string {
+  if (!progress) return 'Processing your file...'
+
+  switch (progress.stage) {
+    case 'validating':
+      return 'Validating file...'
+    case 'reading':
+      if (progress.percent !== undefined) {
+        return `Reading file... ${Math.round(progress.percent)}%`
+      }
+      return 'Reading file...'
+    case 'parsing_workbook':
+      return 'Parsing workbook...'
+    case 'extracting_headers':
+      return 'Extracting headers...'
+    case 'building_rows':
+      if (progress.percent !== undefined) {
+        return `Processing rows... ${Math.round(progress.percent)}%`
+      }
+      return 'Processing rows...'
+    case 'analyzing_columns':
+      return 'Analyzing columns...'
+    case 'complete':
+      return 'Processing complete!'
+    default:
+      return progress.message || 'Processing your file...'
+  }
+}
+
+export function FileUploader({
+  onFileSelect,
   isLoading = false,
   acceptedTypes = ['.xlsx', '.xls', '.csv'],
   maxSize = 50 * 1024 * 1024, // 50MB default
-  className 
+  className,
+  progress,
 }: FileUploaderProps) {
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [error, setError] = useState<string>('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragOver, setIsDragOver] = useState(false)
+  const [error, setError] = useState<string>('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileSelect = useCallback((file: File) => {
-    setError('');
-    
-    const validationError = validateFile(file, maxSize, acceptedTypes);
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
+  const handleFileSelect = useCallback(
+    (file: File) => {
+      setError('')
 
-    onFileSelect(file);
-  }, [onFileSelect, maxSize, acceptedTypes]);
+      const validationError = validateFile(file, maxSize, acceptedTypes)
+      if (validationError) {
+        setError(validationError)
+        return
+      }
+
+      onFileSelect(file)
+    },
+    [onFileSelect, maxSize, acceptedTypes],
+  )
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  }, []);
+    e.preventDefault()
+    setIsDragOver(true)
+  }, [])
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  }, []);
+    e.preventDefault()
+    setIsDragOver(false)
+  }, [])
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) {
-      handleFileSelect(files[0]);
-    }
-  }, [handleFileSelect]);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      setIsDragOver(false)
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      handleFileSelect(files[0]);
-    }
-    // Reset input value to allow selecting the same file again
-    e.target.value = '';
-  }, [handleFileSelect]);
+      const files = Array.from(e.dataTransfer.files)
+      if (files.length > 0) {
+        handleFileSelect(files[0])
+      }
+    },
+    [handleFileSelect],
+  )
+
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files
+      if (files && files.length > 0) {
+        handleFileSelect(files[0])
+      }
+      // Reset input value to allow selecting the same file again
+      e.target.value = ''
+    },
+    [handleFileSelect],
+  )
 
   const openFileDialog = () => {
-    fileInputRef.current?.click();
-  };
+    fileInputRef.current?.click()
+  }
 
   return (
     <div className={className}>
@@ -92,7 +138,7 @@ export function FileUploader({
             'border-primary-300 bg-primary-50': isDragOver && !isLoading,
             'border-gray-300 hover:border-gray-400': !isDragOver && !isLoading,
             'border-gray-200 bg-gray-50': isLoading,
-          }
+          },
         )}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -110,15 +156,30 @@ export function FileUploader({
         {isLoading ? (
           <div className="flex flex-col items-center space-y-4">
             <LoadingSpinner size="lg" />
-            <p className="text-sm text-gray-600">Processing your file...</p>
+            <div className="text-center space-y-2">
+              <p className="text-sm text-gray-600">{formatProgressMessage(progress)}</p>
+              {progress?.percent !== undefined && (
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${Math.min(progress.percent, 100)}%` }}
+                  />
+                </div>
+              )}
+              {progress?.loaded !== undefined && progress?.total !== undefined && (
+                <p className="text-xs text-gray-500">
+                  {Math.round((progress.loaded / 1024 / 1024) * 100) / 100} MB /{' '}
+                  {Math.round((progress.total / 1024 / 1024) * 100) / 100} MB
+                </p>
+              )}
+            </div>
           </div>
         ) : (
           <div className="flex flex-col items-center space-y-4">
-            <DocumentArrowUpIcon className={clsx(
-              'h-12 w-12',
-              isDragOver ? 'text-primary-500' : 'text-gray-400'
-            )} />
-            
+            <DocumentArrowUpIcon
+              className={clsx('h-12 w-12', isDragOver ? 'text-primary-500' : 'text-gray-400')}
+            />
+
             <div className="space-y-2">
               <p className="text-lg font-medium text-gray-900">
                 {isDragOver ? 'Drop your file here' : 'Upload Excel or CSV file'}
@@ -128,11 +189,7 @@ export function FileUploader({
               </p>
             </div>
 
-            <Button 
-              onClick={openFileDialog}
-              variant="primary"
-              size="lg"
-            >
+            <Button onClick={openFileDialog} variant="primary" size="lg">
               Choose File
             </Button>
 
@@ -151,5 +208,5 @@ export function FileUploader({
         </div>
       )}
     </div>
-  );
+  )
 }

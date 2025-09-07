@@ -59,6 +59,8 @@ export function AnalyticsPanel({
     analysisError,
     runAnalysis,
     reloadSuggestions,
+    cancelSuggestions,
+    cancelAnalysis,
   } = useLLMAnalytics(excelData, { contextOverride })
 
   const selectedModel = useMemo(
@@ -78,10 +80,10 @@ export function AnalyticsPanel({
   }, [suggestions])
 
   return (
-    <div className="section-container p-3 space-y-3">
-      <div className="flex items-center justify-between">
+    <div className="section-container p-4 space-y-4">
+      <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <div className="text-sm font-medium">AI Insights</div>
+          <h2 className="text-xl font-semibold">AI Insights</h2>
           {useFilteredForLLM && filtersActive && (
             <span
               className="text-[10px] px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200"
@@ -151,22 +153,48 @@ export function AnalyticsPanel({
               Connect OpenRouter and select a model to use AI analytics.
             </div>
           )}
+
+          {suggestionsLoading && (
+            <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-sm font-medium text-blue-800">Thinking...</span>
+              </div>
+              <span className="text-xs text-blue-600">AI is generating suggestions</span>
+            </div>
+          )}
+
           <div className="flex items-center justify-between">
-            {suggestionsLoading ? (
-              <div className="text-xs text-gray-500">Loading suggestions…</div>
-            ) : (
-              <div className="text-xs text-gray-500">Suggestions</div>
-            )}
+            <div className="text-xs text-gray-500">
+              {suggestionsLoading ? 'Generating suggestions...' : 'Suggestions'}
+            </div>
             <div className="flex items-center gap-2">
               <Button
                 variant="secondary"
                 size="icon"
-                onClick={() => reloadSuggestions()}
-                disabled={!canRun || suggestionsLoading}
-                aria-label="Reload suggestions"
-                title="Reload suggestions"
+                onClick={suggestionsLoading ? cancelSuggestions : reloadSuggestions}
+                disabled={!canRun}
+                aria-label={suggestionsLoading ? 'Cancel suggestions' : 'Reload suggestions'}
+                title={suggestionsLoading ? 'Cancel suggestions' : 'Reload suggestions'}
               >
-                <ArrowPathIcon className="h-4 w-4" />
+                {suggestionsLoading ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                ) : (
+                  <ArrowPathIcon className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </div>
@@ -225,14 +253,29 @@ export function AnalyticsPanel({
             placeholder="Ask a question about your data or paste a suggestion…"
             className="w-full h-24 rounded-md border border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-3 py-2"
           />
+          {analysisLoading && (
+            <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-sm font-medium text-blue-800">Thinking...</span>
+              </div>
+              <span className="text-xs text-blue-600">AI is analyzing your request</span>
+            </div>
+          )}
+
           <div className="flex justify-end">
             <Button
-              onClick={async () => {
-                if (prompt) await runAnalysis(prompt)
-              }}
-              disabled={!canRun || !prompt || analysisLoading}
+              onClick={
+                analysisLoading
+                  ? cancelAnalysis
+                  : async () => {
+                      if (prompt) await runAnalysis(prompt)
+                    }
+              }
+              disabled={!canRun || !prompt}
+              isLoading={analysisLoading}
             >
-              {analysisLoading ? 'Running…' : 'Run Analysis'}
+              {analysisLoading ? 'Cancel' : 'Run Analysis'}
             </Button>
           </div>
 

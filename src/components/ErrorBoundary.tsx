@@ -21,7 +21,17 @@ export class ErrorBoundary extends Component<PropsWithChildren<{}>, ErrorBoundar
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     this.setState({ errorInfo })
 
-    // Log error
+    // Enhanced error logging
+    console.error('🚨 React Error Boundary caught error:', {
+      error: error,
+      errorMessage: error.message,
+      errorStack: error.stack,
+      errorInfo,
+      componentStack: errorInfo.componentStack,
+      timestamp: new Date().toISOString(),
+    })
+
+    // Log error to error handler
     ErrorHandler.getInstance().createError(
       ErrorType.BROWSER_ERROR,
       'React Error Boundary caught an error',

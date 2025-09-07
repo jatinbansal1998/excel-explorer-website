@@ -7,6 +7,7 @@ import { filterGenerator } from '@/services/filterGenerator'
 import { DataFilter } from '@/services/dataFilter'
 import { useSessionPersistence } from './useSessionPersistence'
 import type { UseSessionPersistenceReturn } from './useSessionPersistence'
+import { globalProperties } from '@/types/global'
 
 export function useFilters(excelData: ExcelData | null, sessionExt?: UseSessionPersistenceReturn) {
   const [filters, setFilters] = useState<FilterConfig[]>([])
@@ -136,13 +137,13 @@ export function useFilters(excelData: ExcelData | null, sessionExt?: UseSessionP
     )
   }
 
-  // Expose importer for AI apply filters MVP via global shim
+  // Expose importer for AI apply filters MVP via global property manager
   useEffect(() => {
-    ;(window as any).__importFiltersFromAI = (state: FilterState) => {
+    globalProperties.setImportFiltersFromAI((state: FilterState) => {
       importState(state)
-    }
+    })
     return () => {
-      if ((window as any).__importFiltersFromAI) delete (window as any).__importFiltersFromAI
+      globalProperties.remove('__importFiltersFromAI')
     }
   }, [])
 

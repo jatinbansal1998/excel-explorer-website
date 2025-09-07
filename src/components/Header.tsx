@@ -40,14 +40,14 @@ export function Header() {
             <button
               onClick={() => setIsSessionsOpen(true)}
               type="button"
-              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-sm text-gray-600 hover:text-primary-600 transition-colors"
             >
               Manage Sessions
             </button>
             <button
               onClick={() => setIsSettingsOpen(true)}
               type="button"
-              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-sm text-gray-600 hover:text-primary-600 transition-colors"
             >
               OpenRouter
             </button>
@@ -55,7 +55,7 @@ export function Header() {
               href="https://www.linkedin.com/in/bansal-jatin"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-sm text-gray-600 hover:text-primary-600 transition-colors"
             >
               About
             </a>

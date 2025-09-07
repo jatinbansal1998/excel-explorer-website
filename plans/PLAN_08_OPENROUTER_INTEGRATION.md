@@ -264,9 +264,9 @@ Provide a thin analysis adaptor that can send contextual prompts (dataset metada
 - Generate SQL‑like queries or filter suggestions as text
 - Explain chart insights
 
-Wire this into a new optional panel:
+Wire this into the main analytics panel:
 
-- `src/components/openrouter/DataAnalysisPanel.tsx` — textarea prompt, preset templates, response viewer
+- `src/components/analytics/AnalyticsPanel.tsx` — comprehensive LLM analytics with suggestions, prompt-based analysis, and rich insights display
 
 ## Phases & Tasks
 
@@ -292,7 +292,7 @@ Wire this into a new optional panel:
 
 5. Analysis Panel (optional for MVP toggle)
 
-- Add `DataAnalysisPanel` powered by chat API
+- Enhance `AnalyticsPanel` with LLM analytics capabilities including suggestions generation and prompt-based analysis
 
 6. Testing
 

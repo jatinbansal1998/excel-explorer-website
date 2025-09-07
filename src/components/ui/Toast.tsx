@@ -105,7 +105,20 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const addToast = (toast: Omit<Toast, 'id'>) => {
     const id = Math.random().toString(36).slice(2, 11)
-    setToasts((prev) => [...prev, { ...toast, id }])
+    const toastWithId = { ...toast, id }
+
+    // Log all toast messages to console for debugging
+    const logMethod = toast.type === 'error' ? 'error' : toast.type === 'warning' ? 'warn' : 'log'
+
+    console[logMethod](`🍞 ${toast.type.toUpperCase()}: ${toast.title}`, {
+      message: toast.message,
+      type: toast.type,
+      duration: toast.duration,
+      id,
+      timestamp: new Date().toISOString(),
+    })
+
+    setToasts((prev) => [...prev, toastWithId])
   }
 
   const removeToast = (id: string) => {

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: 'Upload, explore, and visualize your Excel data',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen bg-gray-50" suppressHydrationWarning>

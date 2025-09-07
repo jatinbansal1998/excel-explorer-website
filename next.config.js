@@ -5,6 +5,22 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Bundle optimization
+  experimental: {
+    optimizePackageImports: ['xlsx', 'chart.js', 'react-chartjs-2'],
+  },
+  // Performance optimizations
+  compress: true,
+  poweredByHeader: false,
+  generateEtags: false,
+  httpAgentOptions: {
+    keepAlive: true,
+  },
 }
 
-module.exports = nextConfig
+// Bundle analyzer configuration
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
+
+module.exports = withBundleAnalyzer(nextConfig)

@@ -17,14 +17,257 @@ import {
   parseDateFlexible,
 } from '@/utils/dataTypes'
 import { validateFile } from '@/utils/fileValidation'
+import { globalProperties } from '@/types/global'
+
+// Import xlsx library with proper error handling for browser compatibility
+let XLSX: any
+try {
+  // Try to import xlsx - this will be bundled by Next.js
+  XLSX = require('xlsx')
+  // Expose utils for other methods
+  globalProperties.setXLSXUtils(XLSX.utils)
+} catch (error) {
+  console.error('Failed to load xlsx library:', error)
+  throw new Error('XLSX library not available. Please ensure the library is properly installed.')
+}
 
 export class ExcelParser {
   private getXLSXUtils(): any {
-    // Utils are set by parseFile to avoid SSR import issues
-    if (typeof globalThis !== 'undefined' && (globalThis as any).__XLSX_UTILS) {
-      return (globalThis as any).__XLSX_UTILS
+    // Utils are pre-loaded at module level
+    const utils = globalProperties.getXLSXUtils()
+    if (utils) {
+      return utils
     }
-    throw new Error('XLSX utils not available. Use parseFile() in browser context.')
+    throw new Error('XLSX utils not available. Please ensure the library is properly loaded.')
+  }
+
+  private shouldUseWorker(rowCount: number): boolean {
+    return rowCount > 10000 && typeof Worker !== 'undefined'
+  }
+
+  private async processInWorker(data: any[], options: ParseOptions): Promise<ColumnInfo[]> {
+    return new Promise((resolve, reject) => {
+      try {
+        // Remove non-serializable functions from options before sending to worker
+        const workerOptions = {
+          ...options,
+          progress: undefined, // Remove progress callback as it contains non-serializable functions
+        }
+
+        const workerCode = `
+          self.onmessage = function(e) {
+            const { data, options } = e.data;
+            try {
+              const columns = detectColumnTypes(data, options);
+              self.postMessage(columns);
+            } catch (error) {
+              self.postMessage({ error: error.message });
+            }
+          };
+
+          function detectColumnTypes(data, options) {
+            const [firstRow, ...rows] = data;
+            const headers = extractHeaders(firstRow || []);
+            const colCount = headers.length;
+            const columns = [];
+            const trackingCap = options.uniqueValuesTrackingCap ?? 2000;
+            const returnLimit = options.uniqueValuesReturnLimit ?? 50;
+            const sampleCount = options.sampleValuesCount ?? 5;
+            const sampleRows = Math.min(rows.length, 1000);
+
+            const chooseType = (num, bool, date, str) => {
+              const total = num + bool + date + str;
+              if (total === 0) return 'string';
+              const entries = [['number', num], ['boolean', bool], ['date', date], ['string', str]];
+              const nonZero = entries.filter(([, c]) => c > 0);
+              if (nonZero.length === 1) return nonZero[0][0];
+              const dominant = nonZero.reduce((a, b) => (a[1] > b[1] ? a : b));
+              return dominant[1] / total >= 0.8 ? dominant[0] : 'mixed';
+            };
+
+            function isNullLike(v) {
+              return v === null || v === undefined || v === '';
+            }
+
+            function isBooleanLike(v) {
+              if (typeof v === 'boolean') return true;
+              if (typeof v !== 'string') return false;
+              const s = v.toLowerCase().trim();
+              return s === 'true' || s === 'false' || s === 'yes' || s === 'no' || s === '1' || s === '0';
+            }
+
+            function isNumberLike(v) {
+              if (typeof v === 'number' && Number.isFinite(v)) return true;
+              if (typeof v !== 'string') return false;
+              const s = v.trim();
+              return !isNaN(Number(s)) && s !== '';
+            }
+
+            function isDateLike(v) {
+              if (v instanceof Date && !isNaN(v.getTime())) return true;
+              if (typeof v !== 'string') return false;
+              const s = v.trim();
+              return !isNaN(Date.parse(s));
+            }
+
+            function coerceBoolean(v) {
+              if (typeof v === 'boolean') return v;
+              if (typeof v === 'string') {
+                const s = v.toLowerCase().trim();
+                if (s === 'true' || s === 'yes' || s === '1') return true;
+                if (s === 'false' || s === 'no' || s === '0') return false;
+              }
+              return Boolean(v);
+            }
+
+            function coerceNumber(v) {
+              if (typeof v === 'number') return v;
+              if (typeof v === 'string') {
+                const s = v.trim();
+                const n = Number(s);
+                return isNaN(n) ? null : n;
+              }
+              return null;
+            }
+
+            function parseDateFlexible(v) {
+              if (v instanceof Date) return v;
+              if (typeof v === 'number') {
+                const d = new Date(v);
+                return isNaN(d.getTime()) ? null : d;
+              }
+              if (typeof v === 'string') {
+                const d = new Date(v);
+                return isNaN(d.getTime()) ? null : d;
+              }
+              return null;
+            }
+
+            function keyForUnique(v) {
+              if (v instanceof Date) return v.toISOString();
+              if (typeof v === 'object' && v !== null) return JSON.stringify(v);
+              return v;
+            }
+
+            function extractHeaders(firstRow) {
+              const headers = [];
+              for (let i = 0; i < firstRow.length; i++) {
+                let h = firstRow[i];
+                if (isNullLike(h)) h = '';
+                h = String(h).trim();
+                if (!h) h = 'Column ' + (i + 1);
+                headers.push(h);
+              }
+              return headers;
+            }
+
+            for (let c = 0; c < colCount; c++) {
+              let num = 0, bool = 0, date = 0, str = 0;
+              for (let r = 0; r < sampleRows; r++) {
+                const v = rows[r]?.[c];
+                if (isNullLike(v)) continue;
+                if (isBooleanLike(v)) bool++;
+                else if (isDateLike(v)) date++;
+                else if (isNumberLike(v)) num++;
+                else str++;
+              }
+              const type = chooseType(num, bool, date, str);
+
+              const uniqueSet = new Set();
+              let nullCount = 0;
+              const sampleValues = [];
+              let minNumber, maxNumber, sumNumber = 0, countNumber = 0;
+              let minDateMs, maxDateMs;
+
+              for (let r = 0; r < rows.length; r++) {
+                const raw = rows[r]?.[c];
+                if (isNullLike(raw)) {
+                  nullCount++;
+                  continue;
+                }
+
+                let v = raw;
+                if (type === 'boolean') v = coerceBoolean(raw);
+                else if (type === 'number') v = coerceNumber(raw);
+                else if (type === 'date') v = parseDateFlexible(raw);
+                else v = typeof raw === 'string' ? raw : String(raw);
+
+                if (v == null) {
+                  nullCount++;
+                  continue;
+                }
+
+                if (uniqueSet.size < trackingCap) uniqueSet.add(keyForUnique(v));
+                if (sampleValues.length < sampleCount) sampleValues.push(v);
+
+                if (type === 'number' && typeof v === 'number' && Number.isFinite(v)) {
+                  if (minNumber === undefined || v < minNumber) minNumber = v;
+                  if (maxNumber === undefined || v > maxNumber) maxNumber = v;
+                  sumNumber += v;
+                  countNumber++;
+                } else if (type === 'date' && v instanceof Date && !isNaN(v.getTime())) {
+                  const ms = v.getTime();
+                  if (minDateMs === undefined || ms < minDateMs) minDateMs = ms;
+                  if (maxDateMs === undefined || ms > maxDateMs) maxDateMs = ms;
+                }
+              }
+
+              const uniqueValues = Array.from(uniqueSet).slice(0, returnLimit);
+              let statistics = undefined;
+              const shouldCompute = options.computeStatistics === true;
+              if (type === 'number') {
+                const stats = {};
+                if (minNumber !== undefined) stats.min = minNumber;
+                if (maxNumber !== undefined) stats.max = maxNumber;
+                if (shouldCompute && countNumber > 0) {
+                  stats.average = sumNumber / countNumber;
+                }
+                statistics = stats;
+              } else if (type === 'date') {
+                const stats = {};
+                if (minDateMs !== undefined) stats.min = new Date(minDateMs);
+                if (maxDateMs !== undefined) stats.max = new Date(maxDateMs);
+                statistics = stats;
+              }
+
+              columns.push({
+                name: headers[c],
+                index: c,
+                type,
+                uniqueValues,
+                uniqueCount: uniqueSet.size,
+                hasNulls: nullCount > 0,
+                nullCount,
+                sampleValues,
+                statistics,
+              });
+            }
+            return columns;
+          }
+        `
+
+        const blob = new Blob([workerCode], { type: 'application/javascript' })
+        const worker = new Worker(URL.createObjectURL(blob))
+
+        worker.onmessage = (e) => {
+          if (e.data && e.data.error) {
+            reject(new Error(e.data.error))
+          } else {
+            resolve(e.data)
+          }
+          worker.terminate()
+        }
+
+        worker.onerror = (error) => {
+          reject(new Error(`Web Worker error: ${error.message}`))
+          worker.terminate()
+        }
+
+        worker.postMessage({ data, options: workerOptions })
+      } catch (error) {
+        reject(error)
+      }
+    })
   }
 
   async parseFile(file: File, options: ParseOptions = {}): Promise<ExcelData> {
@@ -60,11 +303,6 @@ export class ExcelParser {
       else reader.readAsArrayBuffer(file)
     })
 
-    // Dynamic import to avoid SSR issues
-    const XLSX: any = await import('xlsx')
-    // Expose utils for other methods
-    ;(globalThis as any).__XLSX_UTILS = XLSX.utils
-
     progress?.({ stage: 'parsing_workbook', message: 'Parsing workbook' })
     const workbook = isCsv
       ? XLSX.read(content as string, { type: 'string', dense: true })
@@ -75,7 +313,7 @@ export class ExcelParser {
           cellNF: false,
           cellText: false,
         })
-    const data = this.parseWorkbook(workbook, options.sheetName, options)
+    const data = await this.parseWorkbook(workbook, options.sheetName, options)
     // Fill file metadata details
     data.metadata.fileName = file.name
     data.metadata.fileSize = file.size
@@ -88,7 +326,11 @@ export class ExcelParser {
     return data
   }
 
-  parseWorkbook(workbook: any, sheetName?: string, options: ParseOptions = {}): ExcelData {
+  async parseWorkbook(
+    workbook: any,
+    sheetName?: string,
+    options: ParseOptions = {},
+  ): Promise<ExcelData> {
     const sheetNames: string[] = workbook.SheetNames || []
     const activeSheet = sheetName && sheetNames.includes(sheetName) ? sheetName : sheetNames[0]
     if (!activeSheet) {
@@ -132,6 +374,7 @@ export class ExcelParser {
       loaded: 0,
       percent: 0,
     })
+
     const rows: any[][] = []
     // Trim trailing completely empty rows to avoid showing blank rows in the UI table
     const isRowCompletelyEmpty = (row: any[] | undefined): boolean => {
@@ -146,23 +389,39 @@ export class ExcelParser {
       lastDataIndex--
     }
     const totalRows = Math.max(lastDataIndex, 0)
+
+    // Use chunked processing for very large datasets
+    const chunkSize = Math.min(5000, totalRows)
     const progressInterval = Math.max(1, Math.floor(totalRows / 20))
-    for (let r = 1; r <= lastDataIndex; r++) {
-      const row = aoa[r]
-      const arr: any[] = []
-      for (let i = 0; i < headers.length; i++) arr.push(row?.[i] ?? null)
-      rows.push(arr)
-      if (r % progressInterval === 0 || r === lastDataIndex) {
-        const loaded = r // number of processed rows
+
+    for (let chunkStart = 1; chunkStart <= lastDataIndex; chunkStart += chunkSize) {
+      const chunkEnd = Math.min(chunkStart + chunkSize - 1, lastDataIndex)
+
+      // Process chunk
+      for (let r = chunkStart; r <= chunkEnd; r++) {
+        const row = aoa[r]
+        const arr: any[] = []
+        for (let i = 0; i < headers.length; i++) arr.push(row?.[i] ?? null)
+        rows.push(arr)
+      }
+
+      // Report progress
+      if (chunkEnd % progressInterval === 0 || chunkEnd === lastDataIndex) {
+        const loaded = chunkEnd
         const percent = totalRows ? (loaded / totalRows) * 100 : 100
         options.progress?.({
           stage: 'building_rows',
-          message: 'Building rows',
+          message: `Building rows (${Math.floor((chunkEnd / totalRows) * 100)}% complete)`,
           sheetName: activeSheet,
           total: totalRows,
           loaded,
           percent,
         })
+      }
+
+      // Allow UI to breathe between chunks for very large datasets
+      if (totalRows > 10000 && chunkEnd < lastDataIndex) {
+        await new Promise((resolve) => setTimeout(resolve, 0))
       }
     }
 
@@ -171,7 +430,18 @@ export class ExcelParser {
       message: 'Analyzing columns',
       sheetName: activeSheet,
     })
-    const columns = this.detectColumnTypes([firstRow, ...rows], options)
+
+    let columns: ColumnInfo[]
+    if (this.shouldUseWorker(rows.length)) {
+      options.progress?.({
+        stage: 'analyzing_columns',
+        message: 'Analyzing columns using Web Worker for optimal performance',
+        sheetName: activeSheet,
+      })
+      columns = await this.processInWorker([firstRow, ...rows], options)
+    } else {
+      columns = this.detectColumnTypes([firstRow, ...rows], options)
+    }
 
     const metadata: ExcelMetadata = {
       fileName: '',

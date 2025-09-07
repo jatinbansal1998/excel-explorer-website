@@ -36,7 +36,10 @@ export interface OpenRouterContextValue {
   disconnect: () => void
   refreshModels: () => Promise<void>
   selectModel: (modelId: string) => void
-  sendChat: (request: OpenRouterChatRequest) => Promise<OpenRouterChatResponse>
+  sendChat: (
+    request: OpenRouterChatRequest,
+    signal?: AbortSignal,
+  ) => Promise<OpenRouterChatResponse>
 }
 
 const OpenRouterContext = createContext<OpenRouterContextValue | null>(null)
@@ -261,9 +264,12 @@ export function OpenRouterProvider({ children }: { children: React.ReactNode }) 
   }, [refreshNamedKeyNames])
 
   const sendChat = useCallback(
-    async (request: OpenRouterChatRequest): Promise<OpenRouterChatResponse> => {
+    async (
+      request: OpenRouterChatRequest,
+      signal?: AbortSignal,
+    ): Promise<OpenRouterChatResponse> => {
       if (!apiKey) throw new Error('Not connected')
-      return serviceRef.current.chat(apiKey, request)
+      return serviceRef.current.chat(apiKey, request, signal)
     },
     [apiKey],
   )

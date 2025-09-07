@@ -51,34 +51,34 @@ export function ModelList({ models, selectedModelId, onSelect }: Props) {
             const selected = selectedModelId === m.id
             const p = m.pricing
             return (
-              <li
-                key={m.id}
-                className={`grid grid-cols-[320px_160px_140px_140px_160px_140px_420px] items-center px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 ${selected ? 'bg-primary-50' : ''}`}
-                onClick={() => onSelect(m.id)}
-              >
-                <div className="truncate" title={m.name || m.description || m.id}>
-                  {m.name || m.description || '—'}
-                </div>
-                <div className="truncate" title={provider}>
-                  {provider}
-                </div>
+              <li key={m.id} className="cursor-pointer p-1" onClick={() => onSelect(m.id)}>
                 <div
-                  className="truncate"
-                  title={typeof m.context_length === 'number' ? String(m.context_length) : '—'}
+                  className={`grid grid-cols-[320px_160px_140px_140px_160px_140px_420px] items-center px-3 py-2 text-sm hover:bg-gray-50 ${selected ? 'relative z-10 bg-primary-50 ring-2 ring-primary-700 ring-offset-1 ring-offset-white rounded-md' : ''}`}
                 >
-                  {formatCompact(m.context_length as number | undefined)}
-                </div>
-                <div className="truncate" title={p?.prompt ? `$${p.prompt}` : '—'}>
-                  {formatPrice(p?.prompt)}
-                </div>
-                <div className="truncate" title={p?.completion ? `$${p.completion}` : '—'}>
-                  {formatPrice(p?.completion)}
-                </div>
-                <div className="truncate" title={p?.request ? `$${p.request}` : '—'}>
-                  {formatPrice(p?.request)}
-                </div>
-                <div className="truncate" title={m.id}>
-                  {m.id}
+                  <div className="truncate" title={m.name || m.description || m.id}>
+                    {m.name || m.description || '—'}
+                  </div>
+                  <div className="truncate" title={provider}>
+                    {provider}
+                  </div>
+                  <div
+                    className="truncate"
+                    title={typeof m.context_length === 'number' ? String(m.context_length) : '—'}
+                  >
+                    {formatCompact(m.context_length as number | undefined)}
+                  </div>
+                  <div className="truncate" title={p?.prompt ? `$${p.prompt}` : '—'}>
+                    {formatPrice(p?.prompt)}
+                  </div>
+                  <div className="truncate" title={p?.completion ? `$${p.completion}` : '—'}>
+                    {formatPrice(p?.completion)}
+                  </div>
+                  <div className="truncate" title={p?.request ? `$${p.request}` : '—'}>
+                    {formatPrice(p?.request)}
+                  </div>
+                  <div className="truncate" title={m.id}>
+                    {m.id}
+                  </div>
                 </div>
               </li>
             )

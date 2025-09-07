@@ -9,6 +9,7 @@ import { Button } from '../ui/Button'
 import { ArrowPathIcon } from '@heroicons/react/24/outline'
 import { useOpenRouter } from '@/hooks/useOpenRouter'
 import { buildDatasetContext } from '@/services/llmAnalytics'
+import { OpenRouterSettingsModal } from '../openrouter/OpenRouterSettingsModal'
 
 interface Props {
   excelData: ExcelData | null
@@ -22,6 +23,7 @@ export function AnalyticsPanel({ excelData, onApplyChart, onApplyFilters }: Read
   const [prompt, setPrompt] = useState('')
   const [activeTab, setActiveTab] = useState<'suggestions' | 'prompt'>('suggestions')
   const [sliceForPrompt, setSliceForPrompt] = useState(true)
+  const [isORSettingsOpen, setIsORSettingsOpen] = useState(false)
 
   const contextOverride = useMemo(
     () => buildDatasetContext(excelData, sliceForPrompt ? 100 : Number.POSITIVE_INFINITY),
@@ -67,12 +69,14 @@ export function AnalyticsPanel({ excelData, onApplyChart, onApplyFilters }: Read
         <div className="flex items-center gap-2">
           <div className="text-sm font-medium">AI Insights</div>
           {orState.selectedModelId && (
-            <span
-              className="text-[11px] px-2 py-0.5 rounded bg-primary-50 text-primary-700 border border-primary-200"
+            <button
+              type="button"
+              onClick={() => setIsORSettingsOpen(true)}
+              className="text-[11px] px-2 py-0.5 rounded bg-primary-50 text-primary-700 border border-primary-200 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer"
               title={orState.selectedModelId}
             >
               {selectedModelLabel}
-            </span>
+            </button>
           )}
         </div>
         <div className="flex gap-2">
@@ -211,6 +215,10 @@ export function AnalyticsPanel({ excelData, onApplyChart, onApplyFilters }: Read
           </div>
         </div>
       )}
+      <OpenRouterSettingsModal
+        isOpen={isORSettingsOpen}
+        onClose={() => setIsORSettingsOpen(false)}
+      />
     </div>
   )
 }

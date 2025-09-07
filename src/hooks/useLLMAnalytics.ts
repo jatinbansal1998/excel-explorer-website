@@ -15,6 +15,8 @@ export function useLLMAnalytics(
 ) {
   const { state: orState, sendChat } = useOpenRouter()
   const serviceRef = useRef(new LLMAnalyticsService())
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const analysisAbortControllerRef = useRef<AbortController | null>(null)
 
   // Suggestions state
   const [suggestionsState, setSuggestionsState] = useState<AsyncState<PromptSuggestion[]>>({
@@ -47,7 +49,18 @@ export function useLLMAnalytics(
   const fetchSuggestions = useCallback(
     async (force?: boolean) => {
       if (!canRun || !orState.selectedModelId) return
-      setSuggestionsState({ isLoading: true, data: suggestionsState.data, error: null })
+
+      // Cancel previous request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+
+      // Create new abort controller
+      abortControllerRef.current = new AbortController()
+      const currentController = abortControllerRef.current
+
+      setSuggestionsState((prev) => ({ ...prev, isLoading: true, error: null }))
+
       try {
         if (!force) {
           const cached = LocalStorageManager.load<PromptSuggestion[]>(suggestionsCacheKey)
@@ -58,14 +71,24 @@ export function useLLMAnalytics(
         }
 
         const resp = await serviceRef.current.suggestPromptsViaChat(
-          orState.selectedModelId!,
+          orState.selectedModelId,
           contextPayload,
-          sendChat,
+          (req) => sendChat(req, currentController.signal),
         )
+
+        // Check if request was aborted
+        if (currentController.signal.aborted) {
+          return
+        }
 
         setSuggestionsState({ isLoading: false, data: resp, error: null })
         LocalStorageManager.save(suggestionsCacheKey, resp)
       } catch (e: any) {
+        // Don't update state if request was aborted
+        if (currentController.signal.aborted) {
+          return
+        }
+
         setSuggestionsState({
           isLoading: false,
           data: null,
@@ -73,14 +96,7 @@ export function useLLMAnalytics(
         })
       }
     },
-    [
-      canRun,
-      orState.selectedModelId,
-      contextPayload,
-      sendChat,
-      suggestionsCacheKey,
-      suggestionsState.data,
-    ],
+    [canRun, orState.selectedModelId, contextPayload, sendChat, suggestionsCacheKey],
   )
 
   // debounce suggestion requests on dataset change
@@ -98,17 +114,39 @@ export function useLLMAnalytics(
   const runAnalysis = useCallback(
     async (prompt: string) => {
       if (!canRun || !orState.selectedModelId) return null
+
+      // Cancel previous analysis request
+      if (analysisAbortControllerRef.current) {
+        analysisAbortControllerRef.current.abort()
+      }
+
+      // Create new abort controller for analysis
+      analysisAbortControllerRef.current = new AbortController()
+      const currentController = analysisAbortControllerRef.current
+
       setAnalysisState((prev) => ({ ...prev, isLoading: true, error: null }))
+
       try {
         const parsed = await serviceRef.current.analyzeViaChat(
-          orState.selectedModelId!,
+          orState.selectedModelId,
           prompt,
           contextPayload,
-          sendChat,
+          (req) => sendChat(req, currentController.signal),
         )
+
+        // Check if request was aborted
+        if (currentController.signal.aborted) {
+          return null
+        }
+
         setAnalysisState({ isLoading: false, data: parsed, error: null })
         return parsed
       } catch (e: any) {
+        // Don't update state if request was aborted
+        if (currentController.signal.aborted) {
+          return null
+        }
+
         const raw = e?.message || 'Failed to analyze'
         const msg = normalizeOpenRouterError(raw)
         setAnalysisState({ isLoading: false, data: null, error: msg })
@@ -117,6 +155,22 @@ export function useLLMAnalytics(
     },
     [canRun, orState.selectedModelId, contextPayload, sendChat],
   )
+
+  const reloadSuggestions = useCallback(() => {
+    fetchSuggestions(true)
+  }, [fetchSuggestions])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+      if (analysisAbortControllerRef.current) {
+        analysisAbortControllerRef.current.abort()
+      }
+    }
+  }, [])
 
   return {
     canRun,
@@ -128,7 +182,7 @@ export function useLLMAnalytics(
     analysisLoading: analysisState.isLoading,
     analysisError: analysisState.error,
     fetchSuggestions,
-    reloadSuggestions: () => fetchSuggestions(true),
+    reloadSuggestions,
     runAnalysis,
   } as const
 }

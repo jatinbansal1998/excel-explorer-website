@@ -68,34 +68,61 @@ export class OpenRouterService {
     return (await res.json()) as OpenRouterCredits
   }
 
-  async chat(apiKey: string, body: OpenRouterChatRequest): Promise<OpenRouterChatResponse> {
-    const res = await fetch(`${OpenRouterService.BASE_URL}/chat/completions`, {
-      method: 'POST',
-      headers: OpenRouterService.buildHeaders(apiKey),
-      body: JSON.stringify(body),
-    })
+  async chat(
+    apiKey: string,
+    body: OpenRouterChatRequest,
+    signal?: AbortSignal,
+  ): Promise<OpenRouterChatResponse> {
+    // Create AbortController with timeout
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 45000) // 45 second timeout for chat
 
-    // Read the response body exactly once to handle both error and success payloads
-    const text = await res.text()
-    let json: any
+    // Chain provided signal
+    if (signal) {
+      signal.addEventListener('abort', () => controller.abort())
+    }
+
+    // Clear timeout on completion
+    const clearTimeoutOnComplete = () => clearTimeout(timeoutId)
+
     try {
-      json = text ? JSON.parse(text) : null
-    } catch {
-      json = null
-    }
+      const res = await fetch(`${OpenRouterService.BASE_URL}/chat/completions`, {
+        method: 'POST',
+        headers: OpenRouterService.buildHeaders(apiKey),
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      })
 
-    // HTTP-level error
-    if (!res.ok) {
-      const msg =
-        json?.error?.message || json?.message || text || `Request failed with status ${res.status}`
-      throw new Error(msg)
-    }
+      clearTimeoutOnComplete()
 
-    // Some providers return a 200 with an error object in the body
-    if (json && json.error && typeof json.error.message === 'string') {
-      throw new Error(json.error.message)
-    }
+      // Read the response body exactly once to handle both error and success payloads
+      const text = await res.text()
+      let json: any
+      try {
+        json = text ? JSON.parse(text) : null
+      } catch {
+        json = null
+      }
 
-    return json as OpenRouterChatResponse
+      // HTTP-level error
+      if (!res.ok) {
+        const msg =
+          json?.error?.message ||
+          json?.message ||
+          text ||
+          `Request failed with status ${res.status}`
+        throw new Error(msg)
+      }
+
+      // Some providers return a 200 with an error object in the body
+      if (json && json.error && typeof json.error.message === 'string') {
+        throw new Error(json.error.message)
+      }
+
+      return json as OpenRouterChatResponse
+    } catch (error) {
+      clearTimeoutOnComplete()
+      throw error
+    }
   }
 }

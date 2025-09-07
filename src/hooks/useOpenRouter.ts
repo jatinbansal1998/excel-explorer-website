@@ -1,6 +1,8 @@
 'use client'
 
-import React, { createContext, useCallback, useContext, useRef, useState } from 'react'
+'use client'
+
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import {
   OpenRouterChatRequest,
   OpenRouterChatResponse,
@@ -258,6 +260,11 @@ export function OpenRouterProvider({ children }: { children: React.ReactNode }) 
     const settings = LocalStorageManager.getOpenRouterSettings() || {}
     LocalStorageManager.saveOpenRouterSettings({ ...settings, selectedModelId: modelId })
   }, [])
+
+  // Ensure named key list is refreshed on client mount (avoids SSR empty state)
+  useEffect(() => {
+    refreshNamedKeyNames()
+  }, [refreshNamedKeyNames])
 
   const sendChat = useCallback(
     async (request: OpenRouterChatRequest): Promise<OpenRouterChatResponse> => {

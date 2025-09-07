@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import type { PersistedSession } from '../../utils/storage/service'
+import type { PersistedSession } from '@/utils/storage/service'
 
 interface SessionListItemProps {
   session: PersistedSession

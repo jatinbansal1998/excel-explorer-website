@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { ChartSuggestion, ChartType } from '../../types/chart'
-import { ColumnInfo, ExcelData } from '../../types/excel'
+import { ChartSuggestion, ChartType } from '@/types/chart'
+import { ColumnInfo, ExcelData } from '@/types/excel'
 import { Button } from '../ui/Button'
 import { TrashIcon, ChevronDownIcon, PlusIcon } from '@heroicons/react/24/outline'
 import { ChartCreationModal } from './ChartCreationModal'
@@ -55,6 +55,7 @@ export function ChartControls({
       <Button
         variant="primary"
         size="sm"
+        type="button"
         onClick={() => suggestions[0] && onAddChart(suggestions[0])}
         disabled={suggestions.length === 0}
         title={suggestions.length > 0 ? `Add: ${suggestions[0].title}` : 'No suggestions available'}
@@ -67,7 +68,12 @@ export function ChartControls({
       {/* All Suggestions Dropdown */}
       {suggestions.length > 1 && (
         <div className="relative" ref={suggestionsRef}>
-          <Button variant="outline" size="sm" onClick={() => setShowSuggestions(!showSuggestions)}>
+          <Button
+            variant="outline"
+            size="sm"
+            type="button"
+            onClick={() => setShowSuggestions(!showSuggestions)}
+          >
             All Suggestions ({suggestions.length})
             <ChevronDownIcon className="w-4 h-4 ml-1" />
           </Button>
@@ -76,6 +82,7 @@ export function ChartControls({
               {suggestions.map((suggestion, index) => (
                 <button
                   key={index}
+                  type="button"
                   onClick={() => {
                     onAddChart(suggestion)
                     setShowSuggestions(false)
@@ -96,7 +103,12 @@ export function ChartControls({
 
       {/* Manual Chart Creation */}
       {onCreateManualChart && (
-        <Button variant="outline" size="sm" onClick={() => setShowChartCreationModal(true)}>
+        <Button
+          variant="outline"
+          size="sm"
+          type="button"
+          onClick={() => setShowChartCreationModal(true)}
+        >
           <PlusIcon className="w-4 h-4 mr-1" />
           Create Chart
         </Button>
@@ -107,6 +119,7 @@ export function ChartControls({
         <Button
           variant="outline"
           size="sm"
+          type="button"
           onClick={onClearCharts}
           aria-label="Remove all charts"
           className="text-red-600 border-red-300 hover:bg-red-50"

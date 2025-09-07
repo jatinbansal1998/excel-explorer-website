@@ -1,14 +1,14 @@
 'use client'
 
 import React, { useEffect, useMemo, useState } from 'react'
-import { useLLMAnalytics } from '../../hooks/useLLMAnalytics'
-import type { ExcelData } from '../../types/excel'
-import type { ChartConfig } from '../../types/chart'
-import type { FilterConfig } from '../../types/filter'
+import { useLLMAnalytics } from '@/hooks/useLLMAnalytics'
+import type { ExcelData } from '@/types/excel'
+import type { ChartConfig } from '@/types/chart'
+import type { FilterConfig } from '@/types/filter'
 import { Button } from '../ui/Button'
 import { ArrowPathIcon } from '@heroicons/react/24/outline'
-import { useOpenRouter } from '../../hooks/useOpenRouter'
-import { buildDatasetContext } from '../../services/llmAnalytics'
+import { useOpenRouter } from '@/hooks/useOpenRouter'
+import { buildDatasetContext } from '@/services/llmAnalytics'
 
 interface Props {
   excelData: ExcelData | null

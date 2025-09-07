@@ -1,4 +1,4 @@
-import { ColumnInfo } from '../types/excel'
+import { ColumnInfo } from '@/types/excel'
 import {
   FilterConfig,
   FilterType,
@@ -6,7 +6,7 @@ import {
   RangeFilter,
   DateRangeFilter,
   SearchFilter,
-} from '../types/filter'
+} from '@/types/filter'
 import { numericRangeGenerator } from './numericRangeGenerator'
 
 function toId(name: string, index: number, suffix?: string) {

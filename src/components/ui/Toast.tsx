@@ -82,6 +82,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
             </div>
             <div className="ml-4 flex flex-shrink-0">
               <button
+                type="button"
                 className="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                 onClick={() => {
                   setShow(false)
@@ -103,7 +104,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
 
   const addToast = (toast: Omit<Toast, 'id'>) => {
-    const id = Math.random().toString(36).substr(2, 9)
+    const id = Math.random().toString(36).slice(2, 11)
     setToasts((prev) => [...prev, { ...toast, id }])
   }
 

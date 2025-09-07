@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { ChartType, AggregationType, NumericRange } from '../../types/chart'
-import { ColumnInfo, ExcelData } from '../../types/excel'
+import { ChartType, AggregationType, NumericRange } from '@/types/chart'
+import { ColumnInfo, ExcelData } from '@/types/excel'
 import { Button } from '../ui/Button'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { NumericRangeEditor } from './NumericRangeEditor'
-import { numericRangeGenerator } from '../../services/numericRangeGenerator'
+import { numericRangeGenerator } from '@/services/numericRangeGenerator'
 
 interface ChartCreationModalProps {
   isOpen: boolean

@@ -1,8 +1,8 @@
 'use client'
 
 import { useCallback, useMemo, useState, useEffect } from 'react'
-import type { ExcelData, ParseOptions, ParseProgressEvent } from '../types/excel'
-import { ExcelParser } from '../services/excelParser'
+import type { ExcelData, ParseOptions, ParseProgressEvent } from '@/types/excel'
+import { ExcelParser } from '@/services/excelParser'
 import { useSessionPersistence } from './useSessionPersistence'
 import type { UseSessionPersistenceReturn } from './useSessionPersistence'
 

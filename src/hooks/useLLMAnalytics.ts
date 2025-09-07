@@ -1,11 +1,11 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { LLMAnalyticsService, buildDatasetContext } from '../services/llmAnalytics'
-import type { ExcelData } from '../types/excel'
-import type { LLMAnalyticsResponse, PromptSuggestion } from '../types/llmAnalytics'
+import { LLMAnalyticsService, buildDatasetContext } from '@/services/llmAnalytics'
+import type { ExcelData } from '@/types/excel'
+import type { LLMAnalyticsResponse, PromptSuggestion } from '@/types/llmAnalytics'
 import { useOpenRouter } from './useOpenRouter'
-import { LocalStorageManager } from '../utils/localStorage'
+import { LocalStorageManager } from '@/utils/localStorage'
 
 type AsyncState<T> = { isLoading: boolean; data: T | null; error: string | null }
 

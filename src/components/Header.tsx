@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react'
 import { SessionManagerModal } from './session/SessionManagerModal'
-import { useSessionPersistence } from '../hooks/useSessionPersistence'
+import { useSessionPersistence } from '@/hooks/useSessionPersistence'
 import { OpenRouterSettingsModal } from './openrouter/OpenRouterSettingsModal'
-import { useOpenRouter } from '../hooks/useOpenRouter'
+import { useOpenRouter } from '@/hooks/useOpenRouter'
 
 export function Header() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
@@ -19,7 +19,7 @@ export function Header() {
       !hasAutoOpened &&
       !isSettingsOpen &&
       !orState.isConnected &&
-      (orState.namedKeyNames?.length || 0) > 0
+      (orState.namedKeyNames?.length ?? 0) > 0
     ) {
       setIsSettingsOpen(true)
       setHasAutoOpened(true)
@@ -39,12 +39,14 @@ export function Header() {
           <nav className="flex items-center space-x-6">
             <button
               onClick={() => setIsSessionsOpen(true)}
+              type="button"
               className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
               Manage Sessions
             </button>
             <button
               onClick={() => setIsSettingsOpen(true)}
+              type="button"
               className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
               OpenRouter

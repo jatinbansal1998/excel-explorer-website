@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Button } from '../ui/Button'
-import { useOpenRouter } from '../../hooks/useOpenRouter'
-import { OpenRouterChatMessage } from '../../types/openrouter'
+import { useOpenRouter } from '@/hooks/useOpenRouter'
+import { OpenRouterChatMessage } from '@/types/openrouter'
 
 interface Props {
   datasetContext?: string

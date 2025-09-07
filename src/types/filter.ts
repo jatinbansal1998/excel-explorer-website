@@ -1,5 +1,5 @@
 import { ColumnInfo } from './excel'
-import type { NumericRange } from '../types/chart'
+import type { NumericRange } from '@/types/chart'
 
 export interface FilterConfig {
   id: string

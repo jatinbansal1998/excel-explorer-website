@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { NumericRange } from '../../types/chart'
-import { numericRangeGenerator } from '../../services/numericRangeGenerator'
+import { NumericRange } from '@/types/chart'
+import { numericRangeGenerator } from '@/services/numericRangeGenerator'
 import { Button } from '../ui/Button'
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { v4 as uuidv4 } from 'uuid'

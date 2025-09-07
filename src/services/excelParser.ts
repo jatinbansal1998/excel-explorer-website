@@ -6,7 +6,7 @@ import {
   ExcelMetadata,
   ValidationResult,
   ParseOptions,
-} from '../types/excel'
+} from '@/types/excel'
 import {
   isNullLike,
   isBooleanLike,
@@ -15,8 +15,8 @@ import {
   coerceBoolean,
   coerceNumber,
   parseDateFlexible,
-} from '../utils/dataTypes'
-import { validateFile } from '../utils/fileValidation'
+} from '@/utils/dataTypes'
+import { validateFile } from '@/utils/fileValidation'
 
 export class ExcelParser {
   private getXLSXUtils(): any {

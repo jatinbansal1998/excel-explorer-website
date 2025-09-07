@@ -1,9 +1,9 @@
 'use client'
 
 import { useMemo } from 'react'
-import { ChartConfig } from '../../types/chart'
-import { ColumnInfo } from '../../types/excel'
-import { chartDataProcessor } from '../../services/chartDataProcessor'
+import { ChartConfig } from '@/types/chart'
+import { ColumnInfo } from '@/types/excel'
+import { chartDataProcessor } from '@/services/chartDataProcessor'
 import { Button } from '../ui/Button'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { Pie } from 'react-chartjs-2'

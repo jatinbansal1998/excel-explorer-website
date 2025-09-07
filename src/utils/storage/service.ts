@@ -1,8 +1,8 @@
 import { DEFAULT_STORAGE_KEYS, type StorageAdapter } from './adapter'
 import { serialize, deserialize, estimateSizeBytes, type SerializedPayload } from './serialization'
-import type { ExcelData } from '../../types/excel'
-import type { FilterState } from '../../types/filter'
-import type { ChartConfig } from '../../types/chart'
+import type { ExcelData } from '@/types/excel'
+import type { FilterState } from '@/types/filter'
+import type { ChartConfig } from '@/types/chart'
 
 export interface PersistedSessionSummary {
   fileName?: string

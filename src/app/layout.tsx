@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { Header } from '../components/Header'
-import { ToastProvider } from '../components/ui/Toast'
-import { OpenRouterProvider } from '../hooks/useOpenRouter'
+import { Header } from '@/components/Header'
+import { ToastProvider } from '@/components/ui/Toast'
+import { OpenRouterProvider } from '@/hooks/useOpenRouter'
 
 export const metadata: Metadata = {
   title: 'Excel Explorer',

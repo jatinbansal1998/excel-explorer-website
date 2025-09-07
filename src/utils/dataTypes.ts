@@ -1,4 +1,4 @@
-import { DataType } from '../types/excel'
+import { DataType } from '@/types/excel'
 
 const TRUE_SET = new Set(['true', '1', 'yes', 'y'])
 const FALSE_SET = new Set(['false', '0', 'no', 'n'])

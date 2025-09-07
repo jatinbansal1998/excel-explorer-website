@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import type { FilterConfig } from '../../types/filter'
+import type { FilterConfig } from '@/types/filter'
 
 interface DateRangeFilterProps {
   filter: FilterConfig

@@ -10,9 +10,9 @@ import {
   RangeFilter,
   DateRangeFilter,
   SearchFilter,
-} from '../types/filter'
-import type { NumericRange } from '../types/chart'
-import type { ColumnInfo } from '../types/excel'
+} from '@/types/filter'
+import type { NumericRange } from '@/types/chart'
+import type { ColumnInfo } from '@/types/excel'
 import { NumericRangeEditor } from './charts/NumericRangeEditor'
 
 interface FilterPanelProps {

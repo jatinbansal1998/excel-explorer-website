@@ -1,8 +1,8 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { ChartConfig, ChartType } from '../../types/chart'
-import { ColumnInfo } from '../../types/excel'
+import { ChartConfig, ChartType } from '@/types/chart'
+import { ColumnInfo } from '@/types/excel'
 import { Modal } from '../ui/Modal'
 import { Button } from '../ui/Button'
 

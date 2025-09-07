@@ -1,5 +1,5 @@
-import { ExcelData } from '../types/excel'
-import { parseDateFlexible } from '../utils/dataTypes'
+import { ExcelData } from '@/types/excel'
+import { parseDateFlexible } from '@/utils/dataTypes'
 import {
   FilterConfig,
   FilterValue,
@@ -7,7 +7,7 @@ import {
   DateRangeFilter,
   SearchFilter,
   FilterState,
-} from '../types/filter'
+} from '@/types/filter'
 
 export class DataFilter {
   private activeFilters: Map<string, FilterConfig>

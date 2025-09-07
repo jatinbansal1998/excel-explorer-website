@@ -1,6 +1,6 @@
 import React, { Component, ErrorInfo, PropsWithChildren } from 'react'
 import { Button } from './ui/Button'
-import { ErrorHandler, ErrorType } from '../utils/errorHandling'
+import { ErrorHandler, ErrorType } from '@/utils/errorHandling'
 
 interface ErrorBoundaryState {
   hasError: boolean

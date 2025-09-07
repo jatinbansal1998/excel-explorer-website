@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useMemo, useState } from 'react'
-import type { PersistedSession } from '../../utils/storage/service'
+import type { PersistedSession } from '@/utils/storage/service'
 import { SessionListItem } from './SessionListItem'
 
 interface SessionManagerModalProps {

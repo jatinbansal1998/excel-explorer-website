@@ -1,8 +1,8 @@
 import { OpenRouterService } from './openrouter'
-import type { LLMAnalyticsResponse, PromptSuggestion } from '../types/llmAnalytics'
-import { LLM_ANALYTICS_SCHEMA_TEXT } from '../types/llmAnalytics'
-import type { ExcelData } from '../types/excel'
-import type { OpenRouterChatRequest, OpenRouterChatResponse } from '../types/openrouter'
+import type { LLMAnalyticsResponse, PromptSuggestion } from '@/types/llmAnalytics'
+import { LLM_ANALYTICS_SCHEMA_TEXT } from '@/types/llmAnalytics'
+import type { ExcelData } from '@/types/excel'
+import type { OpenRouterChatRequest, OpenRouterChatResponse } from '@/types/openrouter'
 
 const TEMPLATE_CACHE: Map<string, string> = new Map()
 

@@ -1,10 +1,10 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ExcelData } from '../types/excel'
-import { FilterConfig, FilterState } from '../types/filter'
-import { filterGenerator } from '../services/filterGenerator'
-import { DataFilter } from '../services/dataFilter'
+import { ExcelData } from '@/types/excel'
+import { FilterConfig, FilterState } from '@/types/filter'
+import { filterGenerator } from '@/services/filterGenerator'
+import { DataFilter } from '@/services/dataFilter'
 import { useSessionPersistence } from './useSessionPersistence'
 import type { UseSessionPersistenceReturn } from './useSessionPersistence'
 

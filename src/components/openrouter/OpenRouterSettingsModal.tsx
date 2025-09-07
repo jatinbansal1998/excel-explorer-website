@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { Button } from '../ui/Button'
 import { ModelList } from './ModelList'
-import { useOpenRouter } from '../../hooks/useOpenRouter'
+import { useOpenRouter } from '@/hooks/useOpenRouter'
 import { EyeIcon, EyeSlashIcon, ArrowPathIcon, TrashIcon } from '@heroicons/react/24/outline'
 
 interface Props {

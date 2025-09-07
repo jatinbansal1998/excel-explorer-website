@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { OpenRouterModel } from '../../types/openrouter'
+import { OpenRouterModel } from '@/types/openrouter'
 
 interface Props {
   models: OpenRouterModel[]

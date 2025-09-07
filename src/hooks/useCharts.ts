@@ -7,9 +7,9 @@ import {
   ChartType,
   AggregationType,
   NumericRange,
-} from '../types/chart'
-import { ColumnInfo } from '../types/excel'
-import { chartSuggestionEngine } from '../services/chartSuggestion'
+} from '@/types/chart'
+import { ColumnInfo } from '@/types/excel'
+import { chartSuggestionEngine } from '@/services/chartSuggestion'
 import { v4 as uuidv4 } from 'uuid'
 import { useSessionPersistence } from './useSessionPersistence'
 import type { UseSessionPersistenceReturn } from './useSessionPersistence'

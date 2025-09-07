@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react'
 import { ChevronUpIcon, ChevronDownIcon, TrashIcon } from '@heroicons/react/24/outline'
-import { ExcelData, DataType } from '../types/excel'
+import { ExcelData, DataType } from '@/types/excel'
 import { LoadingSpinner } from './ui/LoadingSpinner'
 import { clsx } from 'clsx'
-import { parseDateFlexible } from '../utils/dataTypes'
+import { parseDateFlexible } from '@/utils/dataTypes'
 
 interface DataTableProps {
   data: ExcelData | null

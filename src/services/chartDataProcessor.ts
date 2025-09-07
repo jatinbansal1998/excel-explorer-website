@@ -1,5 +1,5 @@
-import { ChartConfig, ChartData, AggregationType, NumericRange } from '../types/chart'
-import { ColumnInfo } from '../types/excel'
+import { ChartConfig, ChartData, AggregationType, NumericRange } from '@/types/chart'
+import { ColumnInfo } from '@/types/excel'
 
 export class ChartDataProcessor {
   prepareChartData(data: any[][], config: ChartConfig, columnInfo: ColumnInfo[]): ChartData {

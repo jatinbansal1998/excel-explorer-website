@@ -1,17 +1,15 @@
 'use client'
 
-'use client'
-
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import {
   OpenRouterChatRequest,
   OpenRouterChatResponse,
   OpenRouterCredits,
   OpenRouterModel,
-} from '../types/openrouter'
-import { OpenRouterService } from '../services/openrouter'
-import { LocalStorageManager } from '../utils/localStorage'
-import { decryptString, encryptString } from '../utils/crypto'
+} from '@/types/openrouter'
+import { OpenRouterService } from '@/services/openrouter'
+import { LocalStorageManager } from '@/utils/localStorage'
+import { decryptString, encryptString } from '@/utils/crypto'
 
 export interface OpenRouterState {
   isConnected: boolean
@@ -54,9 +52,6 @@ export function OpenRouterProvider({ children }: { children: React.ReactNode }) 
   const serviceRef = useRef(new OpenRouterService())
   const [apiKey, setApiKey] = useState<string | null>(null)
   const passphraseRef = useRef<string | null>(null)
-  const [passphraseModalOpen, setPassphraseModalOpen] = useState(false)
-  const [passphraseError, setPassphraseError] = useState<string | null>(null)
-  const [busy, setBusy] = useState(false)
   const [state, setState] = useState<OpenRouterState>({
     isConnected: false,
     models: [],
@@ -69,7 +64,6 @@ export function OpenRouterProvider({ children }: { children: React.ReactNode }) 
     namedKeyNames: LocalStorageManager.getOpenRouterNamedKeyNames(),
     lastUsedKeyName: LocalStorageManager.getOpenRouterSettings()?.lastUsedKeyName,
   })
-  const hasAttemptedAutoLoadRef = useRef<boolean>(false)
 
   const applyFilter = useCallback(
     (
@@ -282,7 +276,7 @@ export function OpenRouterProvider({ children }: { children: React.ReactNode }) 
     saveEncryptedKeyNamed,
     loadEncryptedKeyByName,
     refreshNamedKeyNames,
-    deleteNamedKey: (name: string) => deleteNamedKey(name),
+    deleteNamedKey,
     disconnect,
     refreshModels,
     selectModel,

@@ -1,4 +1,4 @@
-import { ChartConfig, ChartData } from '../types/chart'
+import { ChartConfig, ChartData } from '@/types/chart'
 
 export class ChartExportService {
   exportToPNG(chartElement: HTMLCanvasElement, title: string): void {

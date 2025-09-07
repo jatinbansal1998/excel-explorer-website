@@ -72,9 +72,15 @@ export function useLLMAnalytics(
           error: e?.message || 'Failed to get suggestions',
         })
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
-    [canRun, orState.selectedModelId, contextPayload, sendChat, suggestionsCacheKey],
+    [
+      canRun,
+      orState.selectedModelId,
+      contextPayload,
+      sendChat,
+      suggestionsCacheKey,
+      suggestionsState.data,
+    ],
   )
 
   // debounce suggestion requests on dataset change

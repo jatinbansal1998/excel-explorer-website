@@ -16,7 +16,7 @@ interface Props {
   onApplyFilters?: (filters: FilterConfig[] | FilterConfig) => void
 }
 
-export function AnalyticsPanel({ excelData, onApplyChart, onApplyFilters }: Props) {
+export function AnalyticsPanel({ excelData, onApplyChart, onApplyFilters }: Readonly<Props>) {
   const { state: orState } = useOpenRouter()
 
   const [prompt, setPrompt] = useState('')
@@ -47,10 +47,9 @@ export function AnalyticsPanel({ excelData, onApplyChart, onApplyFilters }: Prop
   const selectedModelLabel = selectedModel?.name || orState.selectedModelId
 
   // Refresh suggestions when toggling slice mode so the context matches
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     reloadSuggestions()
-  }, [sliceForPrompt])
+  }, [sliceForPrompt, reloadSuggestions])
 
   const groupedSuggestions = useMemo(() => {
     const groups: Record<string, typeof suggestions> = {}

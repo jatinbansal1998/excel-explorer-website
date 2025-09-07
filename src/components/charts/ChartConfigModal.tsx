@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { ChartConfig, ChartType } from '@/types/chart'
 import { ColumnInfo } from '@/types/excel'
 import { Modal } from '../ui/Modal'

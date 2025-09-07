@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { Button } from '../ui/Button'
 import { ModelList } from './ModelList'
@@ -49,7 +49,7 @@ export function OpenRouterSettingsModal({ isOpen, onClose }: Props) {
     setKeyName('')
     setLoadKeyName(state.lastUsedKeyName || '')
     refreshNamedKeyNames()
-  }, [isOpen, state.lastUsedKeyName])
+  }, [isOpen, state.lastUsedKeyName, refreshNamedKeyNames])
 
   const handleRefreshModels = async () => {
     setBusy(true)

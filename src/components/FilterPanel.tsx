@@ -223,7 +223,7 @@ function SelectFilterView({
         )}
         {filteredValues.map((v, i) => (
           <label key={`${String(v.value)}-${i}`} className="flex items-center space-x-2 text-sm">
-            <input type="checkbox" checked={!!v.selected} onChange={() => toggle(i)} />
+            <input type="checkbox" checked={v.selected} onChange={() => toggle(i)} />
             <span className="truncate" title={String(v.value)}>
               {String(v.value)}
             </span>
@@ -319,7 +319,7 @@ function RangeFilterView({
             </Button>
           </div>
           {range.ranges.map((r: NumericRange) => {
-            const checked = !!(range.selectedRangeIds || []).includes(r.id)
+            const checked = (range.selectedRangeIds || []).includes(r.id)
             const label = `${r.includeMin ? '≥' : '>'}${r.min} & ${r.includeMax ? '≤' : '<'}${r.max} (${r.label})`
             return (
               <label key={r.id} className="flex items-center space-x-2">
@@ -446,7 +446,7 @@ function SearchFilterView({
 }
 
 function toDateInputValue(d: Date): string {
-  if (!(d instanceof Date) || isNaN(d.getTime())) return ''
+  if (isNaN(d.getTime())) return ''
   const year = d.getFullYear()
   const month = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')

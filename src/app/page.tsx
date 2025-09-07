@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState } from 'react'
 import { FileUploader } from '@/components/FileUploader'
 import { DataTable } from '@/components/DataTable'
 import { useToast } from '@/components/ui/Toast'
@@ -10,7 +10,6 @@ import { FilterPanel } from '@/components/FilterPanel'
 import { ChartView } from '@/components/ChartView'
 import AnalyticsPanel from '@/components/analytics/AnalyticsPanel'
 import { useSessionPersistence } from '@/hooks/useSessionPersistence'
-import { SessionManagerModal } from '@/components/session/SessionManagerModal'
 
 export default function HomePage() {
   const [showDataTypes, setShowDataTypes] = useState(false)

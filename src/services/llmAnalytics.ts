@@ -273,13 +273,11 @@ export class LLMAnalyticsService {
     try {
       const parsed = parseLLMJsonPayload(content)
       if (!parsed) throw new Error('Failed to parse JSON')
-      const normalized = normalizeResponseShape(parsed)
-      return normalized
+      return normalizeResponseShape(parsed)
     } catch {
-      const fallback: LLMAnalyticsResponse = {
+      return {
         insights: [{ key: 'Model Response', value: content || 'No content' }],
       }
-      return fallback
     }
   }
 

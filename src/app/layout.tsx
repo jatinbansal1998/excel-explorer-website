@@ -3,6 +3,7 @@ import './globals.css'
 import { Header } from '@/components/Header'
 import { ToastProvider } from '@/components/ui/Toast'
 import { OpenRouterProvider } from '@/hooks/useOpenRouter'
+import React from 'react'
 
 export const metadata: Metadata = {
   title: 'Excel Explorer',

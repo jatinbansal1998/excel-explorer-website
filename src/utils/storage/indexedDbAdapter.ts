@@ -9,7 +9,7 @@ interface ExplorerDB extends DBSchema {
 }
 
 export class IndexedDbAdapter implements StorageAdapter {
-  private dbPromise: Promise<IDBPDatabase<ExplorerDB>>
+  private readonly dbPromise: Promise<IDBPDatabase<ExplorerDB>>
 
   constructor(dbName: string = 'excel-explorer-db') {
     this.dbPromise = openDB<ExplorerDB>(dbName, 1, {

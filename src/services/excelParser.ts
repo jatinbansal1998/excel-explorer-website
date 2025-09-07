@@ -50,7 +50,7 @@ export class ExcelParser {
       reader.onerror = () => reject(new Error('Failed to read file'))
       reader.onabort = () => reject(new Error('File read was aborted'))
       reader.onprogress = (ev: ProgressEvent<FileReader>) => {
-        const total = typeof ev.total === 'number' && ev.total > 0 ? ev.total : file.size
+        const total = ev.total > 0 ? ev.total : file.size
         const loaded = ev.loaded
         const percent = total ? (loaded / total) * 100 : undefined
         progress?.({ stage: 'reading', loaded, total, percent, message: 'Reading file' })

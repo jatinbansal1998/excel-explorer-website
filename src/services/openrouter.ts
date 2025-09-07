@@ -3,7 +3,7 @@ import {
   OpenRouterChatResponse,
   OpenRouterCredits,
   OpenRouterModel,
-} from '../types/openrouter'
+} from '@/types/openrouter'
 
 export class OpenRouterService {
   private static readonly BASE_URL: string = 'https://openrouter.ai/api/v1'
@@ -77,7 +77,7 @@ export class OpenRouterService {
 
     // Read the response body exactly once to handle both error and success payloads
     const text = await res.text()
-    let json: any = null
+    let json: any
     try {
       json = text ? JSON.parse(text) : null
     } catch {

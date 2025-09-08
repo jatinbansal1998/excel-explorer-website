@@ -6,6 +6,7 @@ import type { ExcelData } from '@/types/excel'
 import type { ChartConfig } from '@/types/chart'
 import type { FilterConfig } from '@/types/filter'
 import { Button } from '../ui/Button'
+import { SpinnerIcon } from '../ui/SpinnerIcon'
 import { ArrowPathIcon } from '@heroicons/react/24/outline'
 import { useOpenRouter } from '@/hooks/useOpenRouter'
 import { buildDatasetContext } from '@/services/llmAnalytics'
@@ -157,7 +158,7 @@ export function AnalyticsPanel({
           {suggestionsLoading && (
             <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                <SpinnerIcon className="text-blue-600" />
                 <span className="text-sm font-medium text-blue-800">Thinking...</span>
               </div>
               <span className="text-xs text-blue-600">AI is generating suggestions</span>
@@ -256,7 +257,7 @@ export function AnalyticsPanel({
           {analysisLoading && (
             <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                <SpinnerIcon className="text-blue-600" />
                 <span className="text-sm font-medium text-blue-800">Thinking...</span>
               </div>
               <span className="text-xs text-blue-600">AI is analyzing your request</span>
@@ -264,19 +265,25 @@ export function AnalyticsPanel({
           )}
 
           <div className="flex justify-end">
-            <Button
-              onClick={
-                analysisLoading
-                  ? cancelAnalysis
-                  : async () => {
-                      if (prompt) await runAnalysis(prompt)
-                    }
-              }
-              disabled={!canRun || !prompt}
-              isLoading={analysisLoading}
-            >
-              {analysisLoading ? 'Cancel' : 'Run Analysis'}
-            </Button>
+            {analysisLoading ? (
+              <button
+                onClick={cancelAnalysis}
+                disabled={!canRun}
+                className="inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 text-sm text-red-600 border border-red-300 hover:bg-red-50"
+              >
+                <SpinnerIcon className="mr-2" />
+                Cancel Analysis
+              </button>
+            ) : (
+              <Button
+                onClick={async () => {
+                  if (prompt) await runAnalysis(prompt)
+                }}
+                disabled={!canRun || !prompt}
+              >
+                Run Analysis
+              </Button>
+            )}
           </div>
 
           {analysisError && (

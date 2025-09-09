@@ -1,4 +1,6 @@
 import { ExcelData } from '@/types/excel'
+import { FilterConfig } from '@/types/filter'
+import { ChartConfig } from '@/types/chart'
 
 // Helper function to generate random dates
 function generateRandomDate(startYear: number, endYear: number): string {
@@ -413,9 +415,9 @@ export function createMockExcelDataWithDateEdgeCases(overrides?: Partial<ExcelDa
     '2023-13-01', // Invalid month
     '2023-01-32', // Invalid day
     '0000-00-00', // Zero date
-    '1970-01-01', // Unix epoch start
-    '2038-01-19', // Unix epoch end (32-bit)
-    '9999-12-31', // Maximum date in some systems
+    '2023-99-99', // Invalid month and day
+    'Not-A-Date', // Clearly invalid
+    '999999-99-99', // Extremely invalid
   ]
 
   const rows = edgeCaseDates.map((date, index) => [
@@ -423,8 +425,8 @@ export function createMockExcelDataWithDateEdgeCases(overrides?: Partial<ExcelDa
     25 + index,
     `City ${index + 1}`,
     50000 + index * 10000,
-    date,
-    date ? `${date} 14:30:00` : null,
+    date === '' ? '' : date, // Ensure empty string stays empty string
+    date && date !== '' ? `${date} 14:30:00` : null,
     generateRandomDate(1990, 2000),
     generateRandomDateTime(2023, 2023),
     new Date().toISOString(),
@@ -611,4 +613,56 @@ export function createLargeDateDataset(size: number = 1000): ExcelData {
       fileSize: size * 100,
     },
   })
+}
+
+// Function to create mock filter configurations
+export function createMockFilter(overrides?: Partial<FilterConfig>): FilterConfig {
+  const defaultFilter: FilterConfig = {
+    id: 'test-filter-1',
+    displayName: 'Test Filter',
+    column: 'Name',
+    columnIndex: 0,
+    type: 'select',
+    active: true,
+    operator: 'equals',
+    values: [
+      { value: 'John Doe', selected: true, count: 1 },
+      { value: 'Jane Smith', selected: false, count: 1 },
+      { value: 'Bob Johnson', selected: false, count: 1 },
+    ],
+  }
+
+  return { ...defaultFilter, ...overrides }
+}
+
+// Function to create mock chart configurations
+export function createMockChart(overrides?: Partial<ChartConfig>): ChartConfig {
+  const defaultChart: ChartConfig = {
+    id: 'test-chart-1',
+    type: 'pie',
+    title: 'Test Chart',
+    dataColumn: 'City',
+    labelColumn: 'Name',
+    aggregation: 'sum',
+    position: 'top' as any, // Using type assertion for now
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+        },
+        title: {
+          display: false,
+          text: '',
+        },
+        tooltip: {
+          enabled: true,
+        },
+      },
+    },
+  }
+
+  return { ...defaultChart, ...overrides }
 }

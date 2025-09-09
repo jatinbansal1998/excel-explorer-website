@@ -1,3 +1,5 @@
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=jatinbansal1998_excel-explorer-website&token=5caf65f17e5cf934c17c7c2735d5b426ce04baa6)](https://sonarcloud.io/summary/new_code?id=jatinbansal1998_excel-explorer-website)
+
 # Excel Explorer Website
 
 A powerful web application for exploring, analyzing, and visualizing Excel data with advanced filtering, charting, and AI-powered analytics capabilities.
@@ -30,12 +32,14 @@ A powerful web application for exploring, analyzing, and visualizing Excel data 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/jatinbansal1998/excel-explorer-website.git
    cd excel-explorer-website
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```

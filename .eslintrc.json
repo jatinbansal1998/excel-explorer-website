@@ -1,6 +1,18 @@
 {
   "root": true,
   "extends": ["next/core-web-vitals"],
+  "env": {
+    "jest": true
+  },
   "rules": {},
-  "ignorePatterns": ["*.md"]
+  "ignorePatterns": ["*.md"],
+  "overrides": [
+    {
+      "files": ["**/*.test.*", "**/*.spec.*"],
+      "rules": {
+        "no-unused-expressions": "off",
+        "@typescript-eslint/no-unused-expressions": "off"
+      }
+    }
+  ]
 }

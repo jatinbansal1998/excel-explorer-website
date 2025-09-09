@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
-import { ChartType, AggregationType, NumericRange } from '@/types/chart'
+import React, { useMemo, useState } from 'react'
+import { AggregationType, ChartType, NumericRange } from '@/types/chart'
 import { ColumnInfo, ExcelData } from '@/types/excel'
 import { Button } from '../ui/Button'
 import { XMarkIcon } from '@heroicons/react/24/outline'
@@ -41,6 +41,38 @@ const chartTypeConfigs: ChartTypeConfig[] = [
     supportedDataTypes: ['string', 'boolean', 'number'],
     aggregationRequired: true,
   },
+  {
+    type: 'bar',
+    label: 'Bar Chart',
+    description: 'Compare values across categories',
+    variables: 1,
+    supportedDataTypes: ['string', 'boolean', 'number'],
+    aggregationRequired: true,
+  },
+  {
+    type: 'line',
+    label: 'Line Chart',
+    description: 'Show trends over time or continuous data',
+    variables: 1,
+    supportedDataTypes: ['number', 'date'],
+    aggregationRequired: true,
+  },
+  {
+    type: 'doughnut',
+    label: 'Doughnut Chart',
+    description: 'Show distribution with a center space',
+    variables: 1,
+    supportedDataTypes: ['string', 'boolean', 'number'],
+    aggregationRequired: true,
+  },
+  {
+    type: 'scatter',
+    label: 'Scatter Plot',
+    description: 'Show relationships between two variables',
+    variables: 2,
+    supportedDataTypes: ['number'],
+    aggregationRequired: false,
+  },
 ]
 
 const aggregationTypes: { type: AggregationType; label: string }[] = [
@@ -56,6 +88,10 @@ const aggregationTypes: { type: AggregationType; label: string }[] = [
 // Define which aggregations make sense for each chart type
 const chartAggregationRules: Record<ChartType, AggregationType[]> = {
   pie: ['count', 'sum', 'average'],
+  bar: ['count', 'sum', 'average', 'min', 'max'],
+  line: ['count', 'sum', 'average', 'min', 'max'],
+  doughnut: ['count', 'sum', 'average'],
+  scatter: ['count', 'sum', 'average', 'min', 'max'],
 }
 
 export function ChartCreationModal({

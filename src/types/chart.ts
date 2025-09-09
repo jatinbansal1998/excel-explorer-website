@@ -1,4 +1,4 @@
-export type ChartType = 'pie'
+export type ChartType = 'pie' | 'bar' | 'line' | 'doughnut' | 'scatter'
 
 export interface NumericRange {
   id: string

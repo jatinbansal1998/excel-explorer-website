@@ -8,6 +8,19 @@
 
 # testing
 /coverage
+/.nyc_output/
+/test-results/
+/junit.xml
+*.lcov
+
+# Test environment
+.env.test
+.env.local.test
+testing.env.js
+
+# Test cache
+.jest/
+.ts-jest/
 
 # next.js
 /.next/

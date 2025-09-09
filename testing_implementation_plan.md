@@ -574,25 +574,93 @@ export function cleanupTest() {
 // __tests__/fixtures/test-data/mock-excel-data.ts
 export function createMockExcelData(overrides?: Partial<ExcelData>): ExcelData {
   const defaultData: ExcelData = {
-    headers: ['Name', 'Age', 'City', 'Salary'],
+    headers: [
+      'Name',
+      'Age',
+      'City',
+      'Salary',
+      'Join Date',
+      'Last Login',
+      'Birth Date',
+      'Meeting Time',
+      'Created At',
+      'Updated At',
+    ],
     rows: [
-      ['John Doe', 30, 'New York', 50000],
-      ['Jane Smith', 25, 'Los Angeles', 60000],
-      ['Bob Johnson', 35, 'Chicago', 70000],
+      [
+        'John Doe',
+        30,
+        'New York',
+        50000,
+        '2023-01-15',
+        '2023-06-15 14:30:00',
+        '1993-05-20',
+        '2023-06-15 10:00:00',
+        '2023-01-15T09:00:00Z',
+        '2023-06-15T15:30:00Z',
+      ],
+      [
+        'Jane Smith',
+        25,
+        'Los Angeles',
+        60000,
+        '2022-03-22',
+        '2023-06-14 09:15:00',
+        '1998-08-10',
+        '2023-06-14 14:30:00',
+        '2022-03-22T11:00:00Z',
+        '2023-06-14T16:45:00Z',
+      ],
+      [
+        'Bob Johnson',
+        35,
+        'Chicago',
+        70000,
+        '2021-07-10',
+        '2023-06-13 16:45:00',
+        '1988-12-05',
+        '2023-06-13 11:30:00',
+        '2021-07-10T13:00:00Z',
+        '2023-06-13T17:20:00Z',
+      ],
+      [
+        'Alice Brown',
+        28,
+        'Houston',
+        55000,
+        '2022-11-05',
+        '2023-06-12 08:30:00',
+        '1995-02-28',
+        '2023-06-12 15:00:00',
+        '2022-11-05T10:00:00Z',
+        '2023-06-12T18:15:00Z',
+      ],
+      [
+        'Charlie Wilson',
+        42,
+        'Phoenix',
+        80000,
+        '2020-04-18',
+        '2023-06-11 12:00:00',
+        '1981-09-15',
+        '2023-06-11 09:30:00',
+        '2020-04-18T14:00:00Z',
+        '2023-06-11T19:45:00Z',
+      ],
     ],
     metadata: {
-      fileName: 'test-data.xlsx',
+      fileName: 'test-data-with-dates.xlsx',
       sheetNames: ['Sheet1'],
       activeSheet: 'Sheet1',
-      totalRows: 3,
-      totalColumns: 4,
+      totalRows: 5,
+      totalColumns: 10,
       columns: [
         {
           name: 'Name',
           index: 0,
           type: 'string',
-          uniqueValues: ['John Doe', 'Jane Smith', 'Bob Johnson'],
-          uniqueCount: 3,
+          uniqueValues: ['John Doe', 'Jane Smith', 'Bob Johnson', 'Alice Brown', 'Charlie Wilson'],
+          uniqueCount: 5,
           hasNulls: false,
           nullCount: 0,
           sampleValues: ['John Doe'],
@@ -601,8 +669,8 @@ export function createMockExcelData(overrides?: Partial<ExcelData>): ExcelData {
           name: 'Age',
           index: 1,
           type: 'number',
-          uniqueValues: [30, 25, 35],
-          uniqueCount: 3,
+          uniqueValues: [30, 25, 35, 28, 42],
+          uniqueCount: 5,
           hasNulls: false,
           nullCount: 0,
           sampleValues: [30],
@@ -611,8 +679,8 @@ export function createMockExcelData(overrides?: Partial<ExcelData>): ExcelData {
           name: 'City',
           index: 2,
           type: 'string',
-          uniqueValues: ['New York', 'Los Angeles', 'Chicago'],
-          uniqueCount: 3,
+          uniqueValues: ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'],
+          uniqueCount: 5,
           hasNulls: false,
           nullCount: 0,
           sampleValues: ['New York'],
@@ -621,18 +689,489 @@ export function createMockExcelData(overrides?: Partial<ExcelData>): ExcelData {
           name: 'Salary',
           index: 3,
           type: 'number',
-          uniqueValues: [50000, 60000, 70000],
-          uniqueCount: 3,
+          uniqueValues: [50000, 60000, 70000, 55000, 80000],
+          uniqueCount: 5,
           hasNulls: false,
           nullCount: 0,
           sampleValues: [50000],
         },
+        {
+          name: 'Join Date',
+          index: 4,
+          type: 'date',
+          uniqueValues: ['2023-01-15', '2022-03-22', '2021-07-10', '2022-11-05', '2020-04-18'],
+          uniqueCount: 5,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: ['2023-01-15'],
+        },
+        {
+          name: 'Last Login',
+          index: 5,
+          type: 'date',
+          uniqueValues: [
+            '2023-06-15 14:30:00',
+            '2023-06-14 09:15:00',
+            '2023-06-13 16:45:00',
+            '2023-06-12 08:30:00',
+            '2023-06-11 12:00:00',
+          ],
+          uniqueCount: 5,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: ['2023-06-15 14:30:00'],
+        },
+        {
+          name: 'Birth Date',
+          index: 6,
+          type: 'date',
+          uniqueValues: ['1993-05-20', '1998-08-10', '1988-12-05', '1995-02-28', '1981-09-15'],
+          uniqueCount: 5,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: ['1993-05-20'],
+        },
+        {
+          name: 'Meeting Time',
+          index: 7,
+          type: 'date',
+          uniqueValues: [
+            '2023-06-15 10:00:00',
+            '2023-06-14 14:30:00',
+            '2023-06-13 11:30:00',
+            '2023-06-12 15:00:00',
+            '2023-06-11 09:30:00',
+          ],
+          uniqueCount: 5,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: ['2023-06-15 10:00:00'],
+        },
+        {
+          name: 'Created At',
+          index: 8,
+          type: 'date',
+          uniqueValues: [
+            '2023-01-15T09:00:00Z',
+            '2022-03-22T11:00:00Z',
+            '2021-07-10T13:00:00Z',
+            '2022-11-05T10:00:00Z',
+            '2020-04-18T14:00:00Z',
+          ],
+          uniqueCount: 5,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: ['2023-01-15T09:00:00Z'],
+        },
+        {
+          name: 'Updated At',
+          index: 9,
+          type: 'date',
+          uniqueValues: [
+            '2023-06-15T15:30:00Z',
+            '2023-06-14T16:45:00Z',
+            '2023-06-13T17:20:00Z',
+            '2023-06-12T18:15:00Z',
+            '2023-06-11T19:45:00Z',
+          ],
+          uniqueCount: 5,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: ['2023-06-15T15:30:00Z'],
+        },
       ],
-      fileSize: 1024,
+      fileSize: 2048,
     },
   }
 
   return { ...defaultData, ...overrides }
+}
+
+// Enhanced mock data generators for comprehensive date testing
+export function createMockExcelDataWithDateFormats(overrides?: Partial<ExcelData>): ExcelData {
+  const dateFormats = [
+    '2023-01-15', // ISO format
+    '01/15/2023', // US format
+    '15-Jan-2023', // Abbreviated month
+    'January 15, 2023', // Full month
+    '20230115', // Compact format
+    '15-01-2023', // European format
+    '01/15/23', // Short year
+    'Jan 15, 2023', // Month abbreviation with comma
+  ]
+
+  const datetimeFormats = [
+    '2023-01-15 14:30:00', // ISO datetime
+    '01/15/2023 2:30 PM', // US datetime with AM/PM
+    '15-Jan-2023 14:30', // Abbreviated month with time
+    'January 15, 2023 14:30:00', // Full month with time
+    '2023-01-15T14:30:00Z', // ISO format with timezone
+    '01/15/23 14:30', // Short year with time
+  ]
+
+  const rows = dateFormats.map((date, index) => [
+    `User ${index + 1}`,
+    25 + index,
+    `City ${index + 1}`,
+    50000 + index * 10000,
+    date,
+    datetimeFormats[index % datetimeFormats.length],
+    generateRandomDate(1990, 2000),
+    generateRandomDateTime(2023, 2023),
+    new Date().toISOString(),
+    new Date().toISOString(),
+  ])
+
+  return createMockExcelData({
+    headers: [
+      'Name',
+      'Age',
+      'City',
+      'Salary',
+      'Various Date Formats',
+      'Various DateTime Formats',
+      'Birth Date',
+      'Meeting Time',
+      'Created At',
+      'Updated At',
+    ],
+    rows,
+    metadata: {
+      fileName: 'test-data-with-date-formats.xlsx',
+      sheetNames: ['Sheet1'],
+      activeSheet: 'Sheet1',
+      totalRows: rows.length,
+      totalColumns: 10,
+      columns: [
+        {
+          name: 'Name',
+          index: 0,
+          type: 'string',
+          uniqueValues: rows.map((row) => row[0]),
+          uniqueCount: rows.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [rows[0][0]],
+        },
+        {
+          name: 'Age',
+          index: 1,
+          type: 'number',
+          uniqueValues: rows.map((row) => row[1]),
+          uniqueCount: rows.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [rows[0][1]],
+        },
+        {
+          name: 'City',
+          index: 2,
+          type: 'string',
+          uniqueValues: rows.map((row) => row[2]),
+          uniqueCount: rows.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [rows[0][2]],
+        },
+        {
+          name: 'Salary',
+          index: 3,
+          type: 'number',
+          uniqueValues: rows.map((row) => row[3]),
+          uniqueCount: rows.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [rows[0][3]],
+        },
+        {
+          name: 'Various Date Formats',
+          index: 4,
+          type: 'date',
+          uniqueValues: dateFormats,
+          uniqueCount: dateFormats.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [dateFormats[0]],
+        },
+        {
+          name: 'Various DateTime Formats',
+          index: 5,
+          type: 'date',
+          uniqueValues: datetimeFormats,
+          uniqueCount: datetimeFormats.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [datetimeFormats[0]],
+        },
+        {
+          name: 'Birth Date',
+          index: 6,
+          type: 'date',
+          uniqueValues: rows.map((row) => row[7]),
+          uniqueCount: rows.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [rows[0][7]],
+        },
+        {
+          name: 'Meeting Time',
+          index: 7,
+          type: 'date',
+          uniqueValues: rows.map((row) => row[8]),
+          uniqueCount: rows.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [rows[0][8]],
+        },
+        {
+          name: 'Created At',
+          index: 8,
+          type: 'date',
+          uniqueValues: rows.map((row) => row[9]),
+          uniqueCount: rows.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [rows[0][9]],
+        },
+        {
+          name: 'Updated At',
+          index: 9,
+          type: 'date',
+          uniqueValues: rows.map((row) => row[10]),
+          uniqueCount: rows.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [rows[0][10]],
+        },
+      ],
+      fileSize: 2048,
+    },
+    ...overrides,
+  })
+}
+
+export function createMockExcelDataWithDateEdgeCases(overrides?: Partial<ExcelData>): ExcelData {
+  const edgeCaseDates = [
+    '', // Empty string
+    null, // Null value
+    'N/A', // Not available
+    'Invalid Date', // Invalid date string
+    '2023-02-30', // Invalid date (February 30th)
+    '2023-13-01', // Invalid month
+    '2023-01-32', // Invalid day
+    '0000-00-00', // Zero date
+    '1970-01-01', // Unix epoch start
+    '2038-01-19', // Unix epoch end (32-bit)
+    '9999-12-31', // Maximum date in some systems
+  ]
+
+  const rows = edgeCaseDates.map((date, index) => [
+    `Edge Case ${index + 1}`,
+    25 + index,
+    `City ${index + 1}`,
+    50000 + index * 10000,
+    date,
+    date ? `${date} 14:30:00` : null,
+    generateRandomDate(1990, 2000),
+    generateRandomDateTime(2023, 2023),
+    new Date().toISOString(),
+    new Date().toISOString(),
+  ])
+
+  return createMockExcelData({
+    headers: [
+      'Name',
+      'Age',
+      'City',
+      'Salary',
+      'Edge Case Dates',
+      'Edge Case Datetimes',
+      'Birth Date',
+      'Meeting Time',
+      'Created At',
+      'Updated At',
+    ],
+    rows,
+    metadata: {
+      fileName: 'test-data-with-date-edge-cases.xlsx',
+      sheetNames: ['Sheet1'],
+      activeSheet: 'Sheet1',
+      totalRows: rows.length,
+      totalColumns: 10,
+      columns: [
+        {
+          name: 'Name',
+          index: 0,
+          type: 'string',
+          uniqueValues: rows.map((row) => row[0]),
+          uniqueCount: rows.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [rows[0][0]],
+        },
+        {
+          name: 'Age',
+          index: 1,
+          type: 'number',
+          uniqueValues: rows.map((row) => row[1]),
+          uniqueCount: rows.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [rows[0][1]],
+        },
+        {
+          name: 'City',
+          index: 2,
+          type: 'string',
+          uniqueValues: rows.map((row) => row[2]),
+          uniqueCount: rows.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [rows[0][2]],
+        },
+        {
+          name: 'Salary',
+          index: 3,
+          type: 'number',
+          uniqueValues: rows.map((row) => row[3]),
+          uniqueCount: rows.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [rows[0][3]],
+        },
+        {
+          name: 'Edge Case Dates',
+          index: 4,
+          type: 'date',
+          uniqueValues: edgeCaseDates.filter((d) => d !== null && d !== ''),
+          uniqueCount: edgeCaseDates.filter((d) => d !== null && d !== '').length,
+          hasNulls: true,
+          nullCount: edgeCaseDates.filter((d) => d === null || d === '').length,
+          sampleValues: [edgeCaseDates[0]],
+        },
+        {
+          name: 'Edge Case Datetimes',
+          index: 5,
+          type: 'date',
+          uniqueValues: edgeCaseDates
+            .filter((d) => d !== null && d !== '')
+            .map((d) => `${d} 14:30:00`),
+          uniqueCount: edgeCaseDates.filter((d) => d !== null && d !== '').length,
+          hasNulls: true,
+          nullCount: edgeCaseDates.filter((d) => d === null).length,
+          sampleValues: [edgeCaseDates[0] ? `${edgeCaseDates[0]} 14:30:00` : null],
+        },
+        {
+          name: 'Birth Date',
+          index: 6,
+          type: 'date',
+          uniqueValues: rows.map((row) => row[7]),
+          uniqueCount: rows.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [rows[0][7]],
+        },
+        {
+          name: 'Meeting Time',
+          index: 7,
+          type: 'date',
+          uniqueValues: rows.map((row) => row[8]),
+          uniqueCount: rows.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [rows[0][8]],
+        },
+        {
+          name: 'Created At',
+          index: 8,
+          type: 'date',
+          uniqueValues: rows.map((row) => row[9]),
+          uniqueCount: rows.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [rows[0][9]],
+        },
+        {
+          name: 'Updated At',
+          index: 9,
+          type: 'date',
+          uniqueValues: rows.map((row) => row[10]),
+          uniqueCount: rows.length,
+          hasNulls: false,
+          nullCount: 0,
+          sampleValues: [rows[0][10]],
+        },
+      ],
+      fileSize: 2048,
+    },
+    ...overrides,
+  })
+}
+
+export function createLargeDateDataset(size: number = 1000): ExcelData {
+  const headers = [
+    'ID',
+    'Name',
+    'Join Date',
+    'Last Login',
+    'Birth Date',
+    'Meeting Time',
+    'Created At',
+    'Updated At',
+  ]
+  const rows = []
+
+  for (let i = 1; i <= size; i++) {
+    rows.push([
+      i,
+      `User ${i}`,
+      generateRandomDate(2020, 2023),
+      generateRandomDateTime(2023, 2023),
+      generateRandomDate(1980, 2000),
+      generateRandomDateTime(2023, 2023),
+      new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
+      new Date().toISOString(),
+    ])
+  }
+
+  return createMockExcelData({
+    headers,
+    rows,
+    metadata: {
+      fileName: 'large-date-dataset.xlsx',
+      sheetNames: ['Sheet1'],
+      activeSheet: 'Sheet1',
+      totalRows: size,
+      totalColumns: headers.length,
+      columns: headers.map((header, index) => ({
+        name: header,
+        index,
+        type: index === 0 ? 'number' : 'date',
+        uniqueValues: [],
+        uniqueCount: 0,
+        hasNulls: false,
+        nullCount: 0,
+        sampleValues: [],
+      })),
+      fileSize: size * 100,
+    },
+  })
+}
+
+// Helper functions for date generation
+function generateRandomDate(startYear: number, endYear: number): string {
+  const year = Math.floor(Math.random() * (endYear - startYear + 1)) + startYear
+  const month = Math.floor(Math.random() * 12)
+  const day = Math.floor(Math.random() * 28) + 1
+  return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
+function generateRandomDateTime(startYear: number, endYear: number): string {
+  const date = generateRandomDate(startYear, endYear)
+  const hours = Math.floor(Math.random() * 24)
+  const minutes = Math.floor(Math.random() * 60)
+  const seconds = Math.floor(Math.random() * 60)
+  return `${date} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
 export function createMockFilter(overrides?: Partial<FilterConfig>): FilterConfig {
@@ -1532,6 +2071,9 @@ export const mockData = {
         ['2023-01-02', 200],
       ],
     }),
+    withDateFormats: createMockExcelDataWithDateFormats(),
+    withDateEdgeCases: createMockExcelDataWithDateEdgeCases(),
+    largeDateDataset: createLargeDateDataset(1000),
   },
   filters: {
     select: createMockFilter({ type: 'select' }),
@@ -1546,6 +2088,93 @@ export const mockData = {
     line: createMockChart({ type: 'line' }),
     doughnut: createMockChart({ type: 'doughnut' }),
   },
+}
+
+// Enhanced date testing utilities
+export const dateUtils = {
+  getDateColumns: (data: ExcelData) =>
+    data.metadata.columns.filter((col) => col.type === 'date').map((col) => col.name),
+
+  getDateValues: (data: ExcelData, columnName: string) => {
+    const columnIndex = data.headers.indexOf(columnName)
+    if (columnIndex === -1) return []
+    return data.rows.map((row) => {
+      const value = row[columnIndex]
+      return value === null || value === undefined || value === '' ? null : String(value)
+    })
+  },
+
+  isValidDate: (dateString: string) => {
+    if (!dateString || dateString.trim() === '') return false
+    const formats = [
+      /^\d{4}-\d{2}-\d{2}$/,
+      /^\d{2}\/\d{2}\/\d{4}$/,
+      /^\d{2}-\d{2}-\d{4}$/,
+      /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/,
+      /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/,
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/,
+    ]
+    return formats.some((format) => format.test(dateString))
+  },
+
+  normalizeDateString: (dateString: string) => {
+    if (!dateString) return ''
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return dateString
+    return date.toISOString().split('T')[0]
+  },
+
+  getDateStatistics: (data: ExcelData, columnName: string) => {
+    const values = dateUtils.getDateValues(data, columnName)
+    const validDates = values.filter((val) => val && dateUtils.isValidDate(val))
+
+    if (validDates.length === 0) {
+      return {
+        min: null,
+        max: null,
+        count: 0,
+        nullCount: values.length - validDates.length,
+        uniqueCount: 0,
+      }
+    }
+
+    const dateObjects = validDates
+      .map((val) => new Date(val!))
+      .filter((date) => !isNaN(date.getTime()))
+
+    const sortedDates = dateObjects.sort((a, b) => a.getTime() - b.getTime())
+
+    return {
+      min: sortedDates[0]?.toISOString().split('T')[0] || null,
+      max: sortedDates[sortedDates.length - 1]?.toISOString().split('T')[0] || null,
+      count: validDates.length,
+      nullCount: values.length - validDates.length,
+      uniqueCount: new Set(validDates).size,
+    }
+  },
+
+  generateDateParseTestCases: () => [
+    // Valid dates
+    { input: '2023-01-15', expected: '2023-01-15', description: 'ISO date format' },
+    { input: '01/15/2023', expected: '2023-01-15', description: 'US date format' },
+    { input: '15-01-2023', expected: '2023-01-15', description: 'European date format' },
+    { input: '2023-01-15 14:30:00', expected: '2023-01-15', description: 'ISO datetime format' },
+    { input: '01/15/2023 2:30 PM', expected: '2023-01-15', description: 'US datetime with AM/PM' },
+    {
+      input: '2023-01-15T14:30:00Z',
+      expected: '2023-01-15',
+      description: 'ISO datetime with timezone',
+    },
+
+    // Invalid dates
+    { input: '', expected: null, description: 'Empty string' },
+    { input: null, expected: null, description: 'Null value' },
+    { input: 'Invalid Date', expected: null, description: 'Invalid date string' },
+    { input: '2023-02-30', expected: null, description: 'Invalid date (February 30th)' },
+    { input: '2023-13-01', expected: null, description: 'Invalid month' },
+    { input: '2023-01-32', expected: null, description: 'Invalid day' },
+    { input: '0000-00-00', expected: null, description: 'Zero date' },
+  ],
 }
 ```
 

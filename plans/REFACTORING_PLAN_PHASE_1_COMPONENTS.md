@@ -20,15 +20,11 @@ all existing functionality.
 1. **NO NEW FEATURES**: Only refactor existing code, do not add new functionality
 2. **PRESERVE BEHAVIOR**: All existing features must work exactly as before
 3. **INCREMENTAL CHANGES**: Implement one component at a time to minimize risks
-4. **TEST THOROUGHLY**: Validate each change before proceeding to the next
-5. **MAINTAIN COMPATIBILITY**: Keep existing APIs unchanged where possible
+4. **MAINTAIN COMPATIBILITY**: Keep existing APIs unchanged where possible
 
 ## Types
 
-Single sentence describing the type system changes.
-
-Detailed type definitions, interfaces, enums, or data structures with complete specifications. Include field names,
-types, validation rules, and relationships.
+Core type definitions for component interfaces and state management.
 
 ### Component Interface Types
 
@@ -50,18 +46,6 @@ interface PresentationalComponentProps extends BaseComponentProps {
   // UI-only props, no business logic
   variant?: 'default' | 'compact' | 'expanded'
   theme?: 'light' | 'dark'
-}
-
-// Data flow interfaces
-interface DataProviderProps<T> {
-  children: React.ReactNode
-  fetchData: () => Promise<T>
-  onUpdate?: (data: T) => void
-}
-
-interface ActionDispatcherProps {
-  children: React.ReactNode
-  dispatch: (action: AppAction) => void
 }
 
 // Context types
@@ -131,14 +115,7 @@ interface AppSelectors {
 
 ## Files
 
-Single sentence describing file modifications.
-
-Detailed breakdown:
-
-- New files to be created (with full paths and purpose)
-- Existing files to be modified (with specific changes)
-- Files to be deleted or moved
-- Configuration file updates
+New files to be created and existing files to be modified for component refactoring.
 
 ### New Files to Create
 
@@ -327,7 +304,6 @@ export function DataTable({
 
 - Add path aliases for new folder structure
 - Enable strict mode for component types
-- Add component testing configuration
 
 **New paths**:
 
@@ -348,13 +324,7 @@ export function DataTable({
 
 ## Functions
 
-Single sentence describing function modifications.
-
-Detailed breakdown:
-
-- New functions (name, signature, file path, purpose)
-- Modified functions (exact name, current file path, required changes)
-- Removed functions (name, file path, reason, migration strategy)
+Key functions to be created, modified, or removed during component refactoring.
 
 ### New Functions to Create
 
@@ -612,13 +582,7 @@ export function renderFriendlyError(error: Error, context?: string): React.React
 
 ## Classes
 
-Single sentence describing class modifications.
-
-Detailed breakdown:
-
-- New classes (name, file path, key methods, inheritance)
-- Modified classes (exact name, file path, specific modifications)
-- Removed classes (name, file path, replacement strategy)
+Key classes to be created, modified, or removed during component refactoring.
 
 ### New Classes to Create
 
@@ -849,9 +813,7 @@ const { applyChart } = useChartContext()
 
 ## Dependencies
 
-Single sentence describing dependency modifications.
-
-Details of new packages, version changes, and integration requirements.
+Required dependencies for component refactoring.
 
 ### New Dependencies to Install
 
@@ -860,30 +822,8 @@ Details of new packages, version changes, and integration requirements.
   "dependencies": {
     "react-use": "^17.4.0",
     "use-context-selector": "^1.4.1",
-    "react-spring": "^9.7.0",
-    "framer-motion": "^10.16.4",
     "react-window": "^1.8.8",
-    "react-virtualized": "^9.22.5",
-    "@types/react-window": "^1.8.8",
-    "@types/react-virtualized": "^9.21.23"
-  },
-  "devDependencies": {
-    "@testing-library/react-hooks": "^8.0.1",
-    "@storybook/react": "^7.5.3",
-    "storybook-addon-react-context": "^1.0.1"
-  }
-}
-```
-
-### Existing Dependencies to Update
-
-```json
-{
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@types/react": "^18.2.37",
-    "@types/react-dom": "^18.2.15"
+    "@types/react-window": "^1.8.8"
   }
 }
 ```
@@ -893,299 +833,357 @@ Details of new packages, version changes, and integration requirements.
 #### React Context Integration
 
 - Replace global state with context providers
-- Implement context selectors for performance optimization
-- Add context devtools for debugging
+- Implement context selectors for basic optimization
 - Ensure proper context provider hierarchy
 
 #### Component Library Integration
 
 - Integrate react-window for virtual scrolling
-- Add framer-motion for animations
-- Implement react-spring for smooth transitions
 - Add component composition utilities
 
-#### Performance Optimization
+## UI Component Migration Plan
 
-- Implement React.memo for presentational components
-- Add useMemo and useCallback hooks
-- Implement virtual scrolling for large lists
-- Add component-level error boundaries
+Migrate one UI component at a time, test it thoroughly, then proceed to the next component.
 
-## Testing
+### Prerequisites (Complete Once Before Starting)
 
-Single sentence describing testing approach.
+1. **Setup Context System Foundation**:
+   - Create basic context providers (AppContext, DataContext, FilterContext, ChartContext)
+   - Create custom hooks for each context
+   - Update TypeScript configuration with path aliases
+   - Ensure context system preserves all existing state management behavior
 
-Test file requirements, existing test modifications, and validation strategies.
+### UI Component 1: DataTable Migration
 
-### New Test Files to Create
-
-#### Unit Tests
-
-```
-src/__tests__/
-├── context/
-│   ├── AppContext.test.tsx
-│   ├── DataContext.test.tsx
-│   ├── FilterContext.test.tsx
-│   └── ChartContext.test.tsx
-├── components/
-│   ├── containers/
-│   │   ├── DataContainer.test.tsx
-│   │   ├── FilterContainer.test.tsx
-│   │   ├── ChartContainer.test.tsx
-│   │   └── AnalyticsContainer.test.tsx
-│   ├── presentational/
-│   │   ├── data/
-│   │   │   ├── DataTable.test.tsx
-│   │   │   ├── TableHeader.test.tsx
-│   │   │   └── TableBody.test.tsx
-│   │   ├── filters/
-│   │   │   ├── FilterPanel.test.tsx
-│   │   │   └── FilterItem.test.tsx
-│   │   └── analytics/
-│   │       ├── AnalyticsPanel.test.tsx
-│   │       └── SuggestionsList.test.tsx
-│   └── layout/
-│       ├── AppLayout.test.tsx
-│       └── Sidebar.test.tsx
-├── hooks/
-│   ├── useAppContext.test.ts
-│   ├── useDataContext.test.ts
-│   ├── useFilterContext.test.ts
-│   ├── useChartContext.test.ts
-│   └── useVirtualScroll.test.ts
-└── utils/
-    ├── component-utils.test.ts
-    ├── prop-utils.test.ts
-    └── composition-utils.test.ts
-```
-
-#### Integration Tests
+**Current File**: `src/components/DataTable.tsx` (200+ lines)
+**Target Files**:
 
 ```
-src/__tests__/integration/
-├── context-integration.test.tsx
-├── container-integration.test.tsx
-├── data-flow.test.tsx
-└── state-management.test.tsx
+src/components/containers/data/TableContainer.tsx
+src/components/presentational/data/DataTable.tsx
+src/components/presentational/data/TableHeader.tsx
+src/components/presentational/data/TableBody.tsx
+src/components/presentational/data/TableRow.tsx
+src/components/presentational/data/TableCell.tsx
 ```
 
-#### Component Tests with Storybook
+**Migration Steps**:
+
+1. Create `TableContainer.tsx`:
+   - Move all sorting logic from DataTable
+   - Move data processing logic
+   - Move virtual scrolling implementation
+   - Connect to DataContext and UIContext
+   - Pass props to presentational components
+
+2. Create presentational components:
+   - `DataTable.tsx`: Only renders layout, receives all data via props
+   - `TableHeader.tsx`: Renders header with sort controls
+   - `TableBody.tsx`: Renders table body with rows
+   - `TableRow.tsx`: Renders individual row
+   - `TableCell.tsx`: Renders individual cell with formatting
+
+3. Update `page.tsx` to use `TableContainer` instead of `DataTable`
+
+4. **Validation**:
+   - Test data display matches original exactly
+   - Test sorting functionality works as before
+   - Test virtual scrolling with large datasets
+   - Test cell formatting and styling
+   - Verify no performance degradation
+
+### UI Component 2: FilterPanel Migration
+
+**Current File**: `src/components/FilterPanel.tsx` (200+ lines)
+**Target Files**:
 
 ```
-src/.storybook/
-├── stories/
-│   ├── containers/
-│   │   ├── DataContainer.stories.tsx
-│   │   ├── FilterContainer.stories.tsx
-│   │   └── ChartContainer.stories.tsx
-│   ├── presentational/
-│   │   ├── data/
-│   │   │   ├── DataTable.stories.tsx
-│   │   │   ├── TableHeader.stories.tsx
-│   │   │   └── TableBody.stories.tsx
-│   │   ├── filters/
-│   │   │   ├── FilterPanel.stories.tsx
-│   │   │   └── FilterItem.stories.tsx
-│   │   └── analytics/
-│   │       ├── AnalyticsPanel.stories.tsx
-│   │       └── SuggestionsList.stories.tsx
-│   └── layout/
-│       ├── AppLayout.stories.tsx
-│       └── Sidebar.stories.tsx
-└── main.ts
+src/components/containers/filters/FilterContainer.tsx
+src/components/presentational/filters/FilterPanel.tsx
+src/components/presentational/filters/FilterItem.tsx
+src/components/presentational/filters/FilterControls.tsx
 ```
 
-### Existing Test Modifications
+**Migration Steps**:
 
-#### Update Existing Component Tests
+1. Create `FilterContainer.tsx`:
+   - Move all filter state management logic
+   - Move filter type handling logic
+   - Connect to FilterContext and DataContext
+   - Handle filter application and reset operations
 
-- **src/**tests**/components/DataTable.test.tsx**: Update to test presentational component only
-- **src/**tests**/components/FilterPanel.test.tsx**: Split into container and presentational tests
-- **src/**tests**/components/analytics/AnalyticsPanel.test.tsx**: Update to test new structure
+2. Create presentational components:
+   - `FilterPanel.tsx`: Renders filter panel layout
+   - `FilterItem.tsx`: Renders individual filter with controls
+   - `FilterControls.tsx`: Renders filter control buttons
 
-### Test Strategies
+3. Update `page.tsx` to use `FilterContainer` instead of `FilterPanel`
 
-#### Unit Testing Strategy
+4. **Validation**:
+   - Test all filter types work as before
+   - Test filter application and data filtering
+   - Test filter reset functionality
+   - Test filter state persistence
+   - Verify UI responsiveness and interactions
 
-- **Context Providers**: Test state management, action dispatch, and selector functions
-- **Container Components**: Test business logic, data flow, and context integration
-- **Presentational Components**: Test rendering, props handling, and user interactions
-- **Custom Hooks**: Test state management, side effects, and return values
+### UI Component 3: AnalyticsPanel Migration
 
-#### Integration Testing Strategy
+**Current File**: `src/components/analytics/AnalyticsPanel.tsx` (150+ lines)
+**Target Files**:
 
-- **Context Integration**: Test multiple contexts working together
-- **Data Flow**: Test data flow from containers to presentational components
-- **State Management**: Test global state changes and component reactions
-- **User Interactions**: Test complete user workflows across components
+```
+src/components/containers/analytics/AnalyticsContainer.tsx
+src/components/presentational/analytics/AnalyticsPanel.tsx
+src/components/presentational/analytics/SuggestionsList.tsx
+src/components/presentational/analytics/PromptInput.tsx
+```
 
-#### Performance Testing Strategy
+**Migration Steps**:
 
-- **Virtual Scrolling**: Test performance with large datasets
-- **Context Optimization**: Test context selector performance
-- **Component Re-rendering**: Test unnecessary re-renders and optimization
-- **Memory Usage**: Test memory leaks and cleanup
+1. Create `AnalyticsContainer.tsx`:
+   - Move all LLM integration logic
+   - Move analytics processing logic
+   - Move suggestion generation logic
+   - Connect to DataContext and OpenRouter services
+   - Handle prompt processing and response display
 
-### Validation Criteria
+2. Create presentational components:
+   - `AnalyticsPanel.tsx`: Renders analytics panel layout
+   - `SuggestionsList.tsx`: Renders list of AI suggestions
+   - `PromptInput.tsx`: Renders prompt input interface
 
-#### Component Validation
+3. Update `page.tsx` to use `AnalyticsContainer` instead of `AnalyticsPanel`
 
-- [ ] All presentational components render correctly with different props
-- [ ] Container components manage state and business logic correctly
-- [ ] Context providers provide expected state and actions
-- [ ] Custom hooks return expected values and handle side effects
+4. **Validation**:
+   - Test AI suggestions generation and display
+   - Test prompt input and processing
+   - Test analytics data display
+   - Test error handling for API failures
+   - Verify all LLM integrations work as before
 
-#### Architecture Validation
+### UI Component 4: ChartView Migration
 
-- [ ] Component hierarchy follows Container/Presentational pattern
-- [ ] No prop drilling beyond one level
-- [ ] Global state managed through context only
-- [ ] Business logic separated from UI logic
+**Current File**: `src/components/ChartView.tsx`
+**Target Files**:
 
-#### Performance Validation
+```
+src/components/containers/charts/ChartContainer.tsx
+src/components/presentational/charts/ChartView.tsx
+src/components/presentational/charts/ChartGrid.tsx
+src/components/presentational/charts/ChartCard.tsx
+```
 
-- [ ] Virtual scrolling handles 100,000+ rows smoothly
-- [ ] Context selectors prevent unnecessary re-renders
-- [ ] Component memoization works correctly
-- [ ] Memory usage remains within acceptable limits
+**Migration Steps**:
 
-#### Integration Validation
+1. Create `ChartContainer.tsx`:
+   - Move all chart creation logic
+   - Move chart data processing
+   - Move chart configuration logic
+   - Connect to ChartContext and DataContext
+   - Handle chart CRUD operations
 
-- [ ] All existing functionality works with new architecture
-- [ ] Data flows correctly between components
-- [ ] State changes propagate correctly through context
-- [ ] User interactions work as expected
+2. Create presentational components:
+   - `ChartView.tsx`: Renders chart view layout
+   - `ChartGrid.tsx`: Renders grid of charts
+   - `ChartCard.tsx`: Renders individual chart card
 
-## Implementation Order
+3. Update `page.tsx` to use `ChartContainer` instead of `ChartView`
 
-Focus on modularizing existing components while strictly preserving all functionality. Implement changes incrementally
-to minimize risks.
+4. **Validation**:
+   - Test chart creation and display
+   - Test chart configuration options
+   - Test chart data updates
+   - Test chart deletion and editing
+   - Verify all chart types work as before
 
-### Phase 1: Context System Setup (Days 1-2)
+### UI Component 5: Header Migration
 
-1. **Document existing functionality**:
-   - Create comprehensive inventory of all existing features in each component
-   - Map all existing state management and data flow
-   - Document all existing APIs and external dependencies
+**Current File**: `src/components/Header.tsx`
+**Target Files**:
 
-2. **Create minimal context structure** with EXISTING functionality only:
-   - **AppContext**: Map existing globalProperties to context actions, preserve all existing state structure
-   - **DataContext**: Preserve all existing Excel data operations and processing logic
-   - **FilterContext**: Preserve all existing filter types and application logic
-   - **ChartContext**: Preserve all existing chart creation and display logic
+```
+src/components/layout/Header.tsx
+src/components/containers/layout/HeaderContainer.tsx
+```
 
-3. **Implement basic context providers**:
-   - Ensure all existing state transitions work exactly as before
-   - Create custom hooks (useAppContext, useDataContext, etc.) with existing functionality only
-   - Update TypeScript configuration with path aliases for new structure
+**Migration Steps**:
 
-4. **Test context system**:
-   - Verify all existing functionality works with new context
-   - Ensure no behavior changes introduced
-   - Test all state management scenarios
+1. Create `HeaderContainer.tsx`:
+   - Move all header state management
+   - Move navigation logic
+   - Connect to UIContext and AppContext
+   - Handle menu interactions and state
 
-### Phase 2: Component Modularization (Days 2-4)
+2. Create presentational component:
+   - `Header.tsx`: Renders header with navigation and controls
 
-1. **Split DataTable component** with EXISTING functionality only:
-   - **TableContainer**: Preserve all existing sorting logic, data processing, and virtual scrolling behavior
-   - **Presentational components**: TableHeader, TableBody, TableRow, TableCell with existing UI and interactions only
-   - **Validation**: Ensure DataTable EXACTLY matches previous behavior
+3. Update `page.tsx` to use `HeaderContainer` instead of `Header`
 
-2. **Split FilterPanel component** with EXISTING functionality only:
-   - **FilterContainer**: Preserve all existing filter state management and application logic
-   - **Presentational components**: FilterItem, FilterControls with existing UI and interactions only
-   - **Validation**: Ensure FilterPanel EXACTLY matches previous behavior
+4. **Validation**:
+   - Test all navigation functionality
+   - Test menu interactions and state
+   - Test responsive behavior
+   - Test all header controls and buttons
+   - Verify header matches original behavior exactly
 
-3. **Split AnalyticsPanel component** with EXISTING functionality only:
-   - **AnalyticsContainer**: Preserve all existing LLM integration, analytics processing, and suggestion generation
-   - **Presentational components**: SuggestionsList, PromptInput with existing UI and interactions only
-   - **Validation**: Ensure AnalyticsPanel EXACTLY matches previous behavior
+### UI Component 6: FileUploader Migration
 
-4. **Split ChartView components** with EXISTING functionality only:
-   - **ChartContainer**: Preserve all existing chart creation logic and data processing
-   - **Presentational components**: ChartGrid, ChartCard with existing UI and interactions only
-   - **Validation**: Ensure ChartView EXACTLY matches previous behavior
+**Current File**: `src/components/FileUploader.tsx`
+**Target Files**:
 
-### Phase 3: Layout and Integration (Days 4-5)
+```
+src/components/containers/data/UploadContainer.tsx
+src/components/presentational/data/FileUploader.tsx
+```
 
-1. **Create layout components** with EXISTING functionality only:
-   - **AppLayout**: Preserve all existing layout structure and responsive behavior
-   - **Header**: Move to layout components with all existing features and interactions preserved
+**Migration Steps**:
 
-2. **Update page.tsx** with modular structure:
-   - Preserve all existing page features and behavior
-   - Use context providers instead of global state
-   - Ensure page EXACTLY matches previous behavior
+1. Create `UploadContainer.tsx`:
+   - Move all file upload logic
+   - Move file processing logic
+   - Connect to DataContext and UIContext
+   - Handle file validation and error states
 
-3. **Migrate existing components**:
-   - Update components to use new modular structure
-   - Ensure all existing APIs work unchanged
-   - Test all functionality after each migration
+2. Create presentational component:
+   - `FileUploader.tsx`: Renders file upload interface
 
-### Phase 4: Testing and Validation (Days 5-6)
+3. Update `page.tsx` to use `UploadContainer` instead of `FileUploader`
 
-1. **Comprehensive testing**:
-   - **Unit tests**: Test all existing functionality in each new component
-   - **Integration tests**: Test all component interactions and data flow
-   - **Regression tests**: Verify no existing functionality was lost
+4. **Validation**:
+   - Test file upload functionality
+   - Test file validation and error handling
+   - Test file processing and data extraction
+   - Test drag-and-drop functionality
+   - Verify upload process matches original exactly
 
-2. **Performance testing**:
-   - Compare performance with original implementation using same datasets
-   - Verify no performance degradation in rendering and virtual scrolling
-   - Ensure memory usage is same or better
+### UI Component 7: Modal Components Migration
 
-3. **User acceptance testing**:
-   - Test all existing user workflows manually
-   - Verify all UI interactions work as before
-   - Test in all supported browsers
+**Current Files**: Various modal components
+**Target Files**:
 
-### Phase 5: Optimization and Cleanup (Days 6-7)
+```
+src/components/containers/modals/
+src/components/presentational/modals/
+```
 
-1. **Performance optimization** (only after functionality is preserved):
-   - Add React.memo to presentational components
-   - Implement context selectors for optimization
-   - Fine-tune virtual scrolling performance
+**Migration Steps**:
 
-2. **Error handling**:
-   - Add error boundaries without changing existing behavior
-   - Preserve all existing error handling and messages
-   - Ensure error recovery works as before
+1. Create container components for each modal:
+   - `ChartConfigModalContainer.tsx`
+   - `ChartCreationModalContainer.tsx`
+   - `OpenRouterSettingsModalContainer.tsx`
+   - `SessionManagerModalContainer.tsx`
 
-3. **Documentation updates**:
-   - Update component documentation with new modular structure
-   - Preserve all existing behavior documentation
-   - Ensure backward compatibility is documented
+2. Create presentational components for each modal:
+   - Move all UI rendering logic to presentational layer
+   - Keep only business logic in containers
 
-## Validation Criteria
+3. Update parent components to use new container components
 
-### Functionality Preservation
+4. **Validation**:
+   - Test each modal's functionality
+   - Test modal open/close behavior
+   - Test form submissions and data handling
+   - Test modal state management
+   - Verify all modals work exactly as before
 
-- [ ] All existing features work exactly as before
-- [ ] No new features or functionality added
-- [ ] All user workflows unchanged
-- [ ] All data displays and processes correctly
+### UI Component 8: Final Page Integration
 
-### Code Quality
+**Current File**: `src/app/page.tsx` (200+ lines)
+**Target File**: `src/app/page.tsx` (simplified to ~50 lines)
 
-- [ ] Components follow Container/Presentational pattern
-- [ ] Clear separation of concerns achieved
+**Migration Steps**:
+
+1. Simplify `page.tsx`:
+   - Remove all direct state management
+   - Remove all business logic
+   - Use only layout and container components
+   - Wrap with context providers
+
+2. Final structure:
+
+   ```typescript
+   export default function HomePage() {
+       return (
+           <AppContextProvider>
+               <DataContextProvider>
+                   <FilterContextProvider>
+                       <ChartContextProvider>
+                           <AppLayout>
+                               <HeaderContainer />
+                               <UploadContainer />
+                               <TableContainer />
+                               <FilterContainer />
+                               <ChartContainer />
+                               <AnalyticsContainer />
+                           </AppLayout>
+                       </ChartContextProvider>
+                   </FilterContextProvider>
+               </DataContextProvider>
+           </AppContextProvider>
+       );
+   }
+   ```
+
+3. **Validation**:
+   - Test complete application functionality
+   - Test all user workflows
+   - Test data flow between components
+   - Test state management across contexts
+   - Verify entire application works exactly as before
+
+## Migration Process
+
+### For Each UI Component:
+
+1. **Analyze Current Component**:
+   - Document all existing functionality
+   - Identify all state management needs
+   - Map all external dependencies
+   - List all user interactions
+
+2. **Create Container Component**:
+   - Move all business logic to container
+   - Connect to appropriate contexts
+   - Handle all state management
+   - Pass props to presentational component
+
+3. **Create Presentational Component**:
+   - Only render UI based on props
+   - Handle user interactions via callbacks
+   - No business logic or state management
+   - Pure UI component
+
+4. **Update Parent Component**:
+   - Replace original component with new container
+   - Ensure proper data flow
+   - Maintain all existing functionality
+
+5. **Test Thoroughly**:
+   - Test all existing features work exactly as before
+   - Test all user interactions
+   - Test edge cases and error states
+   - Verify no regressions introduced
+
+6. **Proceed to Next Component**:
+   - Only move to next component when current is fully validated
+   - Keep application functional after each migration
+   - Maintain backward compatibility
+
+## Success Criteria
+
+### For Each Component Migration:
+
+- [ ] All existing functionality preserved exactly
+- [ ] Component follows Container/Presentational pattern
+- [ ] No regressions introduced
+- [ ] Performance maintained or improved
 - [ ] Code is more maintainable and modular
+
+### Overall Project:
+
+- [ ] All UI components successfully migrated
+- [ ] Application works exactly as before
+- [ ] Code architecture is clean and maintainable
+- [ ] Global state replaced with context system
 - [ ] All existing APIs preserved
-
-### Performance
-
-- [ ] No performance degradation
-- [ ] Memory usage same or better
-- [ ] Rendering performance maintained
-- [ ] Virtual scrolling works correctly
-
-### Testing
-
-- [ ] All existing functionality tested
-- [ ] No regressions found
-- [ ] Performance validated
-- [ ] User acceptance confirmed
-
-This implementation plan provides a comprehensive approach to refactoring the component architecture, ensuring better
-maintainability, performance, and developer experience while preserving all existing functionality.

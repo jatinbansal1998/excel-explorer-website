@@ -3,7 +3,8 @@
 ## Overview
 
 Break down large, monolithic components into smaller, focused components following the Container/Presentational pattern
-to improve maintainability, reduce prop drilling, and establish a clear separation of concerns.
+to improve maintainability, reduce prop drilling, and establish a clear separation of concerns while strictly preserving
+all existing functionality.
 
 ## Current State Analysis
 
@@ -13,6 +14,14 @@ to improve maintainability, reduce prop drilling, and establish a clear separati
 - **FilterPanel.tsx**: 200+ lines managing filter state, UI rendering, and filter type handling
 - **Global state management**: Using window object and globalProperties for cross-component communication
 - **Mixed responsibilities**: Components handling UI, state management, and business logic together
+
+## Core Principles
+
+1. **NO NEW FEATURES**: Only refactor existing code, do not add new functionality
+2. **PRESERVE BEHAVIOR**: All existing features must work exactly as before
+3. **INCREMENTAL CHANGES**: Implement one component at a time to minimize risks
+4. **TEST THOROUGHLY**: Validate each change before proceeding to the next
+5. **MAINTAIN COMPATIBILITY**: Keep existing APIs unchanged where possible
 
 ## Types
 
@@ -1050,98 +1059,133 @@ src/.storybook/
 
 ## Implementation Order
 
-Single sentence describing the implementation sequence.
+Focus on modularizing existing components while strictly preserving all functionality. Implement changes incrementally
+to minimize risks.
 
-Numbered steps showing the logical order of changes to minimize conflicts and ensure successful integration.
+### Phase 1: Context System Setup (Days 1-2)
 
-### 1. Setup Foundation (Day 1-2)
+1. **Document existing functionality**:
+   - Create comprehensive inventory of all existing features in each component
+   - Map all existing state management and data flow
+   - Document all existing APIs and external dependencies
 
-1. **Install new dependencies**: Add react-use, use-context-selector, react-window, framer-motion
-2. **Create folder structure**: Set up context, containers, presentational, and utils folders
-3. **Update TypeScript configuration**: Add path aliases and strict mode settings
-4. **Create base context types**: Define AppContextType, DataContextType, FilterContextType, ChartContextType
+2. **Create minimal context structure** with EXISTING functionality only:
+   - **AppContext**: Map existing globalProperties to context actions, preserve all existing state structure
+   - **DataContext**: Preserve all existing Excel data operations and processing logic
+   - **FilterContext**: Preserve all existing filter types and application logic
+   - **ChartContext**: Preserve all existing chart creation and display logic
 
-### 2. Implement Context System (Day 2-3)
+3. **Implement basic context providers**:
+   - Ensure all existing state transitions work exactly as before
+   - Create custom hooks (useAppContext, useDataContext, etc.) with existing functionality only
+   - Update TypeScript configuration with path aliases for new structure
 
-1. **Create AppContext**: Implement main application context with state and actions
-2. **Create DataContext**: Implement data-specific context with Excel data operations
-3. **Create FilterContext**: Implement filter-specific context with filter operations
-4. **Create ChartContext**: Implement chart-specific context with chart operations
-5. **Create UIContext**: Implement UI-specific context with UI state management
-6. **Create custom hooks**: Implement useAppContext, useDataContext, useFilterContext, useChartContext, useUIContext
+4. **Test context system**:
+   - Verify all existing functionality works with new context
+   - Ensure no behavior changes introduced
+   - Test all state management scenarios
 
-### 3. Implement Container Components (Day 3-4)
+### Phase 2: Component Modularization (Days 2-4)
 
-1. **Create DataContainer**: Implement container for data operations (upload, parsing, display)
-2. **Create FilterContainer**: Implement container for filter operations (management, application)
-3. **Create ChartContainer**: Implement container for chart operations (creation, display)
-4. **Create AnalyticsContainer**: Implement container for analytics operations (LLM integration)
-5. **Test containers**: Write unit and integration tests for all container components
+1. **Split DataTable component** with EXISTING functionality only:
+   - **TableContainer**: Preserve all existing sorting logic, data processing, and virtual scrolling behavior
+   - **Presentational components**: TableHeader, TableBody, TableRow, TableCell with existing UI and interactions only
+   - **Validation**: Ensure DataTable EXACTLY matches previous behavior
 
-### 4. Implement Presentational Components (Day 4-5)
+2. **Split FilterPanel component** with EXISTING functionality only:
+   - **FilterContainer**: Preserve all existing filter state management and application logic
+   - **Presentational components**: FilterItem, FilterControls with existing UI and interactions only
+   - **Validation**: Ensure FilterPanel EXACTLY matches previous behavior
 
-1. **Split DataTable**: Create TableHeader, TableBody, TableRow, TableCell components
-2. **Split FilterPanel**: Create FilterItem, FilterControls, FilterSearch components
-3. **Split ChartView**: Create ChartGrid, ChartCard, ChartControls components
-4. **Split AnalyticsPanel**: Create SuggestionsList, PromptInput, InsightsList components
-5. **Create layout components**: AppLayout, Sidebar, MainContent, Header components
-6. **Test presentational components**: Write unit tests and Storybook stories
+3. **Split AnalyticsPanel component** with EXISTING functionality only:
+   - **AnalyticsContainer**: Preserve all existing LLM integration, analytics processing, and suggestion generation
+   - **Presentational components**: SuggestionsList, PromptInput with existing UI and interactions only
+   - **Validation**: Ensure AnalyticsPanel EXACTLY matches previous behavior
 
-### 5. Implement Utility Functions (Day 5-6)
+4. **Split ChartView components** with EXISTING functionality only:
+   - **ChartContainer**: Preserve all existing chart creation logic and data processing
+   - **Presentational components**: ChartGrid, ChartCard with existing UI and interactions only
+   - **Validation**: Ensure ChartView EXACTLY matches previous behavior
 
-1. **Create component utilities**: composeComponents, withLoading, withError functions
-2. **Create prop utilities**: validateProps, getDefaultProps functions
-3. **Create composition utilities**: createContainer, withContext functions
-4. **Create virtual scroll hook**: Implement useVirtualScroll for large datasets
-5. **Create component state hook**: Implement useComponentState for local state management
-6. **Test utilities**: Write unit tests for all utility functions
+### Phase 3: Layout and Integration (Days 4-5)
 
-### 6. Migrate Page Component (Day 6-7)
+1. **Create layout components** with EXISTING functionality only:
+   - **AppLayout**: Preserve all existing layout structure and responsive behavior
+   - **Header**: Move to layout components with all existing features and interactions preserved
 
-1. **Update page.tsx**: Replace current implementation with new architecture
-2. **Remove global state**: Eliminate globalProperties usage
-3. **Integrate context providers**: Add AppContextProvider and other providers
-4. **Test page integration**: Ensure all functionality works with new structure
-5. **Performance test**: Test performance improvements and optimization
+2. **Update page.tsx** with modular structure:
+   - Preserve all existing page features and behavior
+   - Use context providers instead of global state
+   - Ensure page EXACTLY matches previous behavior
 
-### 7. Update Existing Components (Day 7-8)
+3. **Migrate existing components**:
+   - Update components to use new modular structure
+   - Ensure all existing APIs work unchanged
+   - Test all functionality after each migration
 
-1. **Migrate DataTable**: Update to use new presentational components and context
-2. **Migrate FilterPanel**: Update to use new filter components and context
-3. **Migrate AnalyticsPanel**: Update to use new analytics components and context
-4. **Update Header**: Move to layout components and integrate with context
-5. **Test migrations**: Ensure all migrated components work correctly
+### Phase 4: Testing and Validation (Days 5-6)
 
-### 8. Implement Error Boundaries (Day 8-9)
+1. **Comprehensive testing**:
+   - **Unit tests**: Test all existing functionality in each new component
+   - **Integration tests**: Test all component interactions and data flow
+   - **Regression tests**: Verify no existing functionality was lost
 
-1. **Create component error boundaries**: Implement error boundaries for each component type
-2. **Create context error boundaries**: Implement error boundaries for context providers
-3. **Add error recovery**: Implement error recovery and fallback mechanisms
-4. **Test error handling**: Test error scenarios and recovery mechanisms
+2. **Performance testing**:
+   - Compare performance with original implementation using same datasets
+   - Verify no performance degradation in rendering and virtual scrolling
+   - Ensure memory usage is same or better
 
-### 9. Performance Optimization (Day 9-10)
+3. **User acceptance testing**:
+   - Test all existing user workflows manually
+   - Verify all UI interactions work as before
+   - Test in all supported browsers
 
-1. **Implement React.memo**: Add memoization to presentational components
-2. **Optimize context selectors**: Implement efficient context selectors
-3. **Optimize virtual scrolling**: Fine-tune virtual scrolling performance
-4. **Add performance monitoring**: Implement performance monitoring and profiling
-5. **Performance test**: Test performance improvements and identify bottlenecks
+### Phase 5: Optimization and Cleanup (Days 6-7)
 
-### 10. Final Testing and Validation (Day 10-11)
+1. **Performance optimization** (only after functionality is preserved):
+   - Add React.memo to presentational components
+   - Implement context selectors for optimization
+   - Fine-tune virtual scrolling performance
 
-1. **Comprehensive testing**: Run all unit, integration, and performance tests
-2. **Regression testing**: Ensure all existing functionality works correctly
-3. **User acceptance testing**: Validate user experience and workflows
-4. **Documentation**: Update documentation with new architecture
-5. **Deployment preparation**: Prepare for deployment with new architecture
+2. **Error handling**:
+   - Add error boundaries without changing existing behavior
+   - Preserve all existing error handling and messages
+   - Ensure error recovery works as before
 
-### 11. Rollout and Monitoring (Day 11-12)
+3. **Documentation updates**:
+   - Update component documentation with new modular structure
+   - Preserve all existing behavior documentation
+   - Ensure backward compatibility is documented
 
-1. **Staged rollout**: Roll out changes in stages with monitoring
-2. **Performance monitoring**: Monitor performance metrics and user feedback
-3. **Bug fixes**: Address any issues found during rollout
-4. **Optimization**: Continue optimization based on real-world usage
-5. **Documentation updates**: Update documentation based on feedback and lessons learned
+## Validation Criteria
+
+### Functionality Preservation
+
+- [ ] All existing features work exactly as before
+- [ ] No new features or functionality added
+- [ ] All user workflows unchanged
+- [ ] All data displays and processes correctly
+
+### Code Quality
+
+- [ ] Components follow Container/Presentational pattern
+- [ ] Clear separation of concerns achieved
+- [ ] Code is more maintainable and modular
+- [ ] All existing APIs preserved
+
+### Performance
+
+- [ ] No performance degradation
+- [ ] Memory usage same or better
+- [ ] Rendering performance maintained
+- [ ] Virtual scrolling works correctly
+
+### Testing
+
+- [ ] All existing functionality tested
+- [ ] No regressions found
+- [ ] Performance validated
+- [ ] User acceptance confirmed
 
 This implementation plan provides a comprehensive approach to refactoring the component architecture, ensuring better
 maintainability, performance, and developer experience while preserving all existing functionality.

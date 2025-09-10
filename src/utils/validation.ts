@@ -12,10 +12,7 @@ export class FileValidator {
     'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'text/csv',
-    '.numbers',
-    '.csv',
-    '.xls',
-    '.xlsx',
+    'application/x-iwork-numbers-sffnumbers',
   ]
 
   static validateFile(file: File): ValidationResult {
@@ -133,7 +130,7 @@ export class FileValidator {
 
   private static isValidFileExtension(filename: string): boolean {
     const extension = filename.toLowerCase().split('.').pop()
-    return ['xlsx', 'xls', 'csv'].includes(extension || '')
+    return ['xlsx', 'xls', 'csv', 'numbers'].includes(extension || '')
   }
 
   private static getWarnings(file: File): string[] {

@@ -12,6 +12,10 @@ export class FileValidator {
     'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'text/csv',
+    '.numbers',
+    '.csv',
+    '.xls',
+    '.xlsx',
   ]
 
   static validateFile(file: File): ValidationResult {

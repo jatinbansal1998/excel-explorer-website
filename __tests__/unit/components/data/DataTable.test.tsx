@@ -1,9 +1,9 @@
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {DataTable} from '@/components/DataTable'
-import {ColumnInfo, DataType, ExcelData, ExcelMetadata} from '@/types/excel'
-import {parseDateFlexible} from '@/utils/dataTypes'
+import { DataTable } from '@/components/DataTable'
+import { CellValue, ColumnInfo, DataRow, DataType, ExcelData, ExcelMetadata } from '@/types/excel'
+import { parseDateFlexible } from '@/utils/dataTypes'
 
 // Mock the LoadingSpinner component
 jest.mock('@/components/ui/LoadingSpinner', () => ({
@@ -27,7 +27,7 @@ jest.mock('@heroicons/react/24/outline', () => ({
 
 // Mock clsx properly - this needs to be done before importing the component
 jest.mock('clsx', () => {
-  const mockClsx = jest.fn((...args: any[]) => {
+  const mockClsx = jest.fn((...args: DataRow) => {
     return args.filter(Boolean).join(' ')
   })
   return {
@@ -47,7 +47,11 @@ describe('DataTable', () => {
   const mockOnDeleteColumn = jest.fn()
   const mockOnToggleDataTypes = jest.fn()
 
-  const createColumnInfo = (name: string, type: DataType, sampleValues: any[]): ColumnInfo => ({
+  const createColumnInfo = (
+    name: string,
+    type: DataType,
+    sampleValues: CellValue[],
+  ): ColumnInfo => ({
     name,
     index: 0,
     type,
@@ -85,7 +89,7 @@ describe('DataTable', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(parseDateFlexible as jest.Mock).mockImplementation((value: any) => {
+    ;(parseDateFlexible as jest.Mock).mockImplementation((value: string) => {
       if (typeof value === 'string' && value.includes('2023')) {
         // Return dates at midnight to ensure they're treated as date-only
         const dateStr = value.includes('T') ? value.split('T')[0] : value
@@ -309,7 +313,7 @@ describe('DataTable', () => {
     test('handles empty/null values correctly', () => {
       const dataWithEmpty: ExcelData = {
         ...sampleData,
-          rows: [['', null, null, 'valid']],
+        rows: [['', '', '', 'valid']],
       }
 
       render(<DataTable data={dataWithEmpty} />)
@@ -451,7 +455,7 @@ describe('DataTable', () => {
     })
 
     test('uses clsx for conditional class names', () => {
-      const { clsx: mockClsx } = require('clsx')
+      const { clsx: mockClsx } = jest.requireActual('clsx')
 
       render(<DataTable data={sampleData} onSort={mockOnSort} />)
 

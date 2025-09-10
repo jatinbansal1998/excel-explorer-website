@@ -1,8 +1,8 @@
-import {OpenRouterService} from './openrouter'
-import type {LLMAnalyticsResponse, PromptSuggestion} from '@/types/llmAnalytics'
-import {LLM_ANALYTICS_SCHEMA_TEXT} from '@/types/llmAnalytics'
-import type {ExcelData} from '@/types/excel'
-import type {OpenRouterChatRequest, OpenRouterChatResponse} from '@/types/openrouter'
+import { OpenRouterService } from './openrouter'
+import type { LLMAnalyticsResponse, PromptSuggestion } from '@/types/llmAnalytics'
+import { LLM_ANALYTICS_SCHEMA_TEXT } from '@/types/llmAnalytics'
+import type { ExcelData } from '@/types/excel'
+import type { OpenRouterChatRequest, OpenRouterChatResponse } from '@/types/openrouter'
 
 const TEMPLATE_CACHE: Map<string, string> = new Map()
 
@@ -175,57 +175,75 @@ export function buildDatasetContext(
 }
 
 function normalizeResponseShape(maybeJson: unknown): LLMAnalyticsResponse {
+  const json = maybeJson as Record<string, unknown> | null
+
+  if (!json) {
+    return { insights: [], followUps: [] }
+  }
+
   // Handle { insights: [{ key, value }, ...] }
   if (
-    maybeJson &&
-      Array.isArray((maybeJson as Record<string, unknown>).insights) &&
-      ((maybeJson as Record<string, unknown>).insights as unknown[]).length === 0 ||
-      ((maybeJson as Record<string, unknown>).insights as unknown[])[0]?.key !== undefined
+    Array.isArray(json.insights) &&
+    (json.insights.length === 0 || (json.insights[0] as Record<string, unknown>)?.key !== undefined)
   ) {
-    const insights = ((maybeJson as Record<string, unknown>).insights as unknown[]).map((it: unknown, idx: number) => ({
-      key: String(it?.key ?? `Insight ${idx + 1}`),
-      value: typeof it?.value === 'string' ? it.value : JSON.stringify(it?.value ?? '', null, 2),
-    }))
-    const followUps = Array.isArray((maybeJson as Record<string, unknown>).followUps)
-        ? ((maybeJson as Record<string, unknown>).followUps as unknown[]).map((f: unknown) => ({
-          id: String(f?.id || ''),
-          category: String(f?.category || 'other').toLowerCase() as
-            | 'descriptive'
-            | 'diagnostic'
-            | 'predictive'
-            | 'prescriptive'
-            | 'other',
-          prompt: String(f?.prompt || ''),
-          rationale: f?.rationale ? String(f.rationale) : undefined,
-        }))
+    const insights = (json.insights as unknown[]).map((it: unknown, idx: number) => {
+      const item = it as Record<string, unknown> | null
+      return {
+        key: String(item?.key ?? `Insight ${idx + 1}`),
+        value:
+          typeof item?.value === 'string' ? item.value : JSON.stringify(item?.value ?? '', null, 2),
+      }
+    })
+    const followUps = Array.isArray(json.followUps)
+      ? (json.followUps as unknown[]).map((f: unknown) => {
+          const followUp = f as Record<string, unknown> | null
+          return {
+            id: String(followUp?.id || ''),
+            category: String(followUp?.category || 'other').toLowerCase() as
+              | 'descriptive'
+              | 'diagnostic'
+              | 'predictive'
+              | 'prescriptive'
+              | 'other',
+            prompt: String(followUp?.prompt || ''),
+            rationale: followUp?.rationale ? String(followUp.rationale) : undefined,
+          }
+        })
       : []
     return { insights, followUps }
   }
 
   // Handle legacy cards: { insights: [{ id,title,kind,details, ... }] }
   if (
-    maybeJson &&
-      Array.isArray((maybeJson as Record<string, unknown>).insights) &&
-      ((maybeJson as Record<string, unknown>).insights as unknown[]).length === 0 ||
-      ((maybeJson as Record<string, unknown>).insights as unknown[])[0]?.title !== undefined
+    Array.isArray(json.insights) &&
+    (json.insights.length === 0 ||
+      (json.insights[0] as Record<string, unknown>)?.title !== undefined)
   ) {
-    const insights = ((maybeJson as Record<string, unknown>).insights as unknown[]).map((it: unknown, idx: number) => ({
-      key: String(it?.title ?? `Insight ${idx + 1}`),
-      value:
-        typeof it?.details === 'string' ? it.details : JSON.stringify(it?.details ?? '', null, 2),
-    }))
-    const followUps = Array.isArray((maybeJson as Record<string, unknown>).followUps)
-        ? ((maybeJson as Record<string, unknown>).followUps as unknown[]).map((f: unknown) => ({
-          id: String(f?.id || ''),
-          category: String(f?.category || 'other').toLowerCase() as
-            | 'descriptive'
-            | 'diagnostic'
-            | 'predictive'
-            | 'prescriptive'
-            | 'other',
-          prompt: String(f?.prompt || ''),
-          rationale: f?.rationale ? String(f.rationale) : undefined,
-        }))
+    const insights = (json.insights as unknown[]).map((it: unknown, idx: number) => {
+      const item = it as Record<string, unknown> | null
+      return {
+        key: String(item?.title ?? `Insight ${idx + 1}`),
+        value:
+          typeof item?.details === 'string'
+            ? item.details
+            : JSON.stringify(item?.details ?? '', null, 2),
+      }
+    })
+    const followUps = Array.isArray(json.followUps)
+      ? (json.followUps as unknown[]).map((f: unknown) => {
+          const followUp = f as Record<string, unknown> | null
+          return {
+            id: String(followUp?.id || ''),
+            category: String(followUp?.category || 'other').toLowerCase() as
+              | 'descriptive'
+              | 'diagnostic'
+              | 'predictive'
+              | 'prescriptive'
+              | 'other',
+            prompt: String(followUp?.prompt || ''),
+            rationale: followUp?.rationale ? String(followUp.rationale) : undefined,
+          }
+        })
       : []
     return { insights, followUps }
   }

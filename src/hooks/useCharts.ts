@@ -1,15 +1,21 @@
 'use client'
 
-import {useCallback, useEffect, useState} from 'react'
-import {AggregationType, ChartConfig, ChartSuggestion, ChartType, NumericRange,} from '@/types/chart'
-import {ColumnInfo} from '@/types/excel'
-import {chartSuggestionEngine} from '@/services/chartSuggestion'
-import {v4 as uuidv4} from 'uuid'
-import type {UseSessionPersistenceReturn} from './useSessionPersistence'
-import {useSessionPersistence} from './useSessionPersistence'
+import { useCallback, useEffect, useState } from 'react'
+import {
+  AggregationType,
+  ChartConfig,
+  ChartSuggestion,
+  ChartType,
+  NumericRange,
+} from '@/types/chart'
+import { ColumnInfo, DataMatrix } from '@/types/excel'
+import { chartSuggestionEngine } from '@/services/chartSuggestion'
+import { v4 as uuidv4 } from 'uuid'
+import type { UseSessionPersistenceReturn } from './useSessionPersistence'
+import { useSessionPersistence } from './useSessionPersistence'
 
 export function useCharts(
-    filteredData: (string | number | boolean | Date | null)[][],
+  filteredData: DataMatrix,
   columnInfo: ColumnInfo[],
   sessionExt?: UseSessionPersistenceReturn,
 ) {
@@ -124,20 +130,20 @@ export function useCharts(
 }
 
 function createChartFromSuggestion(
-    _s: ChartSuggestion,
+  _s: ChartSuggestion,
   maxSegments?: number,
   numericRanges?: NumericRange[],
 ): ChartConfig {
   // Configure legend position based on chart type
-    const legendPosition = _s.type === 'pie' || _s.type === 'doughnut' ? 'right' : 'top'
+  const legendPosition = _s.type === 'pie' || _s.type === 'doughnut' ? 'right' : 'top'
 
   return {
     id: uuidv4(),
-      title: _s.title,
-      type: _s.type,
-      dataColumn: _s.dataColumn,
-      labelColumn: _s.labelColumn,
-      aggregation: _s.aggregation,
+    title: _s.title,
+    type: _s.type,
+    dataColumn: _s.dataColumn,
+    labelColumn: _s.labelColumn,
+    aggregation: _s.aggregation,
     maxSegments: maxSegments || 10, // Default to 10 if not specified
     numericRanges: numericRanges,
     position: { row: 0, column: 0, width: 1, height: 1 },
@@ -149,7 +155,7 @@ function createChartFromSuggestion(
           display: true,
           position: legendPosition,
         },
-          title: {display: false, text: _s.title},
+        title: { display: false, text: _s.title },
         tooltip: { enabled: true },
       },
       animation: { duration: 250, easing: 'easeOutQuart' },

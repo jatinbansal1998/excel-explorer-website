@@ -1,17 +1,17 @@
 'use client'
 
-import {useEffect, useRef, useState} from 'react'
-import {ExcelData} from '@/types/excel'
-import {FilterConfig, FilterState} from '@/types/filter'
-import {filterGenerator} from '@/services/filterGenerator'
-import {DataFilter} from '@/services/dataFilter'
-import type {UseSessionPersistenceReturn} from './useSessionPersistence'
-import {useSessionPersistence} from './useSessionPersistence'
-import {globalProperties} from '@/types/global'
+import { useEffect, useRef, useState } from 'react'
+import { DataMatrix, ExcelData } from '@/types/excel'
+import { FilterConfig, FilterState } from '@/types/filter'
+import { filterGenerator } from '@/services/filterGenerator'
+import { DataFilter } from '@/services/dataFilter'
+import type { UseSessionPersistenceReturn } from './useSessionPersistence'
+import { useSessionPersistence } from './useSessionPersistence'
+import { globalProperties } from '@/types/global'
 
 export function useFilters(excelData: ExcelData | null, sessionExt?: UseSessionPersistenceReturn) {
   const [filters, setFilters] = useState<FilterConfig[]>([])
-  const [filteredData, setFilteredData] = useState<(string | number | boolean | Date | null)[][]>([])
+  const [filteredData, setFilteredData] = useState<DataMatrix>([])
   const [isFiltering, setIsFiltering] = useState(false)
   const engineRef = useRef<DataFilter | null>(null)
   const defaultSession = useSessionPersistence()

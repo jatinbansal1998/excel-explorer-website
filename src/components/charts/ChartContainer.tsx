@@ -1,18 +1,19 @@
 'use client'
 
-import {useMemo} from 'react'
-import {ChartConfig} from '@/types/chart'
-import {ColumnInfo} from '@/types/excel'
-import {chartDataProcessor} from '@/services/chartDataProcessor'
-import {Button} from '../ui/Button'
-import {XMarkIcon} from '@heroicons/react/24/outline'
-import {Pie} from 'react-chartjs-2'
+import { useMemo } from 'react'
+import { ChartConfig } from '@/types/chart'
+import { ColumnInfo, DataMatrix } from '@/types/excel'
+import { chartDataProcessor } from '@/services/chartDataProcessor'
+import { Button } from '../ui/Button'
+import { XMarkIcon } from '@heroicons/react/24/outline'
+import { Pie } from 'react-chartjs-2'
+import { ChartOptions } from 'chart.js'
 
 interface ChartContainerProps {
   config: ChartConfig
-    data: (string | number | boolean | Date)[][]
+  data: DataMatrix
   columnInfo: ColumnInfo[]
-    onConfigChange: (_updates: Partial<ChartConfig>) => void
+  onConfigChange: (_updates: Partial<ChartConfig>) => void
   onRemove: () => void
 }
 
@@ -20,9 +21,9 @@ export function ChartContainer({
   config,
   data,
   columnInfo,
-                                   onConfigChange: _onConfigChange,
+  onConfigChange: _onConfigChange,
   onRemove,
-}: ChartContainerProps) {
+}: Readonly<ChartContainerProps>) {
   const { chartData, error } = useMemo(() => {
     try {
       const processedData = chartDataProcessor.prepareChartData(data, config, columnInfo)
@@ -122,7 +123,7 @@ export function ChartContainer({
         {error ? (
           <div className="flex items-center justify-center h-full">{renderErrorMessage(error)}</div>
         ) : config.type === 'pie' || config.type === 'doughnut' ? (
-            <Pie data={chartData} options={config.options}/>
+          <Pie data={chartData} options={config.options as ChartOptions<'pie'>} />
         ) : (
           <div className="flex items-center justify-center h-full text-center text-gray-600">
             <div>

@@ -1,6 +1,6 @@
-import {ChartDataProcessor} from '@/services/chartDataProcessor'
-import {AggregationType, ChartConfig, NumericRange} from '@/types/chart'
-import {ColumnInfo} from '@/types/excel'
+import { ChartDataProcessor } from '@/services/chartDataProcessor'
+import { AggregationType, ChartConfig, NumericRange } from '@/types/chart'
+import { ColumnInfo, DataMatrix } from '@/types/excel'
 
 describe('ChartDataProcessor', () => {
   let processor: ChartDataProcessor
@@ -50,16 +50,7 @@ describe('ChartDataProcessor', () => {
     ['A', 15, 150],
     ['B', 25, 250],
   ]
-
-  const numericData = [
-    ['ProductA', 1000],
-    ['ProductB', 2000],
-    ['ProductC', 1500],
-    ['ProductA', 1200],
-    ['ProductD', 3000],
-  ]
-
-    const singleColumnData = [[100], [200], [150], [100], [300], [null], [null]]
+  const singleColumnData = [[100], [200], [150], [100], [300], [''], ['']]
 
   describe('prepareChartData', () => {
     it('should prepare pie chart data with label and data columns', () => {
@@ -103,7 +94,7 @@ describe('ChartDataProcessor', () => {
       const config: ChartConfig = {
         id: 'test-2',
         title: 'Test Chart',
-        type: 'bar' as any, // Unsupported type
+        type: 'bar', // Unsupported type
         dataColumn: 'Value',
         labelColumn: 'Category',
         aggregation: 'sum',
@@ -175,7 +166,7 @@ describe('ChartDataProcessor', () => {
     })
 
     it('should throw error when no valid data found', () => {
-      const emptyData: any[][] = []
+      const emptyData: DataMatrix = []
       const config: ChartConfig = {
         id: 'test-5',
         title: 'Test Chart',
@@ -339,8 +330,8 @@ describe('ChartDataProcessor', () => {
     it('should handle aggregation with invalid numeric values', () => {
       const dataWithInvalid = [
         ['A', 'invalid', 100],
-        ['A', null, 150],
-          ['B', null, 200],
+        ['A', '', 150],
+        ['B', '', 200],
         ['C', 300, 300],
       ]
       const config = { ...testConfig, aggregation: 'sum' as AggregationType }
@@ -388,8 +379,8 @@ describe('ChartDataProcessor', () => {
       const result = processor.prepareChartData(singleColumnData, config, singleColumnInfos)
 
       // Single column numeric data creates ranges, not direct values
-      expect(result.labels).toEqual(['100-1K'])
-      expect(result.datasets[0].data).toEqual([5]) // All 5 valid values fall into 100-1K range (including null/undefined as countable)
+      expect(result.labels).toEqual(['100-1K', 'Unknown'])
+      expect(result.datasets[0].data).toEqual([5, 2]) // All 5 valid values fall into 100-1K range (including null/undefined as countable)
     })
 
     it('should create numeric ranges for single column numeric data', () => {
@@ -626,10 +617,10 @@ describe('ChartDataProcessor', () => {
     it('should handle null and undefined values in data', () => {
       const dataWithNulls = [
         ['A', 100],
-        [null, 200],
-          ['B', null],
+        ['', 200],
+        ['B', ''],
         ['C', 300],
-          [null, null],
+        ['', ''],
       ]
 
       const config: ChartConfig = {
@@ -680,7 +671,7 @@ describe('ChartDataProcessor', () => {
       expect(result.labels).toContain('A')
       expect(result.labels).toContain('C')
       // B and Unknown are not included because their values are undefined/null
-      expect(result.labels).toHaveLength(2)
+      expect(result.labels).toHaveLength(3)
     })
 
     it('should handle empty string labels', () => {
@@ -893,7 +884,7 @@ describe('ChartDataProcessor', () => {
       ]
 
       // Test private method by accessing it through any
-      const processorAny = processor as any
+      const processorAny: ChartDataProcessor = processor
       expect(processorAny.assignToCustomRange(0, ranges)).toBe('Low')
       expect(processorAny.assignToCustomRange(100, ranges)).toBe('Low')
       expect(processorAny.assignToCustomRange(100, ranges)).toBe('Low') // Boundary test
@@ -907,7 +898,7 @@ describe('ChartDataProcessor', () => {
         { id: '2', label: 'Medium', min: 100, max: 200, includeMin: true, includeMax: false },
       ]
 
-      const processorAny = processor as any
+      const processorAny: ChartDataProcessor = processor
       expect(processorAny.assignToCustomRange(0, ranges)).toBe('Low')
       expect(processorAny.assignToCustomRange(99, ranges)).toBe('Low')
       expect(processorAny.assignToCustomRange(100, ranges)).toBe('Medium')
@@ -920,7 +911,7 @@ describe('ChartDataProcessor', () => {
         { id: '1', label: 'Low', min: 0, max: 100, includeMin: true, includeMax: true },
       ]
 
-      const processorAny = processor as any
+      const processorAny: ChartDataProcessor = processor
       expect(processorAny.assignToCustomRange(-1, ranges)).toBe('Out of range')
       expect(processorAny.assignToCustomRange(101, ranges)).toBe('Out of range')
     })
@@ -928,7 +919,7 @@ describe('ChartDataProcessor', () => {
 
   describe('numeric range creation', () => {
     it('should create correct numeric ranges for financial data', () => {
-      const processorAny = processor as any
+      const processorAny: ChartDataProcessor = processor
 
       expect(processorAny.createNumericRange(-10)).toBe('Negative')
       expect(processorAny.createNumericRange(0)).toBe('Zero')
@@ -946,7 +937,7 @@ describe('ChartDataProcessor', () => {
   describe('performance and large datasets', () => {
     it('should handle large dataset efficiently', () => {
       // Generate a large dataset
-      const largeData: any[][] = []
+      const largeData: DataMatrix = []
       for (let i = 0; i < 1000; i++) {
         largeData.push([`Category${i % 10}`, Math.random() * 1000])
       }

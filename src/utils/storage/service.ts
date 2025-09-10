@@ -1,8 +1,8 @@
-import {DEFAULT_STORAGE_KEYS, type StorageAdapter} from './adapter'
-import {deserialize, estimateSizeBytes, serialize, type SerializedPayload} from './serialization'
-import type {ExcelData} from '@/types/excel'
-import type {FilterState} from '@/types/filter'
-import type {ChartConfig} from '@/types/chart'
+import { DEFAULT_STORAGE_KEYS, type StorageAdapter } from './adapter'
+import { deserialize, estimateSizeBytes, serialize, type SerializedPayload } from './serialization'
+import type { DataMatrix, ExcelData } from '@/types/excel'
+import type { FilterState } from '@/types/filter'
+import type { ChartConfig } from '@/types/chart'
 
 export interface PersistedSessionSummary {
   fileName?: string
@@ -58,7 +58,7 @@ export interface DatasetChunk {
   startRow: number
   endRow: number
   headers: string[]
-  rows: (string | number | boolean | Date | null)[][]
+  rows: DataMatrix
   metadata?: Record<string, unknown>
 }
 
@@ -107,7 +107,8 @@ export class StorageService {
 
   async createOrUpdateSession(summary: PersistedSessionSummary): Promise<PersistedSession> {
     const nowIso = new Date().toISOString()
-    const activeId = (await this.local.getItem<string>(DEFAULT_STORAGE_KEYS.activeSessionId)) || null
+    const activeId =
+      (await this.local.getItem<string>(DEFAULT_STORAGE_KEYS.activeSessionId)) || null
     let session: PersistedSession | null = null
 
     if (activeId) {
@@ -262,11 +263,15 @@ export class StorageService {
     await this.cleanupOldSessions()
   }
 
-  private async saveDatasetChunked(sessionId: string, data: ExcelData, limits: {
-    maxSessions: number
-    maxCompressedDatasetBytes: number
-    maxRowsPersisted: number
-  }): Promise<void> {
+  private async saveDatasetChunked(
+    sessionId: string,
+    data: ExcelData,
+    limits: {
+      maxSessions: number
+      maxCompressedDatasetBytes: number
+      maxRowsPersisted: number
+    },
+  ): Promise<void> {
     const session = await this.local.getItem<PersistedSession>(this.sessionKey(sessionId))
     if (!session) throw new Error('Session not found')
 
@@ -372,7 +377,12 @@ export class StorageService {
     const payload = await this.idb.getItem<SerializedPayload>(session.datasetKey)
     if (!payload) return null
     const snapshot = deserialize<ExcelDataSnapshot>(payload)
-    return snapshot.excelData
+    // Normalize null/undefined cells to empty string on load
+    const normalized: ExcelData = {
+      ...snapshot.excelData,
+      rows: (snapshot.excelData.rows || []).map((row) => row.map((c) => (c == null ? '' : c))),
+    }
+    return normalized
   }
 
   async loadDatasetProgressive(
@@ -433,7 +443,11 @@ export class StorageService {
     onProgress?.(80, 'Finalizing data...')
     const snapshot = deserialize<ExcelDataSnapshot>(payload)
     onProgress?.(100, 'Complete')
-    return snapshot.excelData
+    const normalized: ExcelData = {
+      ...snapshot.excelData,
+      rows: (snapshot.excelData.rows || []).map((row) => row.map((c) => (c == null ? '' : c))),
+    }
+    return normalized
   }
 
   private async loadChunkedDataset(
@@ -618,7 +632,7 @@ export class StorageService {
     }
 
     // Alternative: trigger implicit garbage collection
-    const _temp = new Array(1000).fill(null).map(() => ({large: new Array(1000).fill('data')}))
+    const _temp = new Array(1000).fill(null).map(() => ({ large: new Array(1000).fill('data') }))
     setTimeout(() => {
       // Allow temp to be garbage collected
     }, 0)
@@ -626,7 +640,9 @@ export class StorageService {
 
   private reconstructDatasetFromChunks(allChunks: DatasetChunk[]): ExcelData {
     // Reconstruct the full dataset
-    const allRows = allChunks.flatMap((chunk) => chunk.rows)
+    const allRows = allChunks
+      .flatMap((chunk) => chunk.rows)
+      .map((row) => row.map((cell) => (cell == null ? '' : cell)))
     const headers = allChunks[0]?.headers || []
 
     return {
@@ -732,7 +748,7 @@ export class StorageService {
     const isLowEnd =
       deviceMemory < 4 ||
       !('hardwareConcurrency' in navigator) ||
-        (navigator as Navigator & { hardwareConcurrency?: number }).hardwareConcurrency < 4
+      (navigator as Navigator & { hardwareConcurrency?: number }).hardwareConcurrency < 4
 
     this.deviceCapabilities = { memory: deviceMemory, isLowEnd }
   }

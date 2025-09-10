@@ -1,5 +1,5 @@
-import {ColumnInfo} from './excel'
-import type {NumericRange} from '@/types/chart'
+import { ColumnInfo } from './excel'
+import type { NumericRange } from '@/types/chart'
 
 export interface FilterConfig {
   id: string
@@ -14,7 +14,7 @@ export interface FilterConfig {
   // - 'date': DateRangeFilter
   // - 'boolean': boolean | null
   // - 'null': boolean (include nulls when true)
-    values: unknown
+  values: unknown
   operator: FilterOperator
   displayName: string
 }
@@ -40,7 +40,7 @@ export type FilterOperator =
   | 'is_not_null'
 
 export interface FilterValue {
-    value: unknown
+  value: unknown
   selected: boolean
   count?: number // How many rows have this value
 }
@@ -73,7 +73,7 @@ export interface SearchFilter {
 export interface FilterStateItem {
   id: string
   active: boolean
-    values: unknown
+  values: unknown
   operator: FilterOperator
 }
 

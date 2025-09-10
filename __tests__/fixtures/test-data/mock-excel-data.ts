@@ -19,13 +19,6 @@ function generateRandomDateTime(startYear: number, endYear: number): string {
   return `${date} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
-// Helper function to generate random timestamps
-function generateRandomTimestamp(startYear: number, endYear: number): number {
-  const start = new Date(startYear, 0, 1).getTime()
-  const end = new Date(endYear, 11, 31).getTime()
-  return Math.floor(Math.random() * (end - start + 1)) + start
-}
-
 export function createMockExcelData(overrides?: Partial<ExcelData>): ExcelData {
   const defaultData: ExcelData = {
     headers: [
@@ -408,7 +401,7 @@ export function createMockExcelDataWithDateFormats(overrides?: Partial<ExcelData
 export function createMockExcelDataWithDateEdgeCases(overrides?: Partial<ExcelData>): ExcelData {
   const edgeCaseDates = [
     '', // Empty string
-    null, // Null value
+    '', // Null value
     'N/A', // Not available
     'Invalid Date', // Invalid date string
     '2023-02-30', // Invalid date (February 30th)
@@ -426,7 +419,7 @@ export function createMockExcelDataWithDateEdgeCases(overrides?: Partial<ExcelDa
     `City ${index + 1}`,
     50000 + index * 10000,
     date === '' ? '' : date, // Ensure empty string stays empty string
-    date && date !== '' ? `${date} 14:30:00` : null,
+    date && date !== '' ? `${date} 14:30:00` : '',
     generateRandomDate(1990, 2000),
     generateRandomDateTime(2023, 2023),
     new Date().toISOString(),
@@ -644,7 +637,7 @@ export function createMockChart(overrides?: Partial<ChartConfig>): ChartConfig {
     dataColumn: 'City',
     labelColumn: 'Name',
     aggregation: 'sum',
-    position: 'top' as any, // Using type assertion for now
+    position: { row: 0, column: 0, width: 1, height: 1 }, // Using type assertion for now
     options: {
       responsive: true,
       maintainAspectRatio: false,

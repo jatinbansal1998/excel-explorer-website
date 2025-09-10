@@ -1,31 +1,31 @@
 'use client'
 
-import React, {useEffect, useMemo, useState} from 'react'
-import {useLLMAnalytics} from '@/hooks/useLLMAnalytics'
-import type {ExcelData} from '@/types/excel'
-import type {ChartConfig} from '@/types/chart'
-import type {FilterConfig} from '@/types/filter'
-import {Button} from '../ui/Button'
-import {SpinnerIcon} from '../ui/SpinnerIcon'
-import {ArrowPathIcon} from '@heroicons/react/24/outline'
-import {useOpenRouter} from '@/hooks/useOpenRouter'
-import {buildDatasetContext} from '@/services/llmAnalytics'
-import {OpenRouterSettingsModal} from '../openrouter/OpenRouterSettingsModal'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useLLMAnalytics } from '@/hooks/useLLMAnalytics'
+import type { DataMatrix, ExcelData } from '@/types/excel'
+import type { ChartConfig } from '@/types/chart'
+import type { FilterConfig } from '@/types/filter'
+import { Button } from '../ui/Button'
+import { SpinnerIcon } from '../ui/SpinnerIcon'
+import { ArrowPathIcon } from '@heroicons/react/24/outline'
+import { useOpenRouter } from '@/hooks/useOpenRouter'
+import { buildDatasetContext } from '@/services/llmAnalytics'
+import { OpenRouterSettingsModal } from '../openrouter/OpenRouterSettingsModal'
 
 interface Props {
   excelData: ExcelData | null
-    filteredRows?: (string | number | boolean | Date)[][]
+  filteredRows?: DataMatrix
   filtersActive?: boolean
-    _onApplyChart?: (_config: ChartConfig) => void
-    _onApplyFilters?: (_filters: FilterConfig[] | FilterConfig) => void
+  _onApplyChart?: (_config: ChartConfig) => void
+  _onApplyFilters?: (_filters: FilterConfig[] | FilterConfig) => void
 }
 
 export function AnalyticsPanel({
   excelData,
   filteredRows,
   filtersActive,
-                                   _onApplyChart,
-                                   _onApplyFilters,
+  _onApplyChart,
+  _onApplyFilters,
 }: Readonly<Props>) {
   const { state: orState } = useOpenRouter()
 

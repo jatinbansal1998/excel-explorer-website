@@ -29,7 +29,7 @@ declare global {
 // Safe global property management
 export class GlobalPropertyManager {
   private static instance: GlobalPropertyManager
-  private properties = new Map<string, unknown>()
+  private readonly properties = new Map<string, unknown>()
 
   static getInstance(): GlobalPropertyManager {
     if (!GlobalPropertyManager.instance) {
@@ -49,7 +49,7 @@ export class GlobalPropertyManager {
 
     // Also set on window for backward compatibility
     if (typeof window !== 'undefined') {
-      ;(window as Record<string, unknown>)[key] = value
+      ;(window as unknown as Record<string, unknown>)[key] = value
     }
   }
 
@@ -59,7 +59,7 @@ export class GlobalPropertyManager {
 
     // Also remove from window
     if (typeof window !== 'undefined') {
-      delete (window as Record<string, unknown>)[key]
+      delete (window as unknown as Record<string, unknown>)[key]
     }
   }
 
@@ -107,27 +107,35 @@ export class GlobalPropertyManager {
 
   // Performance monitoring
   getPerformanceMetrics(): Record<string, number> {
-    return this.get('__EXCEL_EXPLORER_PERFORMANCE')?.metrics || {}
+    const perf = (this.get('__EXCEL_EXPLORER_PERFORMANCE') as {
+      metrics: Record<string, number>
+      marks: Record<string, number>
+    }) || { metrics: {}, marks: {} }
+    return perf.metrics
   }
 
   setPerformanceMetric(name: string, value: number): void {
-    const perf = this.get('__EXCEL_EXPLORER_PERFORMANCE') as {
-      metrics: Record<string, number>;
+    const perf = (this.get('__EXCEL_EXPLORER_PERFORMANCE') as {
+      metrics: Record<string, number>
       marks: Record<string, number>
-    } || {metrics: {}, marks: {}}
+    }) || { metrics: {}, marks: {} }
     perf.metrics[name] = value
     this.set('__EXCEL_EXPLORER_PERFORMANCE', perf)
   }
 
   getPerformanceMarks(): Record<string, number> {
-    return this.get('__EXCEL_EXPLORER_PERFORMANCE')?.marks || {}
+    const perf = (this.get('__EXCEL_EXPLORER_PERFORMANCE') as {
+      metrics: Record<string, number>
+      marks: Record<string, number>
+    }) || { metrics: {}, marks: {} }
+    return perf.marks
   }
 
   setPerformanceMark(name: string, timestamp: number): void {
-    const perf = this.get('__EXCEL_EXPLORER_PERFORMANCE') as {
-      metrics: Record<string, number>;
+    const perf = (this.get('__EXCEL_EXPLORER_PERFORMANCE') as {
+      metrics: Record<string, number>
       marks: Record<string, number>
-    } || {metrics: {}, marks: {}}
+    }) || { metrics: {}, marks: {} }
     perf.marks[name] = timestamp
     this.set('__EXCEL_EXPLORER_PERFORMANCE', perf)
   }

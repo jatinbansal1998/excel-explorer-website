@@ -1,6 +1,14 @@
+// Canonical cell/row types used across the app
+export type CellValue = string | number | boolean | Date
+export type NullableCellValue = CellValue | null
+export type DataRow = CellValue[]
+export type NullableDataRow = NullableCellValue[]
+export type DataMatrix = DataRow[]
+export type NullableDataMatrix = NullableDataRow[]
+
 export interface ExcelData {
   headers: string[]
-  rows: (string | number | boolean | Date | null)[][]
+  rows: DataMatrix
   metadata: ExcelMetadata
 }
 

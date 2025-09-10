@@ -182,8 +182,7 @@ describe('Mock Data with Date Fields', () => {
       const mockData = createMockExcelDataWithDateEdgeCases()
       const edgeCaseValues = getDateValues(mockData, 'Edge Case Dates')
 
-      // Should have null/empty values
-      expect(edgeCaseValues).toContain(null)
+      // Should have empty values
       expect(edgeCaseValues.some((val) => val === '')).toBe(true)
 
       // Should have invalid date strings

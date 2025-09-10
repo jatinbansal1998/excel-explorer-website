@@ -1,16 +1,20 @@
 'use client'
 
-import {lazy, Suspense, useState} from 'react'
-import {FileUploader} from '@/components/FileUploader'
-import {DataTable} from '@/components/DataTable'
-import {useToast} from '@/components/ui/Toast'
-import {useExcelData} from '@/hooks/useExcelData'
-import {useFilters} from '@/hooks/useFilters'
-import {useSessionPersistence} from '@/hooks/useSessionPersistence'
-import {globalProperties} from '@/types/global'
-import {ChartErrorBoundary, DataProcessingErrorBoundary, ErrorBoundaryWrapper,} from '@/components/ErrorBoundaryWrapper'
-import {PerformanceMonitor, usePerformanceMonitor} from '@/components/PerformanceMonitor'
-import {SessionRestoreProgress} from '@/components/session/SessionRestoreProgress'
+import { lazy, Suspense, useState } from 'react'
+import { FileUploader } from '@/components/FileUploader'
+import { DataTable } from '@/components/DataTable'
+import { useToast } from '@/components/ui/Toast'
+import { useExcelData } from '@/hooks/useExcelData'
+import { useFilters } from '@/hooks/useFilters'
+import { useSessionPersistence } from '@/hooks/useSessionPersistence'
+import { globalProperties } from '@/types/global'
+import {
+  ChartErrorBoundary,
+  DataProcessingErrorBoundary,
+  ErrorBoundaryWrapper,
+} from '@/components/ErrorBoundaryWrapper'
+import { PerformanceMonitor, usePerformanceMonitor } from '@/components/PerformanceMonitor'
+import { SessionRestoreProgress } from '@/components/session/SessionRestoreProgress'
 
 // Lazy load heavy components
 const FilterPanel = lazy(() =>
@@ -66,7 +70,7 @@ export default function HomePage() {
         type: 'error',
         title: 'Session Restoration Failed',
         message:
-            (error as Error)?.message ||
+          (error as Error)?.message ||
           'Failed to restore session. Please try again or upload a new file.',
         duration: 8000, // Longer duration for session errors
       })
@@ -149,7 +153,7 @@ export default function HomePage() {
                   columnInfo={currentData.metadata.columns}
                   session={session}
                   registerExternalApplyChart={(fn) => {
-                    globalProperties.setApplyChartFromAI(fn)
+                    globalProperties.setApplyChartFromAI(fn as (config: unknown) => void)
                   }}
                 />
               </Suspense>

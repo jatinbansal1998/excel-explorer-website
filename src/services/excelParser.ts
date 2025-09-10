@@ -1,23 +1,23 @@
 import {
-    ColumnInfo,
-    ColumnStatistics,
-    DataType,
-    ExcelData,
-    ExcelMetadata,
-    ParseOptions,
-    ValidationResult,
+  ColumnInfo,
+  ColumnStatistics,
+  DataType,
+  ExcelData,
+  ExcelMetadata,
+  ParseOptions,
+  ValidationResult,
 } from '@/types/excel'
 import {
-    coerceBoolean,
-    coerceNumber,
-    isBooleanLike,
-    isDateLike,
-    isNullLike,
-    isNumberLike,
-    parseDateFlexible,
+  coerceBoolean,
+  coerceNumber,
+  isBooleanLike,
+  isDateLike,
+  isNullLike,
+  isNumberLike,
+  parseDateFlexible,
 } from '@/utils/dataTypes'
-import {validateFile} from '@/utils/fileValidation'
-import {globalProperties} from '@/types/global'
+import { validateFile } from '@/utils/fileValidation'
+import { globalProperties } from '@/types/global'
 
 // Import xlsx library with proper error handling for browser compatibility
 let XLSX: Record<string, unknown>
@@ -34,7 +34,9 @@ async function loadXLSX() {
       xlsxLoaded = true
     } catch (error) {
       console.error('Failed to load xlsx library:', error)
-      throw new Error('XLSX library not available. Please ensure the library is properly installed.')
+      throw new Error(
+        'XLSX library not available. Please ensure the library is properly installed.',
+      )
     }
   }
   return XLSX
@@ -45,7 +47,7 @@ export class ExcelParser {
     // Utils are pre-loaded at module level
     const utils = globalProperties.getXLSXUtils()
     if (utils) {
-      return utils
+      return utils as Record<string, unknown>
     }
     throw new Error('XLSX utils not available. Please ensure the library is properly loaded.')
   }
@@ -315,8 +317,21 @@ export class ExcelParser {
     progress?.({ stage: 'parsing_workbook', message: 'Parsing workbook' })
     const xlsx = await loadXLSX()
     const workbook = isCsv
-        ? xlsx.read(content as string, {type: 'string', dense: true})
-        : xlsx.read(content as ArrayBuffer, {
+      ? (
+          xlsx as Record<
+            string,
+            (content: string, options: Record<string, unknown>) => Record<string, unknown>
+          >
+        ).read(content as string, {
+          type: 'string',
+          dense: true,
+        })
+      : (
+          xlsx as Record<
+            string,
+            (content: ArrayBuffer, options: Record<string, unknown>) => Record<string, unknown>
+          >
+        ).read(content as ArrayBuffer, {
           type: 'array',
           dense: true,
           cellDates: true,
@@ -328,20 +343,21 @@ export class ExcelParser {
     data.metadata.fileName = file.name
     data.metadata.fileSize = file.size
     try {
-      // @ts-expect-error File may have lastModified
       if ((file as File & { lastModified?: number }).lastModified) {
-        data.metadata.lastModified = new Date((file as File & { lastModified?: number }).lastModified)
+        data.metadata.lastModified = new Date(
+          (file as File & { lastModified?: number }).lastModified,
+        )
       }
     } catch {}
     return data
   }
 
   async parseWorkbook(
-      workbook: Record<string, unknown>,
+    workbook: Record<string, unknown>,
     sheetName?: string,
     options: ParseOptions = {},
   ): Promise<ExcelData> {
-    const sheetNames: string[] = workbook.SheetNames || []
+    const sheetNames: string[] = (workbook.SheetNames as string[]) || []
     const activeSheet = sheetName && sheetNames.includes(sheetName) ? sheetName : sheetNames[0]
     if (!activeSheet) {
       return {
@@ -361,7 +377,9 @@ export class ExcelParser {
 
     const sheet = (workbook as Record<string, Record<string, unknown>>).Sheets?.[activeSheet]
     const utils = this.getXLSXUtils()
-    const aoa: unknown[][] = (utils as Record<string, (sheet: unknown, options: Record<string, unknown>) => unknown[][]>).sheet_to_json(sheet, {
+    const aoa: unknown[][] = (
+      utils as Record<string, (sheet: unknown, options: Record<string, unknown>) => unknown[][]>
+    ).sheet_to_json(sheet, {
       header: 1,
       raw: true,
       defval: null,
@@ -464,7 +482,13 @@ export class ExcelParser {
     }
 
     options.progress?.({ stage: 'complete', message: 'Parsing complete', sheetName: activeSheet })
-    return {headers, rows: rows as (string | number | boolean | Date | null)[][], metadata}
+
+    // Convert null values to empty strings to match the expected type
+    const cleanedRows = rows.map((row) =>
+      row.map((cell) => (cell === null || cell === undefined ? '' : cell)),
+    ) as ExcelData['rows']
+
+    return { headers, rows: cleanedRows, metadata }
   }
 
   detectColumnTypes(data: unknown[][], options: ParseOptions = {}): ColumnInfo[] {
@@ -504,7 +528,7 @@ export class ExcelParser {
         const v = rows[r]?.[c]
         if (isNullLike(v)) continue
         if (isBooleanLike(v)) bool++
-        else if (isDateLike(v)) date++
+        else if (isDateLike(v as import('@/types/excel').CellValue)) date++
         else if (isNumberLike(v)) num++
         else str++
       }
@@ -640,7 +664,7 @@ export class ExcelParser {
       if (isNullLike(h)) h = ''
       h = String(h).trim()
       if (!h) h = `Column ${i + 1}`
-      headers.push(h)
+      headers.push(h as string)
     }
     return headers
   }

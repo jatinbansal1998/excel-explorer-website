@@ -1,5 +1,5 @@
 import React from 'react'
-import {ErrorBoundary} from './ErrorBoundary'
+import { ErrorBoundary } from './ErrorBoundary'
 
 interface ErrorBoundaryWrapperProps {
   children: React.ReactNode
@@ -9,10 +9,14 @@ interface ErrorBoundaryWrapperProps {
 
 /**
  * A wrapper component that provides error boundary protection
- * with customizable fallback UI and error handling
+ * with a customizable fallback UI and error handling
  */
-export function ErrorBoundaryWrapper({children, _fallback, _onError}: ErrorBoundaryWrapperProps) {
-  return <ErrorBoundary>{children}</ErrorBoundary>
+export function ErrorBoundaryWrapper({
+  children,
+  fallback,
+  onError: _onError,
+}: Readonly<ErrorBoundaryWrapperProps>) {
+  return <ErrorBoundary fallback={fallback}>{children}</ErrorBoundary>
 }
 
 /**
@@ -91,7 +95,7 @@ export class AsyncErrorBoundary extends React.Component<
 /**
  * Error boundary specifically for chart components
  */
-export function ChartErrorBoundary({ children }: { children: React.ReactNode }) {
+export function ChartErrorBoundary({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <AsyncErrorBoundary
       fallback={
@@ -126,7 +130,7 @@ export function ChartErrorBoundary({ children }: { children: React.ReactNode }) 
 /**
  * Error boundary for data processing operations
  */
-export function DataProcessingErrorBoundary({ children }: { children: React.ReactNode }) {
+export function DataProcessingErrorBoundary({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <AsyncErrorBoundary
       fallback={

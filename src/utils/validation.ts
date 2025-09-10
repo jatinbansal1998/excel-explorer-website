@@ -1,4 +1,4 @@
-import {DataType} from '@/types/excel'
+import { DataType } from '@/types/excel'
 
 export interface ValidationResult {
   isValid: boolean
@@ -311,7 +311,16 @@ export class DataValidator {
         return // Skip null values
       }
 
-      const dateValue = new Date(value)
+      let dateValue: Date
+      if (typeof value === 'string' || typeof value === 'number') {
+        dateValue = new Date(value)
+      } else if (value instanceof Date) {
+        dateValue = value
+      } else {
+        // Try to convert to string and then to date
+        dateValue = new Date(String(value))
+      }
+
       if (isNaN(dateValue.getTime())) {
         if (errors.length < 5) {
           errors.push(`Invalid date value at row ${_index + 1}: ${value}`)
@@ -323,8 +332,11 @@ export class DataValidator {
 
     // Date range warnings
     if (dateValues.length > 0) {
-      const _minDate = new Date(Math.min(...dateValues.map((d) => d.getTime())))
-      const _maxDate = new Date(Math.max(...dateValues.map((d) => d.getTime())))
+      const timestamps = dateValues.map((d) => d.getTime())
+      const minTimestamp = Math.min(...timestamps)
+      const maxTimestamp = Math.max(...timestamps)
+      const _minDate = new Date(minTimestamp)
+      const _maxDate = new Date(maxTimestamp)
 
       // Check for future dates
       const now = new Date()

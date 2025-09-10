@@ -1,30 +1,26 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useCharts } from '@/hooks/useCharts'
-import { ColumnInfo, ExcelData } from '@/types/excel'
-import { ChartConfig } from '@/types/chart'
+import {useEffect} from 'react'
+import {useCharts} from '@/hooks/useCharts'
+import {ColumnInfo, ExcelData} from '@/types/excel'
+import {ChartConfig, ChartSuggestion} from '@/types/chart'
 import ChartContainer from './charts/ChartContainer'
 import ChartControls from './charts/ChartControls'
-import { ArcElement, Chart, Legend, PieController, Title, Tooltip } from 'chart.js'
-import type { UseSessionPersistenceReturn } from '@/hooks/useSessionPersistence'
+import {ArcElement, Chart, Legend, PieController, Title, Tooltip} from 'chart.js'
+import type {UseSessionPersistenceReturn} from '@/hooks/useSessionPersistence'
 
 Chart.register(ArcElement, Tooltip, Legend, Title, PieController)
 
 interface ChartViewProps {
   filteredData: ExcelData['rows']
   columnInfo: ColumnInfo[]
-  onChartAdd?: (config: ChartConfig) => void
-  onChartRemove?: (chartId: string) => void
-  registerExternalApplyChart?: (fn: (config: ChartConfig) => void) => void
+  registerExternalApplyChart?: (_fn: (_config: ChartConfig) => void) => void
   session?: UseSessionPersistenceReturn
 }
 
 export function ChartView({
   filteredData,
   columnInfo,
-  onChartAdd,
-  onChartRemove,
   registerExternalApplyChart,
   session,
 }: ChartViewProps) {
@@ -42,8 +38,42 @@ export function ChartView({
     // Optionally notify parent when charts change
   }, [charts])
 
-  const handleAddChart = (sugg: any) => {
-    addChart(sugg)
+  const handleAddChart = (sugg: ChartSuggestion) => {
+    addChart({
+      id: `chart-${Date.now()}`,
+      title: sugg.title,
+      type: sugg.type,
+      dataColumn: sugg.dataColumn,
+      labelColumn: sugg.labelColumn,
+      aggregation: sugg.aggregation,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+          },
+          title: {
+            display: true,
+            text: sugg.title,
+          },
+          tooltip: {
+            enabled: true,
+          },
+        },
+        animation: {
+          duration: 1000,
+          easing: 'easeOutQuart',
+        },
+      },
+      position: {
+        row: 0,
+        column: 0,
+        width: 1,
+        height: 1,
+      },
+    })
   }
 
   useEffect(() => {

@@ -1,11 +1,11 @@
 'use client'
 
-import { useCallback, useMemo, useState, useEffect } from 'react'
-import type { ExcelData, ParseOptions, ParseProgressEvent } from '@/types/excel'
-import { ExcelParser } from '@/services/excelParser'
-import { useSessionPersistence } from './useSessionPersistence'
-import type { UseSessionPersistenceReturn } from './useSessionPersistence'
-import { PerformanceMonitor } from '@/utils/performanceMonitor'
+import {useCallback, useEffect, useMemo, useState} from 'react'
+import type {ExcelData, ParseOptions, ParseProgressEvent} from '@/types/excel'
+import {ExcelParser} from '@/services/excelParser'
+import type {UseSessionPersistenceReturn} from './useSessionPersistence'
+import {useSessionPersistence} from './useSessionPersistence'
+import {PerformanceMonitor} from '@/utils/performanceMonitor'
 
 export function useExcelData(sessionExt?: UseSessionPersistenceReturn) {
   const [currentData, setCurrentData] = useState<ExcelData | null>(null)
@@ -76,8 +76,8 @@ export function useExcelData(sessionExt?: UseSessionPersistenceReturn) {
               console.warn('⚠️ Dataset persistence failed:', e)
             }
             return data
-          } catch (e: any) {
-            const msg = e?.message || 'Failed to parse file'
+          } catch (e: unknown) {
+            const msg = e instanceof Error ? (e.message || 'Failed to parse file') : 'Failed to parse file'
             setError(msg)
             throw e
           } finally {
@@ -111,7 +111,7 @@ export function useExcelData(sessionExt?: UseSessionPersistenceReturn) {
         const newRows = (prev.rows || []).map((row) => row.filter((_, i) => i !== columnIndex))
 
         // Recompute column metadata using the existing parser utilities
-        const recomputedColumns = parser.detectColumnTypes([newHeaders as any, ...newRows])
+        const recomputedColumns = parser.detectColumnTypes([newHeaders as (string | number | boolean | Date)[], ...newRows])
 
         const newMetadata = {
           ...prev.metadata,

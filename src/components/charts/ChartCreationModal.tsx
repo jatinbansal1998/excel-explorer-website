@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
-import { AggregationType, ChartType, NumericRange } from '@/types/chart'
-import { ColumnInfo, ExcelData } from '@/types/excel'
-import { Button } from '../ui/Button'
-import { XMarkIcon } from '@heroicons/react/24/outline'
-import { NumericRangeEditor } from './NumericRangeEditor'
+import React, {useMemo, useState} from 'react'
+import {AggregationType, ChartType, NumericRange} from '@/types/chart'
+import {ColumnInfo, ExcelData} from '@/types/excel'
+import {Button} from '../ui/Button'
+import {XMarkIcon} from '@heroicons/react/24/outline'
+import {NumericRangeEditor} from './NumericRangeEditor'
 
 interface ChartCreationModalProps {
   isOpen: boolean
@@ -131,7 +131,7 @@ export function ChartCreationModal({
 
     return filteredData
       .map((row) => row[columnIndex])
-      .filter((val) => typeof val === 'number' && Number.isFinite(val))
+        .filter((val) => typeof val === 'number' && Number.isFinite(val)) as number[]
   }, [shouldShowRangeEditor, dataColumn, columnInfo, filteredData])
 
   // Filter available chart types based on available columns
@@ -148,7 +148,7 @@ export function ChartCreationModal({
   })
 
   // Get compatible columns for the selected chart type with intelligent search filtering
-  const getCompatibleColumns = (forLabel = false, searchTerm = '') => {
+  const getCompatibleColumns = (_forLabel = false, searchTerm = '') => {
     if (!selectedConfig) return []
 
     const compatibleColumns = columnInfo.filter((col) => {

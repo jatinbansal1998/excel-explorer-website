@@ -1,6 +1,6 @@
-import { ChartDataProcessor } from '@/services/chartDataProcessor'
-import { AggregationType, ChartConfig, NumericRange } from '@/types/chart'
-import { ColumnInfo } from '@/types/excel'
+import {ChartDataProcessor} from '@/services/chartDataProcessor'
+import {AggregationType, ChartConfig, NumericRange} from '@/types/chart'
+import {ColumnInfo} from '@/types/excel'
 
 describe('ChartDataProcessor', () => {
   let processor: ChartDataProcessor
@@ -59,7 +59,7 @@ describe('ChartDataProcessor', () => {
     ['ProductD', 3000],
   ]
 
-  const singleColumnData = [[100], [200], [150], [100], [300], [null], [undefined]]
+    const singleColumnData = [[100], [200], [150], [100], [300], [null], [null]]
 
   describe('prepareChartData', () => {
     it('should prepare pie chart data with label and data columns', () => {
@@ -340,7 +340,7 @@ describe('ChartDataProcessor', () => {
       const dataWithInvalid = [
         ['A', 'invalid', 100],
         ['A', null, 150],
-        ['B', undefined, 200],
+          ['B', null, 200],
         ['C', 300, 300],
       ]
       const config = { ...testConfig, aggregation: 'sum' as AggregationType }
@@ -627,9 +627,9 @@ describe('ChartDataProcessor', () => {
       const dataWithNulls = [
         ['A', 100],
         [null, 200],
-        ['B', undefined],
+          ['B', null],
         ['C', 300],
-        [undefined, null],
+          [null, null],
       ]
 
       const config: ChartConfig = {

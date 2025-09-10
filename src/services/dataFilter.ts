@@ -1,13 +1,6 @@
-import { ExcelData } from '@/types/excel'
-import { parseDateFlexible } from '@/utils/dataTypes'
-import {
-  FilterConfig,
-  FilterValue,
-  RangeFilter,
-  DateRangeFilter,
-  SearchFilter,
-  FilterState,
-} from '@/types/filter'
+import {ExcelData} from '@/types/excel'
+import {parseDateFlexible} from '@/utils/dataTypes'
+import {DateRangeFilter, FilterConfig, FilterState, FilterValue, RangeFilter, SearchFilter,} from '@/types/filter'
 
 export class DataFilter {
   private activeFilters: Map<string, FilterConfig>
@@ -18,7 +11,7 @@ export class DataFilter {
     this.initialFilters = new Map(filters.map((f) => [f.id, this.cloneFilter(f)]))
   }
 
-  applyFilters(data: ExcelData): any[][] {
+    applyFilters(data: ExcelData): (string | number | boolean | Date)[][] {
     const rows = data.rows || []
     const active = Array.from(this.activeFilters.values()).filter((f) => f.active)
     if (active.length === 0) return rows
@@ -31,7 +24,7 @@ export class DataFilter {
     })
   }
 
-  private evaluateFilter(row: any[], filter: FilterConfig): boolean {
+    private evaluateFilter(row: (string | number | boolean | Date)[], filter: FilterConfig): boolean {
     const cellValue = row[filter.columnIndex]
 
     switch (filter.type) {
@@ -57,7 +50,7 @@ export class DataFilter {
   }
 
   private evaluateSelectFilter(
-    value: any,
+      value: unknown,
     options: FilterValue[],
     operator: FilterConfig['operator'],
   ): boolean {
@@ -70,7 +63,7 @@ export class DataFilter {
   }
 
   private evaluateRangeFilter(
-    value: any,
+      value: unknown,
     range: RangeFilter,
     operator: FilterConfig['operator'],
   ): boolean {
@@ -107,7 +100,7 @@ export class DataFilter {
   }
 
   private evaluateDateFilter(
-    value: any,
+      value: unknown,
     range: DateRangeFilter,
     operator: FilterConfig['operator'],
   ): boolean {
@@ -122,7 +115,7 @@ export class DataFilter {
   }
 
   private evaluateSearchFilter(
-    value: any,
+      value: unknown,
     search: SearchFilter,
     operator: FilterConfig['operator'],
   ): boolean {
@@ -149,7 +142,7 @@ export class DataFilter {
   }
 
   private evaluateBooleanFilter(
-    value: any,
+      value: unknown,
     expected: boolean | null,
     operator: FilterConfig['operator'],
   ): boolean {
@@ -165,7 +158,7 @@ export class DataFilter {
     return boolVal === expected
   }
 
-  private evaluateNullFilter(value: any, operator: FilterConfig['operator']): boolean {
+    private evaluateNullFilter(value: unknown, operator: FilterConfig['operator']): boolean {
     const isNull = value == null || value === ''
     if (operator === 'is_not_null') return !isNull
     return isNull // is_null by default
@@ -229,7 +222,7 @@ export class DataFilter {
     } as FilterConfig
   }
 
-  private cloneValues(type: FilterConfig['type'], values: any): any {
+    private cloneValues(type: FilterConfig['type'], values: unknown): unknown {
     switch (type) {
       case 'select':
         return (values as FilterValue[]).map((v) => ({ ...v }))

@@ -1,11 +1,11 @@
 'use client'
 
 import React from 'react'
-import type { FilterConfig } from '@/types/filter'
+import type {FilterConfig} from '@/types/filter'
 
 interface RangeFilterProps {
   filter: FilterConfig
-  onChange: (min: number, max: number) => void
+    onChange: (_min: number, _max: number) => void
 }
 
 export function RangeFilter({ filter, onChange }: RangeFilterProps) {

@@ -1,38 +1,47 @@
 import {
-  ColumnInfo,
-  ColumnStatistics,
-  DataType,
-  ExcelData,
-  ExcelMetadata,
-  ValidationResult,
-  ParseOptions,
+    ColumnInfo,
+    ColumnStatistics,
+    DataType,
+    ExcelData,
+    ExcelMetadata,
+    ParseOptions,
+    ValidationResult,
 } from '@/types/excel'
 import {
-  isNullLike,
-  isBooleanLike,
-  isNumberLike,
-  isDateLike,
-  coerceBoolean,
-  coerceNumber,
-  parseDateFlexible,
+    coerceBoolean,
+    coerceNumber,
+    isBooleanLike,
+    isDateLike,
+    isNullLike,
+    isNumberLike,
+    parseDateFlexible,
 } from '@/utils/dataTypes'
-import { validateFile } from '@/utils/fileValidation'
-import { globalProperties } from '@/types/global'
+import {validateFile} from '@/utils/fileValidation'
+import {globalProperties} from '@/types/global'
 
 // Import xlsx library with proper error handling for browser compatibility
-let XLSX: any
-try {
-  // Try to import xlsx - this will be bundled by Next.js
-  XLSX = require('xlsx')
-  // Expose utils for other methods
-  globalProperties.setXLSXUtils(XLSX.utils)
-} catch (error) {
-  console.error('Failed to load xlsx library:', error)
-  throw new Error('XLSX library not available. Please ensure the library is properly installed.')
+let XLSX: Record<string, unknown>
+let xlsxLoaded = false
+
+// Function to load XLSX library
+async function loadXLSX() {
+  if (!xlsxLoaded) {
+    try {
+      // Try to import xlsx - this will be bundled by Next.js
+      XLSX = await import('xlsx')
+      // Expose utils for other methods
+      globalProperties.setXLSXUtils(XLSX.utils)
+      xlsxLoaded = true
+    } catch (error) {
+      console.error('Failed to load xlsx library:', error)
+      throw new Error('XLSX library not available. Please ensure the library is properly installed.')
+    }
+  }
+  return XLSX
 }
 
 export class ExcelParser {
-  private getXLSXUtils(): any {
+  private getXLSXUtils(): Record<string, unknown> {
     // Utils are pre-loaded at module level
     const utils = globalProperties.getXLSXUtils()
     if (utils) {
@@ -45,7 +54,7 @@ export class ExcelParser {
     return rowCount > 10000 && typeof Worker !== 'undefined'
   }
 
-  private async processInWorker(data: any[], options: ParseOptions): Promise<ColumnInfo[]> {
+  private async processInWorker(data: unknown[], options: ParseOptions): Promise<ColumnInfo[]> {
     return new Promise((resolve, reject) => {
       try {
         // Remove non-serializable functions from options before sending to worker
@@ -276,7 +285,7 @@ export class ExcelParser {
     const validation = validateFile(file)
     if (!validation.ok) {
       const err = new Error(validation.errors.join('; '))
-      ;(err as any).details = validation
+      ;(err as Error & { details: unknown }).details = validation
       throw err
     }
 
@@ -298,15 +307,16 @@ export class ExcelParser {
         const percent = total ? (loaded / total) * 100 : undefined
         progress?.({ stage: 'reading', loaded, total, percent, message: 'Reading file' })
       }
-      reader.onload = () => resolve(reader.result as any)
+      reader.onload = () => resolve(reader.result as string | ArrayBuffer)
       if (isCsv) reader.readAsText(file)
       else reader.readAsArrayBuffer(file)
     })
 
     progress?.({ stage: 'parsing_workbook', message: 'Parsing workbook' })
+    const xlsx = await loadXLSX()
     const workbook = isCsv
-      ? XLSX.read(content as string, { type: 'string', dense: true })
-      : XLSX.read(content as ArrayBuffer, {
+        ? xlsx.read(content as string, {type: 'string', dense: true})
+        : xlsx.read(content as ArrayBuffer, {
           type: 'array',
           dense: true,
           cellDates: true,
@@ -318,16 +328,16 @@ export class ExcelParser {
     data.metadata.fileName = file.name
     data.metadata.fileSize = file.size
     try {
-      // @ts-ignore File may have lastModified
-      if ((file as any).lastModified) {
-        data.metadata.lastModified = new Date((file as any).lastModified)
+      // @ts-expect-error File may have lastModified
+      if ((file as File & { lastModified?: number }).lastModified) {
+        data.metadata.lastModified = new Date((file as File & { lastModified?: number }).lastModified)
       }
     } catch {}
     return data
   }
 
   async parseWorkbook(
-    workbook: any,
+      workbook: Record<string, unknown>,
     sheetName?: string,
     options: ParseOptions = {},
   ): Promise<ExcelData> {
@@ -349,16 +359,16 @@ export class ExcelParser {
       }
     }
 
-    const sheet = workbook.Sheets[activeSheet]
-    const utils: any = this.getXLSXUtils()
-    const aoa: any[][] = utils.sheet_to_json(sheet, {
+    const sheet = (workbook as Record<string, Record<string, unknown>>).Sheets?.[activeSheet]
+    const utils = this.getXLSXUtils()
+    const aoa: unknown[][] = (utils as Record<string, (sheet: unknown, options: Record<string, unknown>) => unknown[][]>).sheet_to_json(sheet, {
       header: 1,
       raw: true,
       defval: null,
       blankrows: false,
     })
 
-    const firstRow = (aoa[0] || []) as any[]
+    const firstRow = (aoa[0] || []) as unknown[]
     options.progress?.({
       stage: 'extracting_headers',
       message: 'Extracting headers',
@@ -375,9 +385,9 @@ export class ExcelParser {
       percent: 0,
     })
 
-    const rows: any[][] = []
+    const rows: unknown[][] = []
     // Trim trailing completely empty rows to avoid showing blank rows in the UI table
-    const isRowCompletelyEmpty = (row: any[] | undefined): boolean => {
+    const isRowCompletelyEmpty = (row: unknown[] | undefined): boolean => {
       if (!row) return true
       for (let i = 0; i < row.length; i++) {
         if (!isNullLike(row[i])) return false
@@ -400,7 +410,7 @@ export class ExcelParser {
       // Process chunk
       for (let r = chunkStart; r <= chunkEnd; r++) {
         const row = aoa[r]
-        const arr: any[] = []
+        const arr: unknown[] = []
         for (let i = 0; i < headers.length; i++) arr.push(row?.[i] ?? null)
         rows.push(arr)
       }
@@ -454,10 +464,10 @@ export class ExcelParser {
     }
 
     options.progress?.({ stage: 'complete', message: 'Parsing complete', sheetName: activeSheet })
-    return { headers, rows, metadata }
+    return {headers, rows: rows as (string | number | boolean | Date | null)[][], metadata}
   }
 
-  detectColumnTypes(data: any[][], options: ParseOptions = {}): ColumnInfo[] {
+  detectColumnTypes(data: unknown[][], options: ParseOptions = {}): ColumnInfo[] {
     const [firstRow, ...rows] = data
     const headers = this.extractHeaders(firstRow || [])
     const colCount = headers.length
@@ -501,9 +511,9 @@ export class ExcelParser {
       const type: DataType = chooseType(num, bool, date, str)
 
       // 2) Single pass over all rows to collect metadata cheaply
-      const uniqueSet = new Set<any>()
+      const uniqueSet = new Set<unknown>()
       let nullCount = 0
-      const sampleValues: any[] = []
+      const sampleValues: unknown[] = []
 
       // Lightweight stats
       let minNumber: number | undefined = undefined
@@ -521,7 +531,7 @@ export class ExcelParser {
           continue
         }
 
-        let v: any = raw
+        let v: unknown = raw
         if (type === 'boolean') v = coerceBoolean(raw)
         else if (type === 'number') v = coerceNumber(raw)
         else if (type === 'date') v = parseDateFlexible(raw)
@@ -583,7 +593,7 @@ export class ExcelParser {
     return columns
   }
 
-  calculateStatistics(column: any[], type: DataType): ColumnStatistics {
+  calculateStatistics(column: unknown[], type: DataType): ColumnStatistics {
     const stats: ColumnStatistics = {}
     if (type === 'number') {
       const nums = column
@@ -609,7 +619,7 @@ export class ExcelParser {
           bestCount = c
         }
       }
-      stats.mode = best as any
+      stats.mode = best as number | null
     } else if (type === 'date') {
       const dates = column.filter(
         (v) => v instanceof Date && !isNaN((v as Date).getTime()),
@@ -623,7 +633,7 @@ export class ExcelParser {
     return stats
   }
 
-  extractHeaders(firstRow: any[]): string[] {
+  extractHeaders(firstRow: unknown[]): string[] {
     const headers: string[] = []
     for (let i = 0; i < firstRow.length; i++) {
       let h = firstRow[i]
@@ -658,7 +668,7 @@ export class ExcelParser {
     return results
   }
 
-  private keyForUnique(v: any): any {
+  private keyForUnique(v: unknown): unknown {
     if (v instanceof Date) return v.toISOString()
     if (typeof v === 'object' && v !== null) return JSON.stringify(v)
     return v

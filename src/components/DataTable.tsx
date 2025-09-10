@@ -1,24 +1,23 @@
-import React, { useMemo, useCallback } from 'react'
-import { List } from 'react-window'
-import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from '@heroicons/react/24/outline'
-import { DataType, ExcelData } from '@/types/excel'
-import { LoadingSpinner } from './ui/LoadingSpinner'
-import { clsx } from 'clsx'
-import { parseDateFlexible } from '@/utils/dataTypes'
+import React, {useMemo} from 'react'
+import {ChevronDownIcon, ChevronUpIcon, TrashIcon} from '@heroicons/react/24/outline'
+import {DataType, ExcelData} from '@/types/excel'
+import {LoadingSpinner} from './ui/LoadingSpinner'
+import {clsx} from 'clsx'
+import {parseDateFlexible} from '@/utils/dataTypes'
 
 interface DataTableProps {
   data: ExcelData | null
-  filteredRows?: any[][]
-  onSort?: (column: string, direction: 'asc' | 'desc') => void
+    filteredRows?: (string | number | boolean | Date)[][]
+    onSort?: (_column: string, _direction: 'asc' | 'desc') => void
   isLoading?: boolean
   sortColumn?: string
   sortDirection?: 'asc' | 'desc'
-  onDeleteColumn?: (columnIndex: number) => void
+    onDeleteColumn?: (_columnIndex: number) => void
   showDataTypes?: boolean
-  onToggleDataTypes?: (show: boolean) => void
+    onToggleDataTypes?: (_show: boolean) => void
 }
 
-function formatCellValue(value: any, type: DataType, showTime: boolean): string {
+function formatCellValue(value: string | number | boolean | Date | null, type: DataType, showTime: boolean): string {
   if (value === null || value === undefined || value === '') {
     return ''
   }

@@ -61,7 +61,7 @@ export interface OpenRouterErrorResponse {
   error: {
     message: string
     code?: number
-    metadata?: any
+      metadata?: unknown
   }
   user_id?: string
 }

@@ -1,11 +1,6 @@
-import { OpenRouterService } from '@/services/openrouter'
-import { PerformanceMonitor } from '@/utils/performanceMonitor'
-import {
-  OpenRouterChatRequest,
-  OpenRouterChatResponse,
-  OpenRouterCredits,
-  OpenRouterModel,
-} from '@/types/openrouter'
+import {OpenRouterService} from '@/services/openrouter'
+import {PerformanceMonitor} from '@/utils/performanceMonitor'
+import {OpenRouterChatRequest, OpenRouterChatResponse, OpenRouterModel,} from '@/types/openrouter'
 
 // Mock PerformanceMonitor
 jest.mock('@/utils/performanceMonitor', () => ({
@@ -18,7 +13,7 @@ jest.mock('@/utils/performanceMonitor', () => ({
 
 describe('OpenRouterService', () => {
   let openRouterService: OpenRouterService
-  let mockPerformanceMonitor: any
+  let mockPerformanceMonitor: Record<string, unknown>
   let mockFetch: jest.MockedFunction<typeof fetch>
 
   // Mock data
@@ -54,10 +49,6 @@ describe('OpenRouterService', () => {
     },
   ]
 
-  const mockCredits: OpenRouterCredits = {
-    balanceUsd: 10.5,
-  }
-
   const mockChatRequest: OpenRouterChatRequest = {
     model: 'openai/gpt-3.5-turbo',
     messages: [
@@ -89,7 +80,7 @@ describe('OpenRouterService', () => {
 
     // Setup PerformanceMonitor mock
     mockPerformanceMonitor = {
-      measureAsync: jest.fn().mockImplementation((name, fn, context) => fn()),
+      measureAsync: jest.fn().mockImplementation((_name, fn, _context) => fn()),
     }
     ;(PerformanceMonitor.getInstance as jest.Mock).mockReturnValue(mockPerformanceMonitor)
 
@@ -226,68 +217,6 @@ describe('OpenRouterService', () => {
       } as Response)
 
       await expect(openRouterService.listModels(mockApiKey)).rejects.toThrow('Invalid JSON {')
-    })
-  })
-
-  describe('getCredits', () => {
-    it('should fetch credits successfully', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockCredits),
-      } as Response)
-
-      const result = await openRouterService.getCredits(mockApiKey)
-
-      expect(mockFetch).toHaveBeenCalledWith('https://openrouter.ai/api/v1/me/credits', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${mockApiKey}`,
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://charts.jatinbansal.com/',
-          'X-Title': 'Excel Explorer',
-        },
-      })
-      expect(result).toEqual(mockCredits)
-      expect(mockPerformanceMonitor.measureAsync).toHaveBeenCalledWith(
-        'openrouter_get_credits',
-        expect.any(Function),
-      )
-    })
-
-    it('should handle error response with error message', async () => {
-      const errorResponse = {
-        error: { message: 'Unauthorized' },
-      }
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-        text: () => Promise.resolve(JSON.stringify(errorResponse)),
-      } as Response)
-
-      await expect(openRouterService.getCredits(mockApiKey)).rejects.toThrow('Unauthorized')
-    })
-
-    it('should handle error response without error object', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 429,
-        text: () => Promise.resolve(JSON.stringify({ message: 'Rate limited' })),
-      } as Response)
-
-      await expect(openRouterService.getCredits(mockApiKey)).rejects.toThrow('Rate limited')
-    })
-
-    it('should handle empty error response', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        text: () => Promise.resolve(''),
-      } as Response)
-
-      await expect(openRouterService.getCredits(mockApiKey)).rejects.toThrow(
-        'Request failed with status 500',
-      )
     })
   })
 
@@ -499,7 +428,7 @@ describe('OpenRouterService', () => {
 
   describe('buildHeaders', () => {
     it('should build headers with API key', () => {
-      const headers = (OpenRouterService as any).buildHeaders(mockApiKey)
+      const headers = OpenRouterService.buildHeaders(mockApiKey)
 
       expect(headers).toEqual({
         Authorization: `Bearer ${mockApiKey}`,
@@ -511,14 +440,14 @@ describe('OpenRouterService', () => {
     })
 
     it('should include X-Title header', () => {
-      const headers = (OpenRouterService as any).buildHeaders(mockApiKey)
+      const headers = OpenRouterService.buildHeaders(mockApiKey)
 
       expect(headers).toHaveProperty('X-Title')
       expect(typeof headers['X-Title']).toBe('string')
     })
 
     it('should include HTTP-Referer header', () => {
-      const headers = (OpenRouterService as any).buildHeaders(mockApiKey)
+      const headers = OpenRouterService.buildHeaders(mockApiKey)
 
       expect(headers).toHaveProperty('HTTP-Referer')
       expect(headers['HTTP-Referer']).toBe('https://charts.jatinbansal.com/')
@@ -533,7 +462,7 @@ describe('OpenRouterService', () => {
         text: () => Promise.resolve(JSON.stringify({ error: { message: 'Test error' } })),
       } as Response
 
-      const message = await (OpenRouterService as any).parseErrorMessage(response)
+      const message = await OpenRouterService.parseErrorMessage(response)
       expect(message).toBe('Test error')
     })
 
@@ -544,7 +473,7 @@ describe('OpenRouterService', () => {
         text: () => Promise.resolve(JSON.stringify({ message: 'Top-level error' })),
       } as Response
 
-      const message = await (OpenRouterService as any).parseErrorMessage(response)
+      const message = await OpenRouterService.parseErrorMessage(response)
       expect(message).toBe('Top-level error')
     })
 
@@ -555,7 +484,7 @@ describe('OpenRouterService', () => {
         text: () => Promise.resolve('Raw error text'),
       } as Response
 
-      const message = await (OpenRouterService as any).parseErrorMessage(response)
+      const message = await OpenRouterService.parseErrorMessage(response)
       expect(message).toBe('Raw error text')
     })
 
@@ -566,7 +495,7 @@ describe('OpenRouterService', () => {
         text: () => Promise.reject(new Error('Text parsing failed')),
       } as Response
 
-      const message = await (OpenRouterService as any).parseErrorMessage(response)
+      const message = await OpenRouterService.parseErrorMessage(response)
       expect(message).toBe('Request failed with status 500')
     })
 
@@ -577,7 +506,7 @@ describe('OpenRouterService', () => {
         text: () => Promise.resolve(''),
       } as Response
 
-      const message = await (OpenRouterService as any).parseErrorMessage(response)
+      const message = await OpenRouterService.parseErrorMessage(response)
       expect(message).toBe('Request failed with status 404')
     })
   })

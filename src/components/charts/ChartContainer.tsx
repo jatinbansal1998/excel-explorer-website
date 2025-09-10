@@ -1,18 +1,18 @@
 'use client'
 
-import { useMemo } from 'react'
-import { ChartConfig } from '@/types/chart'
-import { ColumnInfo } from '@/types/excel'
-import { chartDataProcessor } from '@/services/chartDataProcessor'
-import { Button } from '../ui/Button'
-import { XMarkIcon } from '@heroicons/react/24/outline'
-import { Pie } from 'react-chartjs-2'
+import {useMemo} from 'react'
+import {ChartConfig} from '@/types/chart'
+import {ColumnInfo} from '@/types/excel'
+import {chartDataProcessor} from '@/services/chartDataProcessor'
+import {Button} from '../ui/Button'
+import {XMarkIcon} from '@heroicons/react/24/outline'
+import {Pie} from 'react-chartjs-2'
 
 interface ChartContainerProps {
   config: ChartConfig
-  data: any[][]
+    data: (string | number | boolean | Date)[][]
   columnInfo: ColumnInfo[]
-  onConfigChange: (updates: Partial<ChartConfig>) => void
+    onConfigChange: (_updates: Partial<ChartConfig>) => void
   onRemove: () => void
 }
 
@@ -20,7 +20,7 @@ export function ChartContainer({
   config,
   data,
   columnInfo,
-  onConfigChange,
+                                   onConfigChange: _onConfigChange,
   onRemove,
 }: ChartContainerProps) {
   const { chartData, error } = useMemo(() => {
@@ -122,7 +122,7 @@ export function ChartContainer({
         {error ? (
           <div className="flex items-center justify-center h-full">{renderErrorMessage(error)}</div>
         ) : config.type === 'pie' || config.type === 'doughnut' ? (
-          <Pie data={chartData as any} options={config.options as any} />
+            <Pie data={chartData} options={config.options}/>
         ) : (
           <div className="flex items-center justify-center h-full text-center text-gray-600">
             <div>

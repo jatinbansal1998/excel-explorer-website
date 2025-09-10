@@ -1,6 +1,6 @@
 export interface ExcelData {
   headers: string[]
-  rows: any[][]
+  rows: (string | number | boolean | Date | null)[][]
   metadata: ExcelMetadata
 }
 
@@ -19,11 +19,11 @@ export interface ColumnInfo {
   name: string
   index: number
   type: DataType
-  uniqueValues: any[]
+  uniqueValues: unknown[]
   uniqueCount: number
   hasNulls: boolean
   nullCount: number
-  sampleValues: any[]
+  sampleValues: unknown[]
   statistics?: ColumnStatistics
 }
 
@@ -34,7 +34,7 @@ export interface ColumnStatistics {
   max?: number | Date
   average?: number
   median?: number
-  mode?: any
+  mode?: unknown
 }
 
 export interface ValidationResult {

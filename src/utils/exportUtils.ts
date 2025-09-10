@@ -1,17 +1,17 @@
-import { saveAs } from 'file-saver';
+import {saveAs} from 'file-saver';
 import * as XLSX from 'xlsx';
-import { ErrorHandler, ErrorType } from './errorHandling';
+import {ErrorHandler, ErrorType} from './errorHandling';
 
 export interface FilterConfig {
   column: string;
   type: 'text' | 'number' | 'date' | 'list';
-  values: any[];
+    values: unknown[];
   active: boolean;
 }
 
 export class ExportService {
   exportToCSV(
-    data: any[][], 
+      data: unknown[][],
     headers: string[], 
     filename: string
   ): void {
@@ -29,7 +29,7 @@ export class ExportService {
   }
 
   exportToExcel(
-    data: any[][], 
+      data: unknown[][],
     headers: string[], 
     filename: string,
     sheetName: string = 'Sheet1'
@@ -39,10 +39,7 @@ export class ExportService {
       const worksheet = XLSX.utils.aoa_to_sheet([headers, ...data]);
       
       // Style the header row
-      const headerRange = XLSX.utils.encode_range({
-        s: { c: 0, r: 0 },
-        e: { c: headers.length - 1, r: 0 }
-      });
+        // Note: headerRange is calculated but not currently used for styling
       
       XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
       
@@ -123,8 +120,8 @@ export class ExportService {
     }
   }
 
-  private convertToCSV(data: any[][], headers: string[]): string {
-    const escapeCSV = (value: any): string => {
+    private convertToCSV(data: unknown[][], headers: string[]): string {
+        const escapeCSV = (value: unknown): string => {
       if (value === null || value === undefined) return '';
       const str = String(value);
       if (str.includes(',') || str.includes('"') || str.includes('\n')) {

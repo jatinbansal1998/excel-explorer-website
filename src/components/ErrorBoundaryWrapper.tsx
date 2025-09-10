@@ -1,17 +1,17 @@
 import React from 'react'
-import { ErrorBoundary } from './ErrorBoundary'
+import {ErrorBoundary} from './ErrorBoundary'
 
 interface ErrorBoundaryWrapperProps {
   children: React.ReactNode
   fallback?: React.ReactNode
-  onError?: (error: Error, errorInfo: React.ErrorInfo) => void
+  onError?: (_error: Error, _errorInfo: React.ErrorInfo) => void
 }
 
 /**
  * A wrapper component that provides error boundary protection
  * with customizable fallback UI and error handling
  */
-export function ErrorBoundaryWrapper({ children, fallback, onError }: ErrorBoundaryWrapperProps) {
+export function ErrorBoundaryWrapper({children, _fallback, _onError}: ErrorBoundaryWrapperProps) {
   return <ErrorBoundary>{children}</ErrorBoundary>
 }
 
@@ -20,7 +20,7 @@ export function ErrorBoundaryWrapper({ children, fallback, onError }: ErrorBound
  */
 export function withErrorBoundary<P extends object>(
   Component: React.ComponentType<P>,
-  fallback?: React.ReactNode,
+  _fallback?: React.ReactNode,
 ): React.FC<P> {
   return function WithErrorBoundary(props: P) {
     return (
@@ -47,8 +47,8 @@ export class AsyncErrorBoundary extends React.Component<
     return { hasError: true, error }
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    this.props.onError?.(error, errorInfo)
+  componentDidCatch(_error: Error, _errorInfo: React.ErrorInfo) {
+    this.props.onError?.(_error, _errorInfo)
   }
 
   render() {

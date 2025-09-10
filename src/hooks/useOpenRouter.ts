@@ -1,15 +1,10 @@
 'use client'
 
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
-import {
-  OpenRouterChatRequest,
-  OpenRouterChatResponse,
-  OpenRouterCredits,
-  OpenRouterModel,
-} from '@/types/openrouter'
-import { OpenRouterService } from '@/services/openrouter'
-import { LocalStorageManager } from '@/utils/localStorage'
-import { decryptString, encryptString } from '@/utils/crypto'
+import React, {createContext, useCallback, useContext, useEffect, useRef, useState} from 'react'
+import {OpenRouterChatRequest, OpenRouterChatResponse, OpenRouterCredits, OpenRouterModel,} from '@/types/openrouter'
+import {OpenRouterService} from '@/services/openrouter'
+import {LocalStorageManager} from '@/utils/localStorage'
+import {decryptString, encryptString} from '@/utils/crypto'
 
 export interface OpenRouterState {
   isConnected: boolean
@@ -143,11 +138,11 @@ export function OpenRouterProvider({ children }: { children: React.ReactNode }) 
           selectedModelId: selectedId || settings.selectedModelId,
         })
         return true
-      } catch (e: any) {
+      } catch (e: unknown) {
         setState((prev) => ({
           ...prev,
           isConnected: false,
-          error: `Connection failed: ${e?.message ?? 'Unknown error'}`,
+          error: `Connection failed: ${e instanceof Error ? e.message : 'Unknown error'}`,
         }))
         return false
       }
@@ -191,7 +186,7 @@ export function OpenRouterProvider({ children }: { children: React.ReactNode }) 
         })
         setState((prev) => ({ ...prev, lastUsedKeyName: name }))
         return key
-      } catch (e) {
+      } catch {
         setState((prev) => ({ ...prev, error: 'Failed to decrypt API key' }))
         return null
       }
@@ -244,10 +239,10 @@ export function OpenRouterProvider({ children }: { children: React.ReactNode }) 
         ...settings,
         selectedModelId: selectedId || settings.selectedModelId,
       })
-    } catch (e: any) {
+    } catch (e: unknown) {
       setState((prev) => ({
         ...prev,
-        error: `Failed to load models: ${e?.message ?? 'Unknown error'}`,
+        error: `Failed to load models: ${e instanceof Error ? e.message : 'Unknown error'}`,
       }))
     }
   }, [apiKey, applyFilter])
@@ -289,7 +284,7 @@ export function OpenRouterProvider({ children }: { children: React.ReactNode }) 
     sendChat,
   }
 
-  return React.createElement(OpenRouterContext.Provider, { value }, children as any)
+  return React.createElement(OpenRouterContext.Provider, {value}, children)
 }
 
 export function useOpenRouter(): OpenRouterContextValue {

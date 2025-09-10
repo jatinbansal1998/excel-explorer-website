@@ -1,8 +1,8 @@
-import { ChartConfig, ChartData, AggregationType, NumericRange } from '@/types/chart'
-import { ColumnInfo } from '@/types/excel'
+import {AggregationType, ChartConfig, ChartData, NumericRange} from '@/types/chart'
+import {ColumnInfo} from '@/types/excel'
 
 export class ChartDataProcessor {
-  prepareChartData(data: any[][], config: ChartConfig, columnInfo: ColumnInfo[]): ChartData {
+  prepareChartData(data: (string | number | boolean | Date)[][], config: ChartConfig, columnInfo: ColumnInfo[]): ChartData {
     const dataColumnIndex = this.findColumnIndex(config.dataColumn, columnInfo)
     const labelColumnIndex = config.labelColumn
       ? this.findColumnIndex(config.labelColumn, columnInfo)
@@ -22,7 +22,7 @@ export class ChartDataProcessor {
   }
 
   private preparePieData(
-    data: any[][],
+      data: (string | number | boolean | Date)[][],
     dataColumn: number,
     labelColumn: number | null,
     config: ChartConfig,
@@ -77,13 +77,13 @@ export class ChartDataProcessor {
   }
 
   private aggregateData(
-    data: any[][],
+      data: (string | number | boolean | Date)[][],
     dataColumn: number,
     labelColumn: number | null,
     aggregation: AggregationType,
     config: ChartConfig,
   ): { label: string; value: number }[] {
-    const groups = new Map<string, any[]>()
+    const groups = new Map<string, unknown[]>()
 
     // Filter out empty rows
     const validData = data.filter(
@@ -96,7 +96,7 @@ export class ChartDataProcessor {
 
     for (const row of validData) {
       let label: string
-      let value: any
+      let value: unknown
 
       if (labelColumn !== null) {
         // Two-column scenario: label column for labels, data column for values
@@ -175,7 +175,7 @@ export class ChartDataProcessor {
     return '1M+'
   }
 
-  private applyAggregation(values: any[], type: AggregationType): number {
+  private applyAggregation(values: unknown[], type: AggregationType): number {
     switch (type) {
       case 'count':
         return values.length

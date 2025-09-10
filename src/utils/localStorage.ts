@@ -19,7 +19,7 @@ export interface FilterPreset {
   id: string
   name: string
   description?: string
-  filters: any[]
+  filters: unknown[]
   createdAt: Date
   lastUsed?: Date
 }
@@ -28,7 +28,7 @@ export interface ChartConfig {
   id: string
   name: string
   type: ChartType
-  config: any
+  config: unknown
   createdAt: Date
 }
 
@@ -146,28 +146,16 @@ export class LocalStorageManager {
   }
 
   private static getStorageQuota(): number {
-    if (!this.isBrowser()) return 5 * 1024 * 1024
     // Most browsers allow ~5-10MB for localStorage
-    // We'll estimate based on typical browser limits
-    try {
-      let testKey = 'storage-test-'
-      let testData = '0123456789'
-      let data = testData
-      let totalSize = 0
-
-      // Try to fill up storage to find limit (not recommended for production)
-      // Instead, use a conservative estimate
+    // We'll use a conservative estimate
       return 5 * 1024 * 1024 // 5MB estimate
-    } catch {
-      return 5 * 1024 * 1024 // 5MB fallback
-    }
   }
 
   private static getStorageUsed(): number {
     if (!this.isBrowser()) return 0
     try {
       let total = 0
-      for (let key in localStorage) {
+      for (const key in localStorage) {
         if (localStorage.hasOwnProperty(key)) {
           total += localStorage[key].length + key.length
         }
@@ -182,7 +170,7 @@ export class LocalStorageManager {
     if (!this.isBrowser()) return 0
     try {
       let total = 0
-      for (let key in localStorage) {
+      for (const key in localStorage) {
         if (key.startsWith(this.PREFIX)) {
           total += localStorage[key].length + key.length
         }
@@ -276,15 +264,15 @@ export class LocalStorageManager {
   }
 
   // Session management
-  static saveSessionData(data: any): void {
+  static saveSessionData(data: unknown): void {
     this.save(this.KEYS.SESSION_DATA, {
-      ...data,
+      ...(data as Record<string, unknown>),
       timestamp: new Date(),
       sessionId: this.generateSessionId(),
     })
   }
 
-  static getSessionData(): any {
+  static getSessionData(): unknown {
     return this.load(this.KEYS.SESSION_DATA)
   }
 
@@ -293,14 +281,14 @@ export class LocalStorageManager {
   }
 
   // App state management
-  static saveAppState(state: any): void {
+  static saveAppState(state: unknown): void {
     this.save(this.KEYS.APP_STATE, {
-      ...state,
+      ...(state as Record<string, unknown>),
       lastSaved: new Date(),
     })
   }
 
-  static getAppState(): any {
+  static getAppState(): unknown {
     return this.load(this.KEYS.APP_STATE)
   }
 

@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, {useMemo, useState} from 'react'
 
 interface SelectFilterProps {
   filter: {
-    values: { value: any; selected: boolean; count?: number }[]
+      values: { value: unknown; selected: boolean; count?: number }[]
   }
-  onChange: (values: any[]) => void
+    onChange: (_values: unknown[]) => void
   maxDisplayValues?: number
 }
 

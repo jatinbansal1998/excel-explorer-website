@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
-import type { PersistedSession } from '@/utils/storage/service'
-import { SessionListItem } from './SessionListItem'
+import React, {useMemo, useState} from 'react'
+import type {PersistedSession} from '@/utils/storage/service'
+import {SessionListItem} from './SessionListItem'
 
 interface SessionManagerModalProps {
   isOpen: boolean
@@ -85,7 +85,7 @@ export function SessionManagerModal({
             />
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) => setSortBy(e.target.value as 'updated' | 'file' | 'rows' | 'cols')}
               className="border rounded px-2 py-2"
             >
               <option value="updated">Last Updated</option>

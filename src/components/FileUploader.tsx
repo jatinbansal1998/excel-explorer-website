@@ -1,11 +1,11 @@
-import React, { useState, useRef, useCallback } from 'react'
-import { DocumentArrowUpIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Button } from './ui/Button'
-import { LoadingSpinner } from './ui/LoadingSpinner'
-import { clsx } from 'clsx'
+import React, {useCallback, useRef, useState} from 'react'
+import {DocumentArrowUpIcon, ExclamationTriangleIcon} from '@heroicons/react/24/outline'
+import {Button} from './ui/Button'
+import {LoadingSpinner} from './ui/LoadingSpinner'
+import {clsx} from 'clsx'
 
 interface FileUploaderProps {
-  onFileSelect: (file: File) => void
+    onFileSelect: (_file: File) => void
   isLoading?: boolean
   acceptedTypes?: string[]
   maxSize?: number // in bytes
@@ -76,16 +76,16 @@ export function FileUploader({
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = useCallback(
-    (file: File) => {
+      (_file: File) => {
       setError('')
 
-      const validationError = validateFile(file, maxSize, acceptedTypes)
+          const validationError = validateFile(_file, maxSize, acceptedTypes)
       if (validationError) {
         setError(validationError)
         return
       }
 
-      onFileSelect(file)
+          onFileSelect(_file)
     },
     [onFileSelect, maxSize, acceptedTypes],
   )

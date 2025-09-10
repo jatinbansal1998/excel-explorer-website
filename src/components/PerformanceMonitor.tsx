@@ -1,12 +1,10 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
-import { Card } from './ui/Card'
-import { Button } from './ui/Button'
-import { Badge } from './ui/Badge'
-import { usePerformance, usePerformanceAlerts } from '@/hooks/usePerformance'
-import { globalProperties } from '@/types/global'
-import { PerformanceAlert } from '@/hooks/usePerformance'
+import {useCallback, useEffect, useMemo, useState} from 'react'
+import {Button} from './ui/Button'
+import {Badge} from './ui/Badge'
+import {PerformanceAlert, usePerformance, usePerformanceAlerts} from '@/hooks/usePerformance'
+import {globalProperties} from '@/types/global'
 
 interface PerformanceMonitorProps {
   isVisible?: boolean

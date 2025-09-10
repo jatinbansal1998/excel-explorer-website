@@ -1,15 +1,15 @@
 'use client'
 
 import React from 'react'
-import type { FilterConfig } from '@/types/filter'
+import type {FilterConfig} from '@/types/filter'
 
 interface DateRangeFilterProps {
   filter: FilterConfig
-  onChange: (startDate: Date, endDate: Date) => void
+    onChange: (_startDate: Date, _endDate: Date) => void
 }
 
 function toDateInputValue(d: Date | null | undefined): string {
-  const date = d instanceof Date ? d : d ? new Date(d as any) : null
+    const date = d instanceof Date ? d : d ? new Date(d as string | number | Date) : null
   if (!date || isNaN(date.getTime())) return ''
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')

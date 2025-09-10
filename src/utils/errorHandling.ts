@@ -14,7 +14,7 @@ export interface AppError {
   message: string;
   originalError?: Error;
   timestamp: Date;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   recoverable: boolean;
 }
 
@@ -33,7 +33,7 @@ export class ErrorHandler {
     type: ErrorType, 
     message: string, 
     originalError?: Error,
-    context?: Record<string, any>
+    context?: Record<string, unknown>
   ): AppError {
     const error: AppError = {
       type,
@@ -76,8 +76,8 @@ export class ErrorHandler {
     console.error(`[${error.type}] ${error.message}`, error.originalError);
     
     // In production, send to error reporting service
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'exception', {
+    if (typeof window !== 'undefined' && (window as Record<string, unknown>).gtag) {
+      ((window as Record<string, unknown>).gtag as (...args: unknown[]) => void)('event', 'exception', {
         description: `${error.type}: ${error.message}`,
         fatal: !error.recoverable
       });

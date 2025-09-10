@@ -1,14 +1,14 @@
-import { DataFilter, dataFilterFactory } from '@/services/dataFilter'
+import {DataFilter, dataFilterFactory} from '@/services/dataFilter'
 import {
-  DateRangeFilter,
-  FilterConfig,
-  FilterOperator,
-  FilterType,
-  FilterValue,
-  RangeFilter,
-  SearchFilter,
+    DateRangeFilter,
+    FilterConfig,
+    FilterOperator,
+    FilterType,
+    FilterValue,
+    RangeFilter,
+    SearchFilter,
 } from '@/types/filter'
-import { ExcelData } from '@/types/excel'
+import {ExcelData} from '@/types/excel'
 
 describe('DataFilter', () => {
   let mockExcelData: ExcelData
@@ -986,16 +986,17 @@ describe('DataFilter', () => {
     it('should clone values during export/import to prevent reference sharing', () => {
       const filter = new DataFilter(sampleFilters)
 
-      const state = filter.exportFilterState()
+        const exportedState = filter.exportFilterState()
 
       // Modify the exported state
-      state[0].values.query = 'modified'
+        const modifiedState = exportedState
+        ;(modifiedState[0].values as any).query = 'modified'
 
       // Import it back
-      filter.importFilterState(state)
+        filter.importFilterState(modifiedState)
 
       // The filter should have the modified value
-      const nameFilter = filter['activeFilters'].get('name-filter')
+        const nameFilter = filter['activeFilters'].get('name-filter') as any
       expect(nameFilter?.values.query).toBe('modified')
     })
   })

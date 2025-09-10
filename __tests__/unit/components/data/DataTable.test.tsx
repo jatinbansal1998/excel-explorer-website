@@ -1,9 +1,9 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { DataTable } from '@/components/DataTable'
-import { ColumnInfo, DataType, ExcelData, ExcelMetadata } from '@/types/excel'
-import { parseDateFlexible } from '@/utils/dataTypes'
+import {DataTable} from '@/components/DataTable'
+import {ColumnInfo, DataType, ExcelData, ExcelMetadata} from '@/types/excel'
+import {parseDateFlexible} from '@/utils/dataTypes'
 
 // Mock the LoadingSpinner component
 jest.mock('@/components/ui/LoadingSpinner', () => ({
@@ -309,7 +309,7 @@ describe('DataTable', () => {
     test('handles empty/null values correctly', () => {
       const dataWithEmpty: ExcelData = {
         ...sampleData,
-        rows: [['', null, undefined, 'valid']],
+          rows: [['', null, null, 'valid']],
       }
 
       render(<DataTable data={dataWithEmpty} />)

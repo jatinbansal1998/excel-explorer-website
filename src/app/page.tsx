@@ -1,20 +1,16 @@
 'use client'
 
-import { useState, lazy, Suspense } from 'react'
-import { FileUploader } from '@/components/FileUploader'
-import { DataTable } from '@/components/DataTable'
-import { useToast } from '@/components/ui/Toast'
-import { useExcelData } from '@/hooks/useExcelData'
-import { useFilters } from '@/hooks/useFilters'
-import { useSessionPersistence } from '@/hooks/useSessionPersistence'
-import { globalProperties } from '@/types/global'
-import {
-  ErrorBoundaryWrapper,
-  ChartErrorBoundary,
-  DataProcessingErrorBoundary,
-} from '@/components/ErrorBoundaryWrapper'
-import { PerformanceMonitor, usePerformanceMonitor } from '@/components/PerformanceMonitor'
-import { SessionRestoreProgress } from '@/components/session/SessionRestoreProgress'
+import {lazy, Suspense, useState} from 'react'
+import {FileUploader} from '@/components/FileUploader'
+import {DataTable} from '@/components/DataTable'
+import {useToast} from '@/components/ui/Toast'
+import {useExcelData} from '@/hooks/useExcelData'
+import {useFilters} from '@/hooks/useFilters'
+import {useSessionPersistence} from '@/hooks/useSessionPersistence'
+import {globalProperties} from '@/types/global'
+import {ChartErrorBoundary, DataProcessingErrorBoundary, ErrorBoundaryWrapper,} from '@/components/ErrorBoundaryWrapper'
+import {PerformanceMonitor, usePerformanceMonitor} from '@/components/PerformanceMonitor'
+import {SessionRestoreProgress} from '@/components/session/SessionRestoreProgress'
 
 // Lazy load heavy components
 const FilterPanel = lazy(() =>
@@ -51,7 +47,7 @@ export default function HomePage() {
       addToast({
         type: 'error',
         title: 'Upload Failed',
-        message: (error as any)?.message || 'There was an error processing your file',
+        message: (error as Error)?.message || 'There was an error processing your file',
       })
     }
   }
@@ -70,7 +66,7 @@ export default function HomePage() {
         type: 'error',
         title: 'Session Restoration Failed',
         message:
-          (error as any)?.message ||
+            (error as Error)?.message ||
           'Failed to restore session. Please try again or upload a new file.',
         duration: 8000, // Longer duration for session errors
       })
@@ -170,13 +166,13 @@ export default function HomePage() {
                   excelData={currentData}
                   filteredRows={filteredData}
                   filtersActive={filters.some((f) => f.active)}
-                  onApplyChart={(cfg) => {
+                  _onApplyChart={(cfg) => {
                     try {
                       const apply = globalProperties.getApplyChartFromAI()
                       if (typeof apply === 'function') apply(cfg)
                     } catch {}
                   }}
-                  onApplyFilters={(f) => {
+                  _onApplyFilters={(f) => {
                     try {
                       // Import filters when provided. If it's a full FilterState array, call importState.
                       if (Array.isArray(f)) {

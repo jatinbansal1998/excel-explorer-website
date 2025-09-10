@@ -1,13 +1,13 @@
-import { DataType } from '@/types/excel'
+import {DataType} from '@/types/excel'
 
 const TRUE_SET = new Set(['true', '1', 'yes', 'y'])
 const FALSE_SET = new Set(['false', '0', 'no', 'n'])
 
-export function isNullLike(v: any): boolean {
+export function isNullLike(v: unknown): boolean {
   return v === null || v === undefined || (typeof v === 'string' && v.trim() === '')
 }
 
-export function isBooleanLike(v: any): boolean {
+export function isBooleanLike(v: unknown): boolean {
   if (typeof v === 'boolean') return true
   if (typeof v === 'number') return v === 0 || v === 1
   if (typeof v === 'string') {
@@ -17,7 +17,7 @@ export function isBooleanLike(v: any): boolean {
   return false
 }
 
-export function coerceBoolean(v: any): boolean | null {
+export function coerceBoolean(v: unknown): boolean | null {
   if (typeof v === 'boolean') return v
   if (typeof v === 'number') return v === 1
   if (typeof v === 'string') {
@@ -28,7 +28,7 @@ export function coerceBoolean(v: any): boolean | null {
   return null
 }
 
-export function isNumberLike(v: any): boolean {
+export function isNumberLike(v: unknown): boolean {
   if (typeof v === 'number') return Number.isFinite(v)
   if (typeof v === 'string') {
     const s = v.trim()
@@ -41,7 +41,7 @@ export function isNumberLike(v: any): boolean {
   return false
 }
 
-export function coerceNumber(v: any): number | null {
+export function coerceNumber(v: unknown): number | null {
   if (typeof v === 'number') return Number.isFinite(v) ? v : null
   if (typeof v === 'string') {
     const n = Number(v.replace(/,/g, ''))
@@ -68,7 +68,7 @@ const MONTH_NAMES = [
   'dec',
 ]
 
-export function parseDateFlexible(v: any): Date | null {
+export function parseDateFlexible(v: unknown): Date | null {
   if (v instanceof Date && !isNaN(v.getTime())) return v
   if (typeof v === 'number') {
     // Could be timestamp (ms) or Excel serial; treat as ms if > 10^10
@@ -128,7 +128,7 @@ export function parseDateFlexible(v: any): Date | null {
   return null
 }
 
-export function isDateLike(v: any): boolean {
+export function isDateLike(v: string | number | Date | boolean): boolean {
   if (v instanceof Date) return !isNaN(v.getTime())
   if (typeof v === 'number') {
     // Treat large numbers as epoch milliseconds and Excel serials in a plausible range as dates
@@ -149,7 +149,7 @@ export function isDateLike(v: any): boolean {
   return false
 }
 
-export function detectTypeForValues(values: any[]): DataType {
+export function detectTypeForValues(values: (string | number | Date | boolean)[]): DataType {
   let num = 0,
     bool = 0,
     date = 0,
@@ -171,7 +171,7 @@ export function detectTypeForValues(values: any[]): DataType {
   return dominant[1] / total >= 0.8 ? (dominant[0] as DataType) : 'mixed'
 }
 
-export function coerceToType(v: any, type: DataType): any {
+export function coerceToType(v: string | number | Date | boolean, type: DataType): string | number | boolean | Date | null {
   if (isNullLike(v)) return null
   switch (type) {
     case 'boolean':

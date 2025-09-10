@@ -1,13 +1,6 @@
-import { ColumnInfo } from '@/types/excel'
-import {
-  FilterConfig,
-  FilterType,
-  FilterValue,
-  RangeFilter,
-  DateRangeFilter,
-  SearchFilter,
-} from '@/types/filter'
-import { numericRangeGenerator } from './numericRangeGenerator'
+import {ColumnInfo} from '@/types/excel'
+import {DateRangeFilter, FilterConfig, FilterValue, RangeFilter, SearchFilter,} from '@/types/filter'
+import {numericRangeGenerator} from './numericRangeGenerator'
 
 function toId(name: string, index: number, suffix?: string) {
   return `filter-${index}${suffix ? '-' + suffix : ''}`
@@ -120,13 +113,13 @@ export class FilterGenerator {
       column.statistics?.min instanceof Date
         ? (column.statistics?.min as Date)
         : column.statistics?.min
-          ? new Date(column.statistics?.min as any)
+              ? new Date(column.statistics?.min as number | string | Date)
           : new Date(0)
     const max =
       column.statistics?.max instanceof Date
         ? (column.statistics?.max as Date)
         : column.statistics?.max
-          ? new Date(column.statistics?.max as any)
+              ? new Date(column.statistics?.max as number | string | Date)
           : new Date()
 
     const range: DateRangeFilter = {
@@ -181,7 +174,7 @@ export class FilterGenerator {
   }
 
   // Utilities for large datasets (optional use)
-  extractUniqueValues(data: any[][], columnIndex: number, maxValues: number = 1000): FilterValue[] {
+    extractUniqueValues(data: unknown[][], columnIndex: number, maxValues: number = 1000): FilterValue[] {
     const counts = this.calculateValueCounts(data, columnIndex)
     const values: FilterValue[] = []
     let i = 0
@@ -193,8 +186,8 @@ export class FilterGenerator {
     return values
   }
 
-  calculateValueCounts(data: any[][], columnIndex: number): Map<any, number> {
-    const map = new Map<any, number>()
+    calculateValueCounts(data: unknown[][], columnIndex: number): Map<unknown, number> {
+        const map = new Map<unknown, number>()
     for (let i = 0; i < data.length; i++) {
       const v = data[i][columnIndex]
       const key = v ?? null // normalize undefined to null

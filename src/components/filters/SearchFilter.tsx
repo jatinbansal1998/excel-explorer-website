@@ -1,11 +1,11 @@
 'use client'
 
 import React from 'react'
-import type { FilterConfig } from '@/types/filter'
+import type {FilterConfig} from '@/types/filter'
 
 interface SearchFilterProps {
   filter: FilterConfig
-  onChange: (query: string, options: { caseSensitive: boolean; exactMatch: boolean }) => void
+    onChange: (_query: string, _options: { caseSensitive: boolean; exactMatch: boolean }) => void
 }
 
 export function SearchFilter({ filter, onChange }: SearchFilterProps) {

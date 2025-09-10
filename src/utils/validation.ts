@@ -1,4 +1,4 @@
-import { DataType } from '@/types/excel'
+import {DataType} from '@/types/excel'
 
 export interface ValidationResult {
   isValid: boolean
@@ -164,14 +164,14 @@ export class FileValidator {
 }
 
 export class DataValidator {
-  static validateColumnData(data: any[], columnType: DataType): ValidationResult {
+  static validateColumnData(data: unknown[], columnType: DataType): ValidationResult {
     const errors: string[] = []
     const warnings: string[] = []
 
     let validCount = 0
     let nullCount = 0
 
-    data.forEach((value, index) => {
+    data.forEach((value, _index) => {
       if (value === null || value === undefined || value === '') {
         nullCount++
         return
@@ -182,7 +182,7 @@ export class DataValidator {
       } else {
         if (errors.length < 5) {
           // Limit error messages
-          errors.push(`Invalid ${columnType} value at row ${index + 1}: ${value}`)
+          errors.push(`Invalid ${columnType} value at row ${_index + 1}: ${value}`)
         }
       }
     })
@@ -207,7 +207,7 @@ export class DataValidator {
     }
   }
 
-  static validateDataRange(data: any[][], expectedColumns?: number): ValidationResult {
+  static validateDataRange(data: unknown[][], expectedColumns?: number): ValidationResult {
     const errors: string[] = []
     const warnings: string[] = []
 
@@ -240,7 +240,7 @@ export class DataValidator {
     }
 
     // Check for completely empty rows
-    const emptyRows = data.filter((row, index) =>
+    const emptyRows = data.filter((row, _index) =>
       row.every((cell) => cell === null || cell === undefined || cell === ''),
     ).length
 
@@ -255,12 +255,12 @@ export class DataValidator {
     }
   }
 
-  static validateNumericColumn(data: any[]): ValidationResult {
+  static validateNumericColumn(data: unknown[]): ValidationResult {
     const errors: string[] = []
     const warnings: string[] = []
     const numericValues: number[] = []
 
-    data.forEach((value, index) => {
+    data.forEach((value, _index) => {
       if (value === null || value === undefined || value === '') {
         return // Skip null values
       }
@@ -268,7 +268,7 @@ export class DataValidator {
       const numValue = Number(value)
       if (isNaN(numValue)) {
         if (errors.length < 5) {
-          errors.push(`Non-numeric value at row ${index + 1}: ${value}`)
+          errors.push(`Non-numeric value at row ${_index + 1}: ${value}`)
         }
       } else {
         numericValues.push(numValue)
@@ -301,12 +301,12 @@ export class DataValidator {
     }
   }
 
-  static validateDateColumn(data: any[]): ValidationResult {
+  static validateDateColumn(data: unknown[]): ValidationResult {
     const errors: string[] = []
     const warnings: string[] = []
     const dateValues: Date[] = []
 
-    data.forEach((value, index) => {
+    data.forEach((value, _index) => {
       if (value === null || value === undefined || value === '') {
         return // Skip null values
       }
@@ -314,7 +314,7 @@ export class DataValidator {
       const dateValue = new Date(value)
       if (isNaN(dateValue.getTime())) {
         if (errors.length < 5) {
-          errors.push(`Invalid date value at row ${index + 1}: ${value}`)
+          errors.push(`Invalid date value at row ${_index + 1}: ${value}`)
         }
       } else {
         dateValues.push(dateValue)
@@ -323,8 +323,8 @@ export class DataValidator {
 
     // Date range warnings
     if (dateValues.length > 0) {
-      const minDate = new Date(Math.min(...dateValues.map((d) => d.getTime())))
-      const maxDate = new Date(Math.max(...dateValues.map((d) => d.getTime())))
+      const _minDate = new Date(Math.min(...dateValues.map((d) => d.getTime())))
+      const _maxDate = new Date(Math.max(...dateValues.map((d) => d.getTime())))
 
       // Check for future dates
       const now = new Date()
@@ -348,12 +348,12 @@ export class DataValidator {
     }
   }
 
-  private static isValidForType(value: any, type: DataType): boolean {
+  private static isValidForType(value: unknown, type: DataType): boolean {
     switch (type) {
       case 'number':
         return !isNaN(Number(value))
       case 'date':
-        return !isNaN(Date.parse(value))
+        return !isNaN(Date.parse(value as string))
       case 'boolean':
         return (
           typeof value === 'boolean' ||

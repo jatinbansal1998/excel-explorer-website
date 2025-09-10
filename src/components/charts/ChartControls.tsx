@@ -1,24 +1,24 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { ChartSuggestion, ChartType } from '@/types/chart'
-import { ColumnInfo, ExcelData } from '@/types/excel'
-import { Button } from '../ui/Button'
-import { TrashIcon, ChevronDownIcon, PlusIcon } from '@heroicons/react/24/outline'
-import { ChartCreationModal } from './ChartCreationModal'
+import {useEffect, useRef, useState} from 'react'
+import {AggregationType, ChartSuggestion, ChartType, NumericRange} from '@/types/chart'
+import {ColumnInfo, ExcelData} from '@/types/excel'
+import {Button} from '../ui/Button'
+import {ChevronDownIcon, PlusIcon, TrashIcon} from '@heroicons/react/24/outline'
+import {ChartCreationModal} from './ChartCreationModal'
 
 interface ChartControlsProps {
   suggestions: ChartSuggestion[]
-  onAddChart: (s: ChartSuggestion) => void
+  onAddChart: (_s: ChartSuggestion) => void
   onClearCharts?: () => void
   onCreateManualChart?: (config: {
     type: ChartType
     dataColumn: string
     labelColumn?: string
-    aggregation: any
+    aggregation: AggregationType
     title: string
     maxSegments?: number
-    numericRanges?: any[]
+    numericRanges?: NumericRange[]
   }) => void
   columnInfo: ColumnInfo[]
   filteredData: ExcelData['rows']

@@ -8,7 +8,11 @@ module.exports = {
     ],
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
     transform: {
-        '^.+\\.(ts|tsx|js|jsx)$': 'ts-jest',
+        '^.+\\.(ts|tsx|js|jsx)$': ['ts-jest', {
+            tsconfig: {
+                jsx: 'react-jsx',
+            },
+        }],
         '.+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$': 'jest-transform-stub',
     },
     transformIgnorePatterns: [
@@ -18,13 +22,6 @@ module.exports = {
         '^@/(.*)$': '<rootDir>/src/$1',
         '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
         '\\.(gif|ttf|eot|svg)$': '<rootDir>/__tests__/utils/fileMock.js',
-    },
-    globals: {
-        'ts-jest': {
-            tsconfig: {
-                jsx: 'react-jsx',
-            },
-        },
     },
     collectCoverageFrom: [
         'src/**/*.{ts,tsx}',

@@ -1,10 +1,10 @@
 import React from 'react'
-import { fireEvent, render, screen } from '@testing-library/react'
+import {fireEvent, render, screen} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import ChartContainer from '@/components/charts/ChartContainer'
-import { ChartConfig, ChartType } from '@/types/chart'
-import { ColumnInfo, DataType } from '@/types/excel'
-import { chartDataProcessor } from '@/services/chartDataProcessor'
+import {ChartConfig, ChartType} from '@/types/chart'
+import {ColumnInfo, DataType} from '@/types/excel'
+import {chartDataProcessor} from '@/services/chartDataProcessor'
 
 // Mock the chartDataProcessor service
 jest.mock('@/services/chartDataProcessor')
@@ -565,6 +565,8 @@ describe('ChartContainer Component', () => {
 
   describe('Error State Data Fallback', () => {
     it('provides fallback chart data when error occurs', () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {
+        })
       const error = new Error('Test error')
       mockedChartDataProcessor.prepareChartData.mockImplementation(() => {
         throw error
@@ -583,6 +585,7 @@ describe('ChartContainer Component', () => {
       // The component should catch the error and show error message
       // instead of crashing
       expect(screen.getByText('Chart Display Error')).toBeInTheDocument()
+        consoleSpy.mockRestore()
     })
 
     it('logs error to console when data processing fails', () => {

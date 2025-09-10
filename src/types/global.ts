@@ -1,11 +1,11 @@
 // Global type definitions for AI integration and utilities
 export interface GlobalWindow extends Window {
   // Excel parser utilities
-  __XLSX_UTILS?: any
+  __XLSX_UTILS?: unknown
 
   // AI integration functions
-  __applyChartFromAI?: (config: any) => void
-  __importFiltersFromAI?: (state: any) => void
+  __applyChartFromAI?: (config: unknown) => void
+  __importFiltersFromAI?: (state: unknown) => void
 
   // Performance monitoring
   __EXCEL_EXPLORER_PERFORMANCE?: {
@@ -16,9 +16,9 @@ export interface GlobalWindow extends Window {
 
 declare global {
   interface Window {
-    __XLSX_UTILS?: any
-    __applyChartFromAI?: (config: any) => void
-    __importFiltersFromAI?: (state: any) => void
+    __XLSX_UTILS?: unknown
+    __applyChartFromAI?: (config: unknown) => void
+    __importFiltersFromAI?: (state: unknown) => void
     __EXCEL_EXPLORER_PERFORMANCE?: {
       metrics: Record<string, number>
       marks: Record<string, number>
@@ -29,7 +29,7 @@ declare global {
 // Safe global property management
 export class GlobalPropertyManager {
   private static instance: GlobalPropertyManager
-  private properties = new Map<string, any>()
+  private properties = new Map<string, unknown>()
 
   static getInstance(): GlobalPropertyManager {
     if (!GlobalPropertyManager.instance) {
@@ -39,17 +39,17 @@ export class GlobalPropertyManager {
   }
 
   // Safely get a global property
-  get<T = any>(key: string): T | undefined {
+  get<T = unknown>(key: string): T | undefined {
     return this.properties.get(key) as T
   }
 
   // Safely set a global property
-  set<T = any>(key: string, value: T): void {
+  set<T = unknown>(key: string, value: T): void {
     this.properties.set(key, value)
 
     // Also set on window for backward compatibility
     if (typeof window !== 'undefined') {
-      ;(window as any)[key] = value
+      ;(window as Record<string, unknown>)[key] = value
     }
   }
 
@@ -59,7 +59,7 @@ export class GlobalPropertyManager {
 
     // Also remove from window
     if (typeof window !== 'undefined') {
-      delete (window as any)[key]
+      delete (window as Record<string, unknown>)[key]
     }
   }
 
@@ -69,7 +69,7 @@ export class GlobalPropertyManager {
   }
 
   // Get all properties
-  getAll(): Record<string, any> {
+  getAll(): Record<string, unknown> {
     return Object.fromEntries(this.properties)
   }
 
@@ -80,28 +80,28 @@ export class GlobalPropertyManager {
   }
 
   // Excel parser utilities
-  getXLSXUtils(): any {
+  getXLSXUtils(): unknown {
     return this.get('__XLSX_UTILS')
   }
 
-  setXLSXUtils(utils: any): void {
+  setXLSXUtils(utils: unknown): void {
     this.set('__XLSX_UTILS', utils)
   }
 
   // AI integration functions
-  getApplyChartFromAI(): ((config: any) => void) | undefined {
+  getApplyChartFromAI(): ((config: unknown) => void) | undefined {
     return this.get('__applyChartFromAI')
   }
 
-  setApplyChartFromAI(fn: (config: any) => void): void {
+  setApplyChartFromAI(fn: (config: unknown) => void): void {
     this.set('__applyChartFromAI', fn)
   }
 
-  getImportFiltersFromAI(): ((state: any) => void) | undefined {
+  getImportFiltersFromAI(): ((state: unknown) => void) | undefined {
     return this.get('__importFiltersFromAI')
   }
 
-  setImportFiltersFromAI(fn: (state: any) => void): void {
+  setImportFiltersFromAI(fn: (state: unknown) => void): void {
     this.set('__importFiltersFromAI', fn)
   }
 
@@ -111,7 +111,10 @@ export class GlobalPropertyManager {
   }
 
   setPerformanceMetric(name: string, value: number): void {
-    const perf = this.get('__EXCEL_EXPLORER_PERFORMANCE') || { metrics: {}, marks: {} }
+    const perf = this.get('__EXCEL_EXPLORER_PERFORMANCE') as {
+      metrics: Record<string, number>;
+      marks: Record<string, number>
+    } || {metrics: {}, marks: {}}
     perf.metrics[name] = value
     this.set('__EXCEL_EXPLORER_PERFORMANCE', perf)
   }
@@ -121,7 +124,10 @@ export class GlobalPropertyManager {
   }
 
   setPerformanceMark(name: string, timestamp: number): void {
-    const perf = this.get('__EXCEL_EXPLORER_PERFORMANCE') || { metrics: {}, marks: {} }
+    const perf = this.get('__EXCEL_EXPLORER_PERFORMANCE') as {
+      metrics: Record<string, number>;
+      marks: Record<string, number>
+    } || {metrics: {}, marks: {}}
     perf.marks[name] = timestamp
     this.set('__EXCEL_EXPLORER_PERFORMANCE', perf)
   }

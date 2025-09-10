@@ -1,6 +1,6 @@
-import React, { Component, ErrorInfo, PropsWithChildren } from 'react'
-import { Button } from './ui/Button'
-import { ErrorHandler, ErrorType } from '@/utils/errorHandling'
+import React, {Component, ErrorInfo, PropsWithChildren} from 'react'
+import {Button} from './ui/Button'
+import {ErrorHandler, ErrorType} from '@/utils/errorHandling'
 
 interface ErrorBoundaryState {
   hasError: boolean
@@ -8,8 +8,8 @@ interface ErrorBoundaryState {
   errorInfo: ErrorInfo | null
 }
 
-export class ErrorBoundary extends Component<PropsWithChildren<{}>, ErrorBoundaryState> {
-  constructor(props: PropsWithChildren<{}>) {
+export class ErrorBoundary extends Component<PropsWithChildren<Record<string, unknown>>, ErrorBoundaryState> {
+    constructor(props: PropsWithChildren<Record<string, unknown>>) {
     super(props)
     this.state = { hasError: false, error: null, errorInfo: null }
   }

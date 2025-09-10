@@ -1,12 +1,12 @@
-import { OpenRouterService } from './openrouter'
-import type { LLMAnalyticsResponse, PromptSuggestion } from '@/types/llmAnalytics'
-import { LLM_ANALYTICS_SCHEMA_TEXT } from '@/types/llmAnalytics'
-import type { ExcelData } from '@/types/excel'
-import type { OpenRouterChatRequest, OpenRouterChatResponse } from '@/types/openrouter'
+import {OpenRouterService} from './openrouter'
+import type {LLMAnalyticsResponse, PromptSuggestion} from '@/types/llmAnalytics'
+import {LLM_ANALYTICS_SCHEMA_TEXT} from '@/types/llmAnalytics'
+import type {ExcelData} from '@/types/excel'
+import type {OpenRouterChatRequest, OpenRouterChatResponse} from '@/types/openrouter'
 
 const TEMPLATE_CACHE: Map<string, string> = new Map()
 
-function safeJsonParse<T = any>(text: string): T | null {
+function safeJsonParse<T = Record<string, unknown>>(text: string): T | null {
   try {
     return JSON.parse(text) as T
   } catch {
@@ -20,7 +20,7 @@ function stripBom(text: string): string {
   return text
 }
 
-function tryParseFromCodeFences(text: string): any | null {
+function tryParseFromCodeFences(text: string): Record<string, unknown> | null {
   const re = /```(?:json|jsonc|ts|typescript|js|javascript)?\s*([\s\S]*?)```/gi
   let match: RegExpExecArray | null
   let firstBlock: string | null = null
@@ -83,7 +83,7 @@ function findBalancedJsonSubstring(input: string): string | null {
   return tryScan('{', '}') ?? tryScan('[', ']')
 }
 
-function parseLLMJsonPayload(text: string): any | null {
+function parseLLMJsonPayload(text: string): Record<string, unknown> | null {
   if (!text) return null
   const cleaned = stripBom(text).trim()
   // 1) Direct parse
@@ -124,7 +124,7 @@ async function buildAnalyzeUser(context: string, prompt: string): Promise<string
   return md.replace('{{CONTEXT}}', context).replace('{{PROMPT}}', prompt)
 }
 
-function pickSampleRows(rows: any[][], limit: number): any[][] {
+function pickSampleRows(rows: unknown[][], limit: number): unknown[][] {
   if (!rows || rows.length <= limit) return rows || []
   const mid = Math.floor(limit / 2)
   const head = rows.slice(0, mid)
@@ -135,7 +135,7 @@ function pickSampleRows(rows: any[][], limit: number): any[][] {
 export function buildDatasetContext(
   data: ExcelData | null,
   sampleRowLimit: number = 100,
-  rowsOverride?: any[][],
+  rowsOverride?: unknown[][],
 ): string {
   if (!data) return 'No dataset provided.'
   const meta = data.metadata
@@ -174,19 +174,20 @@ export function buildDatasetContext(
   return JSON.stringify(payload)
 }
 
-function normalizeResponseShape(maybeJson: any): LLMAnalyticsResponse {
+function normalizeResponseShape(maybeJson: unknown): LLMAnalyticsResponse {
   // Handle { insights: [{ key, value }, ...] }
   if (
     maybeJson &&
-    Array.isArray(maybeJson.insights) &&
-    (maybeJson.insights.length === 0 || maybeJson.insights[0]?.key !== undefined)
+      Array.isArray((maybeJson as Record<string, unknown>).insights) &&
+      ((maybeJson as Record<string, unknown>).insights as unknown[]).length === 0 ||
+      ((maybeJson as Record<string, unknown>).insights as unknown[])[0]?.key !== undefined
   ) {
-    const insights = (maybeJson.insights as any[]).map((it: any, idx: number) => ({
+    const insights = ((maybeJson as Record<string, unknown>).insights as unknown[]).map((it: unknown, idx: number) => ({
       key: String(it?.key ?? `Insight ${idx + 1}`),
       value: typeof it?.value === 'string' ? it.value : JSON.stringify(it?.value ?? '', null, 2),
     }))
-    const followUps = Array.isArray(maybeJson.followUps)
-      ? maybeJson.followUps.map((f: any) => ({
+    const followUps = Array.isArray((maybeJson as Record<string, unknown>).followUps)
+        ? ((maybeJson as Record<string, unknown>).followUps as unknown[]).map((f: unknown) => ({
           id: String(f?.id || ''),
           category: String(f?.category || 'other').toLowerCase() as
             | 'descriptive'
@@ -204,16 +205,17 @@ function normalizeResponseShape(maybeJson: any): LLMAnalyticsResponse {
   // Handle legacy cards: { insights: [{ id,title,kind,details, ... }] }
   if (
     maybeJson &&
-    Array.isArray(maybeJson.insights) &&
-    (maybeJson.insights.length === 0 || maybeJson.insights[0]?.title !== undefined)
+      Array.isArray((maybeJson as Record<string, unknown>).insights) &&
+      ((maybeJson as Record<string, unknown>).insights as unknown[]).length === 0 ||
+      ((maybeJson as Record<string, unknown>).insights as unknown[])[0]?.title !== undefined
   ) {
-    const insights = (maybeJson.insights as any[]).map((it: any, idx: number) => ({
+    const insights = ((maybeJson as Record<string, unknown>).insights as unknown[]).map((it: unknown, idx: number) => ({
       key: String(it?.title ?? `Insight ${idx + 1}`),
       value:
         typeof it?.details === 'string' ? it.details : JSON.stringify(it?.details ?? '', null, 2),
     }))
-    const followUps = Array.isArray(maybeJson.followUps)
-      ? maybeJson.followUps.map((f: any) => ({
+    const followUps = Array.isArray((maybeJson as Record<string, unknown>).followUps)
+        ? ((maybeJson as Record<string, unknown>).followUps as unknown[]).map((f: unknown) => ({
           id: String(f?.id || ''),
           category: String(f?.category || 'other').toLowerCase() as
             | 'descriptive'

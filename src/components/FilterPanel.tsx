@@ -1,27 +1,21 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
-import { Button } from './ui/Button'
-import { ArrowPathIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
-import { Modal } from './ui/Modal'
-import {
-  DateRangeFilter,
-  FilterConfig,
-  FilterValue,
-  RangeFilter,
-  SearchFilter,
-} from '@/types/filter'
-import type { NumericRange } from '@/types/chart'
-import type { ColumnInfo } from '@/types/excel'
-import { NumericRangeEditor } from './charts/NumericRangeEditor'
+import React, {useMemo, useState} from 'react'
+import {Button} from './ui/Button'
+import {ArrowPathIcon, ChevronDownIcon, ChevronUpIcon} from '@heroicons/react/24/outline'
+import {Modal} from './ui/Modal'
+import {DateRangeFilter, FilterConfig, FilterValue, RangeFilter, SearchFilter,} from '@/types/filter'
+import type {NumericRange} from '@/types/chart'
+import type {ColumnInfo} from '@/types/excel'
+import {NumericRangeEditor} from './charts/NumericRangeEditor'
 
 interface FilterPanelProps {
   filters: FilterConfig[]
-  onFilterChange: (filterId: string, updates: Partial<FilterConfig>) => void
-  onFilterReset: (filterId: string) => void
+    onFilterChange: (_filterId: string, _updates: Partial<FilterConfig>) => void
+    onFilterReset: (_filterId: string) => void
   onResetAll: () => void
   columnInfo: ColumnInfo[]
-  filteredData: any[][]
+    filteredData: (string | number | boolean | Date)[][]
 }
 
 export function FilterPanel({
@@ -164,9 +158,9 @@ function FilterComponent({
   filteredData,
 }: {
   filter: FilterConfig
-  onChange: (updates: Partial<FilterConfig>) => void
+    onChange: (_updates: Partial<FilterConfig>) => void
   columnInfo: ColumnInfo[]
-  filteredData: any[][]
+    filteredData: (string | number | boolean | Date)[][]
 }) {
   switch (filter.type) {
     case 'select':
@@ -198,7 +192,7 @@ function SelectFilterView({
   onChange,
 }: Readonly<{
   filter: FilterConfig
-  onChange: (updates: Partial<FilterConfig>) => void
+    onChange: (_updates: Partial<FilterConfig>) => void
 }>) {
   const values = filter.values as FilterValue[]
   const [query, setQuery] = useState('')
@@ -247,9 +241,9 @@ function RangeFilterView({
   filteredData,
 }: Readonly<{
   filter: FilterConfig
-  onChange: (updates: Partial<FilterConfig>) => void
+    onChange: (_updates: Partial<FilterConfig>) => void
   columnInfo: ColumnInfo[]
-  filteredData: any[][]
+    filteredData: (string | number | boolean | Date)[][]
 }>) {
   const range = (filter.values as RangeFilter) || ({} as RangeFilter)
   const [showEditBins, setShowEditBins] = useState(false)
@@ -368,9 +362,9 @@ function EditBinsModal({
   isOpen: boolean
   onClose: () => void
   filter: FilterConfig
-  onChange: (updates: Partial<FilterConfig>) => void
+    onChange: (_updates: Partial<FilterConfig>) => void
   columnInfo: ColumnInfo[]
-  filteredData: any[][]
+    filteredData: (string | number | boolean | Date)[][]
 }>) {
   const range = (filter.values as RangeFilter) || ({} as RangeFilter)
   const col = columnInfo.find((c) => c.index === filter.columnIndex)
@@ -415,7 +409,7 @@ function SearchFilterView({
   onChange,
 }: Readonly<{
   filter: FilterConfig
-  onChange: (updates: Partial<FilterConfig>) => void
+    onChange: (_updates: Partial<FilterConfig>) => void
 }>) {
   const search = filter.values as SearchFilter
   const update = (patch: Partial<SearchFilter>) => {
@@ -466,7 +460,7 @@ function DateRangeFilterView({
   onChange,
 }: Readonly<{
   filter: FilterConfig
-  onChange: (updates: Partial<FilterConfig>) => void
+    onChange: (_updates: Partial<FilterConfig>) => void
 }>) {
   const range = filter.values as DateRangeFilter
   const update = (key: 'currentStart' | 'currentEnd', val: string) => {
@@ -497,7 +491,7 @@ function BooleanFilterView({
   onChange,
 }: Readonly<{
   filter: FilterConfig
-  onChange: (updates: Partial<FilterConfig>) => void
+    onChange: (_updates: Partial<FilterConfig>) => void
 }>) {
   const val = filter.values as boolean | null
   const setVal = (v: boolean | null) => onChange({ values: v, active: true, operator: 'equals' })
@@ -539,7 +533,7 @@ function NullFilterView({
   onChange,
 }: Readonly<{
   filter: FilterConfig
-  onChange: (updates: Partial<FilterConfig>) => void
+    onChange: (_updates: Partial<FilterConfig>) => void
 }>) {
   // values boolean not used in engine; we drive via operator
   const includeNulls = filter.operator === 'is_null'

@@ -13,6 +13,7 @@ export class FileValidator {
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'text/csv',
     'application/x-iwork-numbers-sffnumbers',
+    'application/vnd.apple.numbers',
   ]
 
   static validateFile(file: File): ValidationResult {
@@ -20,6 +21,7 @@ export class FileValidator {
 
     // Check file size
     if (file.size > this.MAX_FILE_SIZE) {
+      console.log('File size exceeds maximum allowed size:', file.size)
       errors.push(
         `File size (${this.formatFileSize(file.size)}) exceeds maximum allowed size (${this.formatFileSize(this.MAX_FILE_SIZE)})`,
       )
@@ -27,6 +29,7 @@ export class FileValidator {
 
     // Check file type
     if (!this.isValidFileType(file)) {
+      console.log('File type not supported:', file.type)
       errors.push(
         `File type "${file.type}" is not supported. Please use .xlsx, .xls, or .csv files.`,
       )
@@ -34,6 +37,7 @@ export class FileValidator {
 
     // Check file extension as fallback
     if (!this.isValidFileExtension(file.name)) {
+      console.log('File extension not supported:', file.name)
       errors.push(
         `File extension is not supported. Please use files with .xlsx, .xls, or .csv extensions.`,
       )
@@ -51,6 +55,7 @@ export class FileValidator {
     const errors: string[] = []
 
     if (file.size > maxSize) {
+      console.log('File size exceeds maximum allowed size:', file.size)
       errors.push(
         `File size (${this.formatFileSize(file.size)}) exceeds maximum allowed size (${this.formatFileSize(maxSize)})`,
       )

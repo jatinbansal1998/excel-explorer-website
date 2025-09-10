@@ -1,11 +1,11 @@
-import React, {useCallback, useRef, useState} from 'react'
-import {DocumentArrowUpIcon, ExclamationTriangleIcon} from '@heroicons/react/24/outline'
-import {Button} from './ui/Button'
-import {LoadingSpinner} from './ui/LoadingSpinner'
-import {clsx} from 'clsx'
+import React, { useCallback, useRef, useState } from 'react'
+import { DocumentArrowUpIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { Button } from './ui/Button'
+import { LoadingSpinner } from './ui/LoadingSpinner'
+import { clsx } from 'clsx'
 
 interface FileUploaderProps {
-    onFileSelect: (_file: File) => void
+  onFileSelect: (_file: File) => void
   isLoading?: boolean
   acceptedTypes?: string[]
   maxSize?: number // in bytes
@@ -66,26 +66,26 @@ function formatProgressMessage(progress?: FileUploaderProps['progress']): string
 export function FileUploader({
   onFileSelect,
   isLoading = false,
-  acceptedTypes = ['.xlsx', '.xls', '.csv'],
+  acceptedTypes = ['.xlsx', '.xls', '.csv', '.numbers'],
   maxSize = 50 * 1024 * 1024, // 50MB default
   className,
   progress,
-}: FileUploaderProps) {
+}: Readonly<FileUploaderProps>) {
   const [isDragOver, setIsDragOver] = useState(false)
   const [error, setError] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = useCallback(
-      (_file: File) => {
+    (_file: File) => {
       setError('')
 
-          const validationError = validateFile(_file, maxSize, acceptedTypes)
+      const validationError = validateFile(_file, maxSize, acceptedTypes)
       if (validationError) {
         setError(validationError)
         return
       }
 
-          onFileSelect(_file)
+      onFileSelect(_file)
     },
     [onFileSelect, maxSize, acceptedTypes],
   )

@@ -9,7 +9,8 @@ export interface FileValidationResult {
   warnings: string[]
 }
 
-const DEFAULT_ALLOWED_EXTS = ['.xlsx', '.xls', '.csv', '.numbers']
+export const DEFAULT_ALLOWED_EXTS = ['.xlsx', '.xls', '.csv', '.numbers']
+export const DEFAULT_MAX_SIZE_MB = 50
 
 export function validateFile(
   file: File,
@@ -17,7 +18,7 @@ export function validateFile(
 ): FileValidationResult {
   const errors: string[] = []
   const warnings: string[] = []
-  const { maxSizeMB = 50, allowedTypes } = options
+  const { maxSizeMB = DEFAULT_MAX_SIZE_MB, allowedTypes } = options
   const allowed = allowedTypes && allowedTypes.length > 0 ? allowedTypes : DEFAULT_ALLOWED_EXTS
 
   const name = file.name.toLowerCase()

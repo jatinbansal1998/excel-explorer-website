@@ -3,6 +3,11 @@ import { DocumentArrowUpIcon, ExclamationTriangleIcon } from '@heroicons/react/2
 import { Button } from './ui/Button'
 import { LoadingSpinner } from './ui/LoadingSpinner'
 import { clsx } from 'clsx'
+import {
+  DEFAULT_ALLOWED_EXTS,
+  DEFAULT_MAX_SIZE_MB,
+  validateFile as validateFileUtil,
+} from '@/utils/fileValidation'
 
 interface FileUploaderProps {
   onFileSelect: (_file: File) => void
@@ -17,21 +22,6 @@ interface FileUploaderProps {
     loaded?: number
     total?: number
   }
-}
-
-function validateFile(file: File, maxSize: number, acceptedTypes: string[]): string | null {
-  // Check file size
-  if (file.size > maxSize) {
-    return `File size (${(file.size / 1024 / 1024).toFixed(1)}MB) exceeds the maximum allowed size of ${(maxSize / 1024 / 1024).toFixed(1)}MB`
-  }
-
-  // Check file type
-  const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase()
-  if (!acceptedTypes.includes(fileExtension)) {
-    return `File type "${fileExtension}" is not supported. Please upload: ${acceptedTypes.join(', ')}`
-  }
-
-  return null
 }
 
 function formatProgressMessage(progress?: FileUploaderProps['progress']): string {
@@ -66,8 +56,8 @@ function formatProgressMessage(progress?: FileUploaderProps['progress']): string
 export function FileUploader({
   onFileSelect,
   isLoading = false,
-  acceptedTypes = ['.xlsx', '.xls', '.csv', '.numbers'],
-  maxSize = 50 * 1024 * 1024, // 50MB default
+  acceptedTypes = DEFAULT_ALLOWED_EXTS,
+  maxSize = DEFAULT_MAX_SIZE_MB * 1024 * 1024, // 50MB default
   className,
   progress,
 }: Readonly<FileUploaderProps>) {
@@ -79,9 +69,12 @@ export function FileUploader({
     (_file: File) => {
       setError('')
 
-      const validationError = validateFile(_file, maxSize, acceptedTypes)
-      if (validationError) {
-        setError(validationError)
+      const result = validateFileUtil(_file, {
+        maxSizeMB: maxSize / 1024 / 1024,
+        allowedTypes: acceptedTypes,
+      })
+      if (!result.ok) {
+        setError(result.errors[0] ?? 'Invalid file')
         return
       }
 

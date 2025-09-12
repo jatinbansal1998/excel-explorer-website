@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { Modal } from '../ui/Modal'
-import { Button } from '../ui/Button'
-import { ModelList } from './ModelList'
-import { useOpenRouter } from '@/hooks/useOpenRouter'
-import { ArrowPathIcon, EyeIcon, EyeSlashIcon, TrashIcon } from '@heroicons/react/24/outline'
+'use client'
+
+import React, {useEffect, useState} from 'react'
+import {Modal} from '../ui/Modal'
+import {Button} from '../ui/Button'
+import {ModelList} from './ModelList'
+import {useOpenRouter} from '@/hooks/useOpenRouter'
+import {ArrowPathIcon, EyeIcon, EyeSlashIcon, TrashIcon} from '@heroicons/react/24/outline'
 
 interface Props {
   isOpen: boolean

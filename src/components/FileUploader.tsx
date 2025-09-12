@@ -1,13 +1,8 @@
-import React, { useCallback, useRef, useState } from 'react'
-import { DocumentArrowUpIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Button } from './ui/Button'
-import { LoadingSpinner } from './ui/LoadingSpinner'
-import { clsx } from 'clsx'
-import {
-  DEFAULT_ALLOWED_EXTS,
-  DEFAULT_MAX_SIZE_MB,
-  validateFile as validateFileUtil,
-} from '@/utils/fileValidation'
+import React, {useCallback, useRef, useState} from 'react'
+import {DocumentArrowUpIcon, ExclamationTriangleIcon} from '@heroicons/react/24/outline'
+import {LoadingSpinner} from './ui/LoadingSpinner'
+import {clsx} from 'clsx'
+import {DEFAULT_ALLOWED_EXTS, DEFAULT_MAX_SIZE_MB, validateFile as validateFileUtil,} from '@/utils/fileValidation'
 
 interface FileUploaderProps {
   onFileSelect: (_file: File) => void
@@ -124,7 +119,8 @@ export function FileUploader({
 
   return (
     <div className={className}>
-      <div
+        <button
+            type="button"
         className={clsx(
           'relative border-2 border-dashed rounded-lg p-8 text-center transition-colors',
           {
@@ -136,6 +132,10 @@ export function FileUploader({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+            onClick={() => {
+                if (!isLoading) openFileDialog()
+            }}
+            disabled={isLoading}
       >
         <input
           ref={fileInputRef}
@@ -182,9 +182,10 @@ export function FileUploader({
               </p>
             </div>
 
-            <Button onClick={openFileDialog} variant="primary" size="lg">
+              <span
+                  className="inline-flex items-center rounded-md bg-primary-600 px-5 py-2.5 text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
               Choose File
-            </Button>
+            </span>
 
             <div className="text-xs text-gray-500 space-y-1">
               <p>Supported formats: {acceptedTypes.join(', ')}</p>
@@ -192,7 +193,7 @@ export function FileUploader({
             </div>
           </div>
         )}
-      </div>
+        </button>
 
       {error && (
         <div className="mt-4 flex items-center space-x-2 text-red-600 bg-red-50 p-3 rounded-md">

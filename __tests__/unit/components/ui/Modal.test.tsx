@@ -1,6 +1,6 @@
 import React from 'react'
-import { fireEvent, render, screen } from '@testing-library/react'
-import { Modal } from '@/components/ui/Modal'
+import {fireEvent, render, screen} from '@testing-library/react'
+import {Modal} from '@/components/ui/Modal'
 
 // Mock @heroicons/react/24/outline
 jest.mock('@heroicons/react/24/outline', () => ({
@@ -38,9 +38,11 @@ jest.mock('@headlessui/react', () => {
   return {
     ...jest.requireActual('@headlessui/react'),
     Transition: MockTransition,
+      TransitionChild: MockTransitionChild,
     Dialog: Object.assign(
-      ({ children, onClose, as: As = 'div', className, ...props }: any) => (
+        ({children, onClose, as: As = 'dialog', className, ...props}: any) => (
         <As
+            open
           role="dialog"
           aria-modal="true"
           className={className}
@@ -59,32 +61,8 @@ jest.mock('@headlessui/react', () => {
         Panel: MockDialogPanel,
       },
     ),
-  }
-
-  return {
-    ...jest.requireActual('@headlessui/react'),
-    Transition: MockTransition,
-    Dialog: Object.assign(
-      ({ children, onClose, as: As = 'div', className, ...props }: any) => (
-        <As
-          role="dialog"
-          aria-modal="true"
-          className={className}
-          onClick={(e: React.MouseEvent) => {
-            if (e.target === e.currentTarget) {
-              onClose()
-            }
-          }}
-          {...props}
-        >
-          {children}
-        </As>
-      ),
-      {
-        Title: MockDialogTitle,
-        Panel: MockDialogPanel,
-      },
-    ),
+      DialogTitle: MockDialogTitle,
+      DialogPanel: MockDialogPanel,
     Fragment: React.Fragment,
   }
 })

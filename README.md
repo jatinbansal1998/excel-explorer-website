@@ -1,4 +1,8 @@
-[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=jatinbansal1998_excel-explorer-website&token=5caf65f17e5cf934c17c7c2735d5b426ce04baa6)](https://sonarcloud.io/summary/new_code?id=jatinbansal1998_excel-explorer-website)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jatinbansal1998_excel-explorer-website&metric=alert_status&token=5caf65f17e5cf934c17c7c2735d5b426ce04baa6)](https://sonarcloud.io/summary/new_code?id=jatinbansal1998_excel-explorer-website)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=jatinbansal1998_excel-explorer-website&metric=bugs&token=5caf65f17e5cf934c17c7c2735d5b426ce04baa6)](https://sonarcloud.io/summary/new_code?id=jatinbansal1998_excel-explorer-website)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=jatinbansal1998_excel-explorer-website&metric=code_smells&token=5caf65f17e5cf934c17c7c2735d5b426ce04baa6)](https://sonarcloud.io/summary/new_code?id=jatinbansal1998_excel-explorer-website)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=jatinbansal1998_excel-explorer-website&metric=coverage&token=5caf65f17e5cf934c17c7c2735d5b426ce04baa6)](https://sonarcloud.io/summary/new_code?id=jatinbansal1998_excel-explorer-website)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=jatinbansal1998_excel-explorer-website&metric=duplicated_lines_density&token=5caf65f17e5cf934c17c7c2735d5b426ce04baa6)](https://sonarcloud.io/summary/new_code?id=jatinbansal1998_excel-explorer-website)
 
 # Excel Explorer Website
 

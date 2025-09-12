@@ -11,7 +11,7 @@ interface PerformanceMonitorProps {
   onToggle?: () => void
 }
 
-export function PerformanceMonitor({ isVisible = false, onToggle }: PerformanceMonitorProps) {
+export function PerformanceMonitor({isVisible = false, onToggle}: Readonly<PerformanceMonitorProps>) {
   const { metrics, summary, clearMetrics, refreshSummary, getMemoryUsage, isHighMemoryPressure } =
     usePerformance()
 

@@ -30,7 +30,7 @@ function formatPrice(value?: string): string {
     return `$${value}`
 }
 
-export function ModelList({models, selectedModelId, onSelect}: Readonly<Props>) {
+export default function ModelList({models, selectedModelId, onSelect}: Readonly<Props>) {
     const rows = useMemo(() => models, [models])
 
     return (
@@ -89,6 +89,3 @@ export function ModelList({models, selectedModelId, onSelect}: Readonly<Props>) 
         </div>
     )
 }
-
-export default ModelList
-

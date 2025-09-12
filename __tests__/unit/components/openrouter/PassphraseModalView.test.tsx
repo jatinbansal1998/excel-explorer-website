@@ -1,6 +1,6 @@
 import React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react'
-import PassphraseModalView from '@/components/presentational/openrouter/PassphraseModalView'
+import {PassphraseModalView} from '@/components/presentational/openrouter'
 
 describe('PassphraseModalView (presentational)', () => {
     function setup(extraProps: Partial<React.ComponentProps<typeof PassphraseModalView>> = {}) {
@@ -41,4 +41,3 @@ describe('PassphraseModalView (presentational)', () => {
         expect(props.onSubmit).toHaveBeenCalled()
     })
 })
-

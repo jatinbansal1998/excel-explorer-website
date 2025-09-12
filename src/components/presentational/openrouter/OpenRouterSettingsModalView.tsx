@@ -3,7 +3,7 @@
 import React from 'react'
 import {Modal} from '@/components/ui/Modal'
 import {Button} from '@/components/ui/Button'
-import ModelList from '@/components/presentational/openrouter/ModelList'
+import {ModelList} from '@/components/presentational/openrouter'
 import {ArrowPathIcon, EyeIcon, EyeSlashIcon, TrashIcon} from '@heroicons/react/24/outline'
 import {OpenRouterModel} from '@/types/openrouter'
 
@@ -59,7 +59,7 @@ interface Props {
     onSelectModel: (id: string) => void
 }
 
-export default function OpenRouterSettingsModalView(props: Props) {
+export default function OpenRouterSettingsModalView(props: Readonly<Props>) {
     const {
         isOpen,
         onClose,
@@ -387,4 +387,3 @@ export default function OpenRouterSettingsModalView(props: Props) {
         </Modal>
     )
 }
-

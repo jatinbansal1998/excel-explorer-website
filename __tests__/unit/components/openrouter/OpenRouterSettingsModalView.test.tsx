@@ -1,6 +1,6 @@
 import React from 'react'
 import {fireEvent, render, screen, within} from '@testing-library/react'
-import OpenRouterSettingsModalView from '@/components/presentational/openrouter/OpenRouterSettingsModalView'
+import {OpenRouterSettingsModalView} from '@/components/presentational/openrouter'
 import {OpenRouterModel} from '@/types/openrouter'
 
 describe('OpenRouterSettingsModalView (presentational)', () => {

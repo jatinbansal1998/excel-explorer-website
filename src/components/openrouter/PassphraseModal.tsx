@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import PassphraseModalView from '@/components/presentational/openrouter/PassphraseModalView'
+import {PassphraseModalView} from '@/components/presentational/openrouter'
 import {usePassphraseModal} from '@/hooks/usePassphraseModal'
 
 interface PassphraseModalProps {
@@ -12,7 +12,7 @@ interface PassphraseModalProps {
   busy?: boolean
 }
 
-export function PassphraseModal({ isOpen, onSubmit, onClose, error, busy }: PassphraseModalProps) {
+export function PassphraseModal({isOpen, onSubmit, onClose, error, busy}: Readonly<PassphraseModalProps>) {
     const vm = usePassphraseModal({busy, onSubmit})
 
   return (

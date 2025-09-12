@@ -28,7 +28,7 @@ export default function PassphraseModalView({
                                                 onPassphraseChange,
                                                 onToggleShowPassphrase,
                                                 onSubmit,
-                                            }: Props) {
+                                            }: Readonly<Props>) {
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Decrypt OpenRouter Key" size="sm">
             <form onSubmit={onSubmit} className="space-y-3">

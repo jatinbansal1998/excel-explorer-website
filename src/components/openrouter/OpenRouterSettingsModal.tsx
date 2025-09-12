@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import OpenRouterSettingsModalView from '@/components/presentational/openrouter/OpenRouterSettingsModalView'
+import {OpenRouterSettingsModalView} from '@/components/presentational/openrouter'
 import {useOpenRouterSettingsModal} from '@/hooks/useOpenRouterSettingsModal'
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
   onClose: () => void
 }
 
-export function OpenRouterSettingsModal({ isOpen, onClose }: Props) {
+export function OpenRouterSettingsModal({isOpen, onClose}: Readonly<Props>) {
   const vm = useOpenRouterSettingsModal(isOpen)
 
   return (

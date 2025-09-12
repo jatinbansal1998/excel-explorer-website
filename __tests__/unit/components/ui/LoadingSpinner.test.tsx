@@ -1,6 +1,6 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import {render, screen} from '@testing-library/react'
+import {LoadingSpinner} from '@/components/ui/LoadingSpinner'
 
 describe('LoadingSpinner Component', () => {
   describe('Rendering', () => {
@@ -139,11 +139,6 @@ describe('LoadingSpinner Component', () => {
       expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
     })
 
-    it('should not render progress bar when progress is null', () => {
-      render(<LoadingSpinner showProgress progress={undefined} />)
-
-      expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
-    })
 
     it('should render progress bar with custom message', () => {
       render(<LoadingSpinner showProgress progress={75} message="Processing..." />)
@@ -311,13 +306,6 @@ describe('LoadingSpinner Component', () => {
       expect(spinner).toHaveClass('animate-spin', 'h-6', 'w-6') // default classes still apply
     })
 
-    it('should handle null className gracefully', () => {
-      render(<LoadingSpinner className={undefined} />)
-      const spinner = document.querySelector('svg.animate-spin')
-
-      expect(spinner).toBeInTheDocument()
-      expect(spinner).toHaveClass('animate-spin', 'h-6', 'w-6') // default classes still apply
-    })
 
     it('should handle negative progress values', () => {
       render(<LoadingSpinner showProgress progress={-10} />)

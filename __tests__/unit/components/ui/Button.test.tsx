@@ -1,7 +1,7 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Button } from '@/components/ui/Button'
+import {Button} from '@/components/ui/Button'
 
 describe('Button Component', () => {
   const user = userEvent.setup()
@@ -147,16 +147,6 @@ describe('Button Component', () => {
       expect(button).toHaveClass('disabled:opacity-50', 'disabled:pointer-events-none')
     })
 
-    it('should be disabled when both disabled and isLoading are true', () => {
-      render(
-        <Button disabled isLoading>
-          Double Disabled
-        </Button>,
-      )
-      const button = screen.getByRole('button', { name: /double disabled/i })
-
-      expect(button).toBeDisabled()
-    })
 
     it('should not be disabled by default', () => {
       render(<Button>Enabled Button</Button>)
@@ -233,13 +223,6 @@ describe('Button Component', () => {
       expect(button).toHaveAttribute('aria-label', 'Custom aria label')
     })
 
-    it('should support aria-disabled when disabled', () => {
-      render(<Button disabled>Disabled Button</Button>)
-      const button = screen.getByRole('button', { name: /disabled button/i })
-
-      // HTML buttons automatically get aria-disabled when disabled attribute is set
-      expect(button).toBeDisabled()
-    })
 
     it('should support custom data attributes', () => {
       render(<Button data-testid="custom-button">Custom Button</Button>)

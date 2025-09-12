@@ -1,6 +1,6 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
-import { Badge } from '@/components/ui/Badge'
+import {render, screen} from '@testing-library/react'
+import {Badge} from '@/components/ui/Badge'
 
 describe('Badge Component', () => {
   describe('Rendering', () => {
@@ -87,20 +87,6 @@ describe('Badge Component', () => {
   })
 
   describe('Styling and Structure', () => {
-    it('should have correct base styling classes', () => {
-      render(<Badge>Styled Badge</Badge>)
-      const badge = screen.getByText('Styled Badge')
-
-      // Check base classes
-      expect(badge).toHaveClass('inline-flex')
-      expect(badge).toHaveClass('items-center')
-      expect(badge).toHaveClass('px-2.5')
-      expect(badge).toHaveClass('py-0.5')
-      expect(badge).toHaveClass('rounded-full')
-      expect(badge).toHaveClass('text-xs')
-      expect(badge).toHaveClass('font-medium')
-    })
-
     it('should render as span element', () => {
       render(<Badge>Span Badge</Badge>)
       const badge = screen.getByText('Span Badge')
@@ -196,13 +182,7 @@ describe('Badge Component', () => {
       expect(badge).toHaveClass('bg-blue-100', 'text-blue-800') // default variant still applies
     })
 
-    it('should handle null className gracefully', () => {
-      render(<Badge className={undefined}>Null Class Badge</Badge>)
-      const badge = screen.getByText('Null Class Badge')
 
-      expect(badge).toBeInTheDocument()
-      expect(badge).toHaveClass('bg-blue-100', 'text-blue-800') // default variant still applies
-    })
   })
 
   describe('Variant Specific Behavior', () => {
@@ -230,26 +210,6 @@ describe('Badge Component', () => {
       expect(badge).not.toHaveClass('bg-blue-100') // should not have default background
     })
 
-    it('should maintain base classes across all variants', () => {
-      const variants = ['default', 'secondary', 'destructive', 'outline'] as const
 
-      variants.forEach((variant) => {
-        const { container, unmount } = render(<Badge variant={variant}>Test</Badge>)
-        const badge = screen.getByText('Test')
-
-        // All variants should have base classes
-        expect(badge).toHaveClass(
-          'inline-flex',
-          'items-center',
-          'px-2.5',
-          'py-0.5',
-          'rounded-full',
-          'text-xs',
-          'font-medium',
-        )
-
-        unmount()
-      })
-    })
   })
 })

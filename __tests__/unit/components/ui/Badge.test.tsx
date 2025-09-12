@@ -1,6 +1,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {Badge} from '@/components/ui/Badge'
+import {expectHasClasses} from '../../../utils/dom-helpers'
 
 describe('Badge Component', () => {
   describe('Rendering', () => {
@@ -22,30 +23,17 @@ describe('Badge Component', () => {
     })
 
     it('should render with different variants', () => {
-      const variants = ['default', 'secondary', 'destructive', 'outline'] as const
+      const cases = {
+            default: ['bg-blue-100', 'text-blue-800'],
+            secondary: ['bg-gray-100', 'text-gray-800'],
+            destructive: ['bg-red-100', 'text-red-800'],
+            outline: ['border', 'border-gray-200', 'text-gray-700', 'bg-white'],
+          } as const
 
-      variants.forEach((variant) => {
-        const { container, unmount } = render(<Badge variant={variant}>{variant} Badge</Badge>)
+      ;(Object.keys(cases) as Array<keyof typeof cases>).forEach((variant) => {
+        const {unmount} = render(<Badge variant={variant}>{variant} Badge</Badge>)
         const badge = screen.getByText(`${variant} Badge`)
-
-        expect(badge).toBeInTheDocument()
-
-        // Check specific variant classes
-        switch (variant) {
-          case 'default':
-            expect(badge).toHaveClass('bg-blue-100', 'text-blue-800')
-            break
-          case 'secondary':
-            expect(badge).toHaveClass('bg-gray-100', 'text-gray-800')
-            break
-          case 'destructive':
-            expect(badge).toHaveClass('bg-red-100', 'text-red-800')
-            break
-          case 'outline':
-            expect(badge).toHaveClass('border', 'border-gray-200', 'text-gray-700', 'bg-white')
-            break
-        }
-
+        expectHasClasses(badge, [...cases[variant]])
         unmount()
       })
     })

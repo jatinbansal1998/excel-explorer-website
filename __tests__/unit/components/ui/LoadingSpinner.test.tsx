@@ -2,12 +2,35 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {LoadingSpinner} from '@/components/ui/LoadingSpinner'
 
+// Local helpers to reduce duplication across tests
+const spinnerSel = 'svg.animate-spin'
+const progressBarSel = '.bg-gray-200.rounded-full.h-2'
+const progressFillSel = '.bg-primary-600'
+
+function getSpinner(): SVGElement | null {
+  return document.querySelector(spinnerSel)
+}
+
+function getProgressBar(): HTMLElement | null {
+  return document.querySelector(progressBarSel)
+}
+
+function getProgressFill(): HTMLElement | null {
+  return document.querySelector(progressFillSel)
+}
+
+function expectProgressWidth(percent: string) {
+  const fill = getProgressFill()
+  expect(fill).toBeInTheDocument()
+  expect(fill).toHaveStyle({width: percent})
+}
+
 describe('LoadingSpinner Component', () => {
   describe('Rendering', () => {
     it('should render with default props', () => {
       render(<LoadingSpinner />)
 
-      const spinner = document.querySelector('svg.animate-spin')
+      const spinner = getSpinner()
       expect(spinner).toBeInTheDocument()
       expect(spinner).toHaveClass('animate-spin', 'h-6', 'w-6') // default size
       expect(spinner).toHaveAttribute('xmlns', 'http://www.w3.org/2000/svg')
@@ -19,8 +42,8 @@ describe('LoadingSpinner Component', () => {
       const sizes = ['sm', 'md', 'lg'] as const
 
       sizes.forEach((size) => {
-        const { container, unmount } = render(<LoadingSpinner size={size} />)
-        const spinner = document.querySelector('svg.animate-spin')
+        const {unmount} = render(<LoadingSpinner size={size}/>)
+        const spinner = getSpinner()
 
         expect(spinner).toBeInTheDocument()
 
@@ -46,7 +69,7 @@ describe('LoadingSpinner Component', () => {
 
     it('should render with custom className', () => {
       render(<LoadingSpinner className="custom-spinner" />)
-      const spinner = document.querySelector('svg.animate-spin')
+      const spinner = getSpinner()
 
       expect(spinner).toHaveClass('custom-spinner')
       expect(spinner).toHaveClass('animate-spin', 'h-6', 'w-6') // default classes
@@ -54,7 +77,7 @@ describe('LoadingSpinner Component', () => {
 
     it('should render as SVG element', () => {
       render(<LoadingSpinner />)
-      const spinner = document.querySelector('svg.animate-spin')
+      const spinner = getSpinner()
 
       expect(spinner).toBeTruthy()
       expect(spinner?.tagName).toBe('svg')
@@ -62,7 +85,7 @@ describe('LoadingSpinner Component', () => {
 
     it('should render with proper SVG structure', () => {
       render(<LoadingSpinner />)
-      const spinner = document.querySelector('svg.animate-spin')
+      const spinner = getSpinner()
       expect(spinner).toBeInTheDocument()
 
       // Check circle element
@@ -89,7 +112,7 @@ describe('LoadingSpinner Component', () => {
     it('should render with message', () => {
       render(<LoadingSpinner message="Loading data..." />)
 
-      const spinner = document.querySelector('svg.animate-spin')
+      const spinner = getSpinner()
       const message = screen.getByRole('paragraph')
 
       expect(spinner).toBeInTheDocument()
@@ -101,7 +124,7 @@ describe('LoadingSpinner Component', () => {
     it('should render without message by default', () => {
       render(<LoadingSpinner />)
 
-      const spinner = document.querySelector('svg.animate-spin')
+      const spinner = getSpinner()
       expect(spinner).toBeInTheDocument()
       expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
     })
@@ -111,12 +134,12 @@ describe('LoadingSpinner Component', () => {
     it('should render progress bar when showProgress is true and progress is provided', () => {
       render(<LoadingSpinner showProgress progress={50} />)
 
-      const progressBar = document.querySelector('.bg-gray-200.rounded-full.h-2')
-      const progressFill = document.querySelector('.bg-primary-600')
+      const progressBar = getProgressBar()
+      const progressFill = getProgressFill()
 
       expect(progressBar).toBeInTheDocument()
       expect(progressFill).toBeInTheDocument()
-      expect(progressFill).toHaveStyle({ width: '50%' })
+      expectProgressWidth('50%')
       expect(progressFill).toHaveClass(
         'bg-primary-600',
         'h-2',
@@ -166,18 +189,18 @@ describe('LoadingSpinner Component', () => {
     it('should handle progress values at boundaries', () => {
       const { rerender } = render(<LoadingSpinner showProgress progress={0} />)
 
-      let progressFill = document.querySelector('.bg-primary-600')
+      let progressFill = getProgressFill()
       expect(progressFill).toHaveStyle({ width: '0%' })
 
       rerender(<LoadingSpinner showProgress progress={100} />)
-      progressFill = document.querySelector('.bg-primary-600')
+      progressFill = getProgressFill()
       expect(progressFill).toHaveStyle({ width: '100%' })
     })
 
     it('should render progress bar with proper structure', () => {
       render(<LoadingSpinner showProgress progress={45} />)
 
-      const progressBar = document.querySelector('.bg-gray-200.rounded-full.h-2')
+      const progressBar = getProgressBar()
       const progressContainer = progressBar?.parentElement
       const progressTextContainer =
         progressContainer?.parentElement?.querySelector('.flex.justify-between')
@@ -231,7 +254,7 @@ describe('LoadingSpinner Component', () => {
       render(<LoadingSpinner message="" />)
 
       expect(screen.queryByRole('paragraph')).not.toBeInTheDocument()
-      const spinner = document.querySelector('svg.animate-spin')
+      const spinner = getSpinner()
       expect(spinner).toBeInTheDocument()
     })
 
@@ -259,7 +282,7 @@ describe('LoadingSpinner Component', () => {
     it('should render with proper flex container', () => {
       render(<LoadingSpinner />)
 
-      const container = document.querySelector('svg.animate-spin')?.closest('div')
+      const container = getSpinner()?.closest('div')
       expect(container).toBeInTheDocument()
       expect(container).toHaveClass(
         'flex',
@@ -273,10 +296,10 @@ describe('LoadingSpinner Component', () => {
     it('should maintain proper spacing between spinner and message', () => {
       render(<LoadingSpinner message="Test message" />)
 
-      const container = document.querySelector('svg.animate-spin')?.closest('div')
+      const container = getSpinner()?.closest('div')
       expect(container).toHaveClass('space-y-2')
 
-      const spinner = document.querySelector('svg.animate-spin')
+      const spinner = getSpinner()
       const message = screen.getByRole('paragraph')
 
       expect(spinner).toBeInTheDocument()
@@ -286,11 +309,11 @@ describe('LoadingSpinner Component', () => {
     it('should maintain proper spacing between spinner and progress bar', () => {
       render(<LoadingSpinner showProgress progress={50} />)
 
-      const container = document.querySelector('svg.animate-spin')?.closest('div')
+      const container = getSpinner()?.closest('div')
       expect(container).toHaveClass('space-y-2')
 
-      const spinner = document.querySelector('svg.animate-spin')
-      const progressBar = document.querySelector('.bg-gray-200.rounded-full.h-2')
+      const spinner = getSpinner()
+      const progressBar = getProgressBar()
 
       expect(spinner).toBeInTheDocument()
       expect(progressBar).toBeInTheDocument()
@@ -300,7 +323,7 @@ describe('LoadingSpinner Component', () => {
   describe('Edge Cases', () => {
     it('should handle undefined className gracefully', () => {
       render(<LoadingSpinner className={undefined} />)
-      const spinner = document.querySelector('svg.animate-spin')
+      const spinner = getSpinner()
 
       expect(spinner).toBeInTheDocument()
       expect(spinner).toHaveClass('animate-spin', 'h-6', 'w-6') // default classes still apply
@@ -310,14 +333,14 @@ describe('LoadingSpinner Component', () => {
     it('should handle negative progress values', () => {
       render(<LoadingSpinner showProgress progress={-10} />)
 
-      const progressFill = document.querySelector('.bg-primary-600')
+      const progressFill = getProgressFill()
       expect(progressFill).toHaveStyle({ width: '-10%' })
     })
 
     it('should handle progress values over 100', () => {
       render(<LoadingSpinner showProgress progress={150} />)
 
-      const progressFill = document.querySelector('.bg-primary-600')
+      const progressFill = getProgressFill()
       expect(progressFill).toHaveStyle({ width: '150%' })
     })
 
@@ -327,18 +350,18 @@ describe('LoadingSpinner Component', () => {
       const percentageText = screen.getByText('68%') // Should be rounded
       expect(percentageText).toBeInTheDocument()
 
-      const progressFill = document.querySelector('.bg-primary-600')
+      const progressFill = getProgressFill()
       expect(progressFill).toHaveStyle({ width: '67.5%' })
     })
 
     it('should render minimal spinner with no optional props', () => {
       render(<LoadingSpinner />)
 
-      const spinner = document.querySelector('svg.animate-spin')
+      const spinner = getSpinner()
       expect(spinner).toBeInTheDocument()
       expect(spinner).toHaveClass('animate-spin', 'h-6', 'w-6')
 
-      expect(document.querySelector('.bg-gray-200.rounded-full.h-2')).not.toBeInTheDocument()
+      expect(getProgressBar()).not.toBeInTheDocument()
       expect(screen.queryByText(/loading/i)).not.toBeInTheDocument()
     })
   })
@@ -346,21 +369,21 @@ describe('LoadingSpinner Component', () => {
   describe('Accessibility', () => {
     it('should have proper img role for spinner', () => {
       render(<LoadingSpinner />)
-      const spinner = document.querySelector('svg.animate-spin')
+      const spinner = getSpinner()
       expect(spinner).toBeInTheDocument()
     })
 
     it('should have proper progressbar role when progress is shown', () => {
       render(<LoadingSpinner showProgress progress={50} />)
-      const progressBar = document.querySelector('.bg-gray-200.rounded-full.h-2')
+      const progressBar = getProgressBar()
       expect(progressBar).toBeInTheDocument()
     })
 
     it('should be accessible with screen readers', () => {
       render(<LoadingSpinner showProgress progress={75} message="Accessible loading message" />)
 
-      const spinner = document.querySelector('svg.animate-spin')
-      const progressBar = document.querySelector('.bg-gray-200.rounded-full.h-2')
+      const spinner = getSpinner()
+      const progressBar = getProgressBar()
       const message = screen.getByText('Accessible loading message')
       const percentage = screen.getByText('75%')
 
@@ -373,7 +396,7 @@ describe('LoadingSpinner Component', () => {
     it('should maintain proper ARIA attributes', () => {
       render(<LoadingSpinner showProgress progress={50} />)
 
-      const progressBar = document.querySelector('.bg-gray-200.rounded-full.h-2')
+      const progressBar = getProgressBar()
       // Progress bar should have proper aria attributes for accessibility
       expect(progressBar).toBeInTheDocument()
     })
@@ -382,14 +405,14 @@ describe('LoadingSpinner Component', () => {
   describe('Animation and Styling', () => {
     it('should have proper animation classes', () => {
       render(<LoadingSpinner />)
-      const spinner = document.querySelector('svg.animate-spin')
+      const spinner = getSpinner()
 
       expect(spinner).toHaveClass('animate-spin')
     })
 
     it('should have proper opacity classes for SVG elements', () => {
       render(<LoadingSpinner />)
-      const spinner = document.querySelector('svg.animate-spin')
+      const spinner = getSpinner()
       expect(spinner).toBeInTheDocument()
 
       const circle = spinner?.querySelector('circle')
@@ -401,14 +424,14 @@ describe('LoadingSpinner Component', () => {
 
     it('should have proper transition classes for progress bar', () => {
       render(<LoadingSpinner showProgress progress={50} />)
-      const progressFill = document.querySelector('.bg-primary-600')
+      const progressFill = getProgressFill()
 
       expect(progressFill).toHaveClass('transition-all', 'duration-300', 'ease-out')
     })
 
     it('should combine classes correctly with custom className', () => {
       render(<LoadingSpinner className="custom-class another-class" size="lg" />)
-      const spinner = document.querySelector('svg.animate-spin')
+      const spinner = getSpinner()
 
       expect(spinner).toHaveClass('custom-class', 'another-class')
       expect(spinner).toHaveClass('animate-spin', 'h-8', 'w-8') // default and size classes

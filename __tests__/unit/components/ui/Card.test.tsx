@@ -1,13 +1,7 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/Card'
+import {render, screen} from '@testing-library/react'
+import {expectHasClasses, expectLacksClasses} from '../../../utils/dom-helpers'
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,} from '@/components/ui/Card'
 
 describe('Card Component System', () => {
   describe('Main Card Component', () => {
@@ -21,62 +15,36 @@ describe('Card Component System', () => {
     })
 
     it('should render with different padding options', () => {
-      const paddingOptions = ['none', 'sm', 'md', 'lg'] as const
+      const cases = {
+            none: {has: [] as string[], not: ['p-2', 'p-4', 'p-6']},
+            sm: {has: ['p-2'], not: ['p-4', 'p-6']},
+            md: {has: ['p-4'], not: ['p-2', 'p-6']},
+            lg: {has: ['p-6'], not: ['p-2', 'p-4']},
+          } as const
 
-      paddingOptions.forEach((padding) => {
-        const { container, unmount } = render(
+      ;(Object.keys(cases) as Array<keyof typeof cases>).forEach((padding) => {
+        const {unmount} = render(
           <Card padding={padding}>Card with {padding} padding</Card>,
         )
         const card = screen.getByText(`Card with ${padding} padding`)
-
-        expect(card).toBeInTheDocument()
-
-        // Check specific padding classes
-        switch (padding) {
-          case 'none':
-            expect(card).not.toHaveClass('p-2', 'p-4', 'p-6')
-            break
-          case 'sm':
-            expect(card).toHaveClass('p-2')
-            expect(card).not.toHaveClass('p-4', 'p-6')
-            break
-          case 'md':
-            expect(card).toHaveClass('p-4')
-            expect(card).not.toHaveClass('p-2', 'p-6')
-            break
-          case 'lg':
-            expect(card).toHaveClass('p-6')
-            expect(card).not.toHaveClass('p-2', 'p-4')
-            break
-        }
-
+        if (cases[padding].has.length) expectHasClasses(card, cases[padding].has as any)
+        expectLacksClasses(card, cases[padding].not as any)
         unmount()
       })
     })
 
     it('should render with different variants', () => {
-      const variants = ['default', 'outlined', 'elevated'] as const
+      const cases = {
+            default: {has: [] as string[], not: ['border', 'shadow-md']},
+            outlined: {has: ['border', 'border-gray-200'], not: ['shadow-md']},
+            elevated: {has: ['shadow-md', 'border', 'border-gray-100'], not: [] as string[]},
+          } as const
 
-      variants.forEach((variant) => {
-        const { container, unmount } = render(<Card variant={variant}>{variant} Card</Card>)
+      ;(Object.keys(cases) as Array<keyof typeof cases>).forEach((variant) => {
+        const {unmount} = render(<Card variant={variant}>{variant} Card</Card>)
         const card = screen.getByText(`${variant} Card`)
-
-        expect(card).toBeInTheDocument()
-
-        // Check specific variant classes
-        switch (variant) {
-          case 'default':
-            expect(card).not.toHaveClass('border', 'shadow-md')
-            break
-          case 'outlined':
-            expect(card).toHaveClass('border', 'border-gray-200')
-            expect(card).not.toHaveClass('shadow-md')
-            break
-          case 'elevated':
-            expect(card).toHaveClass('shadow-md', 'border', 'border-gray-100')
-            break
-        }
-
+        if (cases[variant].has.length) expectHasClasses(card, cases[variant].has as any)
+        if (cases[variant].not.length) expectLacksClasses(card, cases[variant].not as any)
         unmount()
       })
     })

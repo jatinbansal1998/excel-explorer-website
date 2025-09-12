@@ -2,6 +2,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Button} from '@/components/ui/Button'
+import {expectHasClasses} from '../../../utils/dom-helpers'
 
 describe('Button Component', () => {
   const user = userEvent.setup()
@@ -16,72 +17,34 @@ describe('Button Component', () => {
     })
 
     it('should render with different variants', () => {
-      const variants = ['primary', 'secondary', 'outline', 'primaryOutline', 'ghost'] as const
+      const cases = {
+            primary: ['bg-primary-600', 'text-white'],
+            secondary: ['bg-gray-200', 'text-gray-900'],
+            outline: ['border', 'border-gray-300', 'bg-transparent', 'text-gray-700'],
+            primaryOutline: ['border', 'border-primary-600', 'bg-transparent', 'text-primary-700'],
+            ghost: ['text-gray-700'],
+          } as const
 
-      variants.forEach((variant) => {
-        const { container, unmount } = render(<Button variant={variant}>Button</Button>)
+      ;(Object.keys(cases) as Array<keyof typeof cases>).forEach((variant) => {
+        const {unmount} = render(<Button variant={variant}>Button</Button>)
         const button = screen.getByRole('button', { name: /button/i })
-
-        expect(button).toBeInTheDocument()
-
-        // Check specific variant classes
-        switch (variant) {
-          case 'primary':
-            expect(button).toHaveClass('bg-primary-600', 'text-white')
-            break
-          case 'secondary':
-            expect(button).toHaveClass('bg-gray-200', 'text-gray-900')
-            break
-          case 'outline':
-            expect(button).toHaveClass(
-              'border',
-              'border-gray-300',
-              'bg-transparent',
-              'text-gray-700',
-            )
-            break
-          case 'primaryOutline':
-            expect(button).toHaveClass(
-              'border',
-              'border-primary-600',
-              'bg-transparent',
-              'text-primary-700',
-            )
-            break
-          case 'ghost':
-            expect(button).toHaveClass('text-gray-700')
-            break
-        }
-
+        expectHasClasses(button, [...cases[variant]])
         unmount()
       })
     })
 
     it('should render with different sizes', () => {
-      const sizes = ['sm', 'md', 'lg', 'icon'] as const
+      const cases = {
+            sm: ['h-8', 'px-3', 'text-sm'],
+            md: ['h-10', 'px-4', 'py-2'],
+            lg: ['h-12', 'px-8', 'text-lg'],
+            icon: ['h-8', 'w-8', 'p-0'],
+          } as const
 
-      sizes.forEach((size) => {
-        const { container, unmount } = render(<Button size={size}>Button</Button>)
+      ;(Object.keys(cases) as Array<keyof typeof cases>).forEach((size) => {
+        const {unmount} = render(<Button size={size}>Button</Button>)
         const button = screen.getByRole('button', { name: /button/i })
-
-        expect(button).toBeInTheDocument()
-
-        // Check specific size classes
-        switch (size) {
-          case 'sm':
-            expect(button).toHaveClass('h-8', 'px-3', 'text-sm')
-            break
-          case 'md':
-            expect(button).toHaveClass('h-10', 'px-4', 'py-2')
-            break
-          case 'lg':
-            expect(button).toHaveClass('h-12', 'px-8', 'text-lg')
-            break
-          case 'icon':
-            expect(button).toHaveClass('h-8', 'w-8', 'p-0')
-            break
-        }
-
+        expectHasClasses(button, [...cases[size]])
         unmount()
       })
     })

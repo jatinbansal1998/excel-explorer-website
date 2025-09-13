@@ -10,6 +10,7 @@
 /.nyc_output/
 /test-results/
 /junit.xml
+/coverage
 
 # Test environment
 .env.test

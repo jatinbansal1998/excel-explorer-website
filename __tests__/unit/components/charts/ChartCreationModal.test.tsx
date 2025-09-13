@@ -88,21 +88,5 @@ describe('ChartCreationModal', () => {
     expect(mockOnClose).toHaveBeenCalled()
   })
 
-  test('should show aggregation selection', () => {
-    render(<ChartCreationModal {...defaultProps} />)
-
-    expect(screen.getByText('Aggregation')).toBeInTheDocument()
-  })
-
-  test('should show max segments input for pie charts', () => {
-    render(<ChartCreationModal {...defaultProps} />)
-
-    expect(screen.getByText('Maximum Segments')).toBeInTheDocument()
-  })
-
-  test('should show title input', () => {
-    render(<ChartCreationModal {...defaultProps} />)
-
-    expect(screen.getByText('Chart Title (optional)')).toBeInTheDocument()
-  })
+  // Container-specific behavior is covered here; presentational details are tested in ChartCreationModalView.test.tsx
 })

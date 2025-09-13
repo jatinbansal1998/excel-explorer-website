@@ -59,11 +59,6 @@ export default function HomePage() {
   const handleRestoreSession = async (restoreFn: () => Promise<void>) => {
     try {
       await restoreFn()
-      addToast({
-        type: 'success',
-        title: 'Session Restored',
-        message: 'Your previous session has been successfully restored.',
-      })
     } catch (error) {
       console.error('Session restoration failed:', error)
       addToast({

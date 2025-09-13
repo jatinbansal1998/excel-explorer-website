@@ -10,6 +10,8 @@
 /.nyc_output/
 /test-results/
 /junit.xml
+coverage/*
+!coverage/lcov.info
 
 # Test environment
 .env.test

@@ -1,28 +1,27 @@
 'use client'
 
-import React, {useMemo, useState} from 'react'
+import React, { useMemo, useState } from 'react'
+import type { FilterConfig, FilterValue } from '@/types/filter'
 
-interface SelectFilterProps {
-  filter: {
-      values: { value: unknown; selected: boolean; count?: number }[]
-  }
-    onChange: (_values: unknown[]) => void
-  maxDisplayValues?: number
+interface Props {
+  filter: FilterConfig
+  onChange: (_updates: Partial<FilterConfig>) => void
 }
 
-export function SelectFilter({ filter, onChange, maxDisplayValues = 1000 }: SelectFilterProps) {
+export default function SelectFilterView({ filter, onChange }: Readonly<Props>) {
+  const values = useMemo(() => (filter.values as FilterValue[]) || [], [filter.values])
   const [query, setQuery] = useState('')
-  const values = (filter.values || []).slice(0, maxDisplayValues)
   const normalized = query.trim().toLowerCase()
   const filteredValues = useMemo(() => {
     if (!normalized) return values
     return values.filter((v) => String(v.value).toLowerCase().includes(normalized))
   }, [values, normalized])
+
   const toggle = (idx: number) => {
     const next = values.map((v, i) => (i === idx ? { ...v, selected: !v.selected } : v))
-    const selected = next.filter((v) => v.selected).map((v) => v.value)
-    onChange(selected)
+    onChange({ values: next, active: true })
   }
+
   return (
     <div className="space-y-2">
       <input
@@ -37,19 +36,12 @@ export function SelectFilter({ filter, onChange, maxDisplayValues = 1000 }: Sele
           <div className="text-sm text-gray-500">No options match your search</div>
         )}
         {filteredValues.map((v, i) => (
-          <label key={`${String(v.value)}-${i}`} className="flex items-center space-x-2 text-sm">
-            <input
-              className="mr-2"
-              type="checkbox"
-              checked={v.selected}
-              onChange={() => toggle(i)}
-            />
+          <label key={`${String(v.value)}-${i}`} className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={v.selected} onChange={() => toggle(i)} />
             <span className="truncate" title={String(v.value)}>
               {String(v.value)}
             </span>
-            {typeof v.count === 'number' && (
-              <span className="text-xs text-gray-400">({v.count})</span>
-            )}
+            {typeof v.count === 'number' && <span className="text-xs text-gray-400">({v.count})</span>}
           </label>
         ))}
       </div>

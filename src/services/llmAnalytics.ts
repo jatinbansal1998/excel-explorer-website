@@ -174,82 +174,50 @@ export function buildDatasetContext(
   return JSON.stringify(payload)
 }
 
+function mapFollowUps(raw: unknown): PromptSuggestion[] {
+  if (!Array.isArray(raw)) return []
+  return (raw as unknown[]).map((f: unknown) => {
+    const followUp = f as Record<string, unknown> | null
+    return {
+      id: String(followUp?.id || ''),
+      category: String(followUp?.category || 'other').toLowerCase() as
+        | 'descriptive'
+        | 'diagnostic'
+        | 'predictive'
+        | 'prescriptive'
+        | 'other',
+      prompt: String(followUp?.prompt || ''),
+      rationale: followUp?.rationale ? String(followUp.rationale) : undefined,
+    }
+  })
+}
+
+function mapInsights(raw: unknown): { insights: { key: string; value: string }[] } {
+  if (!Array.isArray(raw)) return { insights: [] }
+  const items = raw as unknown[]
+  const first = (items[0] || null) as Record<string, unknown> | null
+  const isLegacy = first && (first.title !== undefined || first.details !== undefined)
+
+  const insights = items.map((it: unknown, idx: number) => {
+    const item = it as Record<string, unknown> | null
+    const key = isLegacy
+      ? String(item?.title ?? `Insight ${idx + 1}`)
+      : String(item?.key ?? `Insight ${idx + 1}`)
+    const rawValue = isLegacy ? item?.details : item?.value
+    const value = typeof rawValue === 'string' ? rawValue : JSON.stringify(rawValue ?? '', null, 2)
+    return { key, value }
+  })
+
+  return { insights }
+}
+
 function normalizeResponseShape(maybeJson: unknown): LLMAnalyticsResponse {
   const json = maybeJson as Record<string, unknown> | null
+  if (!json) return { insights: [], followUps: [] }
 
-  if (!json) {
-    return { insights: [], followUps: [] }
-  }
-
-  // Handle { insights: [{ key, value }, ...] }
-  if (
-    Array.isArray(json.insights) &&
-    (json.insights.length === 0 || (json.insights[0] as Record<string, unknown>)?.key !== undefined)
-  ) {
-    const insights = (json.insights as unknown[]).map((it: unknown, idx: number) => {
-      const item = it as Record<string, unknown> | null
-      return {
-        key: String(item?.key ?? `Insight ${idx + 1}`),
-        value:
-          typeof item?.value === 'string' ? item.value : JSON.stringify(item?.value ?? '', null, 2),
-      }
-    })
-    const followUps = Array.isArray(json.followUps)
-      ? (json.followUps as unknown[]).map((f: unknown) => {
-          const followUp = f as Record<string, unknown> | null
-          return {
-            id: String(followUp?.id || ''),
-            category: String(followUp?.category || 'other').toLowerCase() as
-              | 'descriptive'
-              | 'diagnostic'
-              | 'predictive'
-              | 'prescriptive'
-              | 'other',
-            prompt: String(followUp?.prompt || ''),
-            rationale: followUp?.rationale ? String(followUp.rationale) : undefined,
-          }
-        })
-      : []
-    return { insights, followUps }
-  }
-
-  // Handle legacy cards: { insights: [{ id,title,kind,details, ... }] }
-  if (
-    Array.isArray(json.insights) &&
-    (json.insights.length === 0 ||
-      (json.insights[0] as Record<string, unknown>)?.title !== undefined)
-  ) {
-    const insights = (json.insights as unknown[]).map((it: unknown, idx: number) => {
-      const item = it as Record<string, unknown> | null
-      return {
-        key: String(item?.title ?? `Insight ${idx + 1}`),
-        value:
-          typeof item?.details === 'string'
-            ? item.details
-            : JSON.stringify(item?.details ?? '', null, 2),
-      }
-    })
-    const followUps = Array.isArray(json.followUps)
-      ? (json.followUps as unknown[]).map((f: unknown) => {
-          const followUp = f as Record<string, unknown> | null
-          return {
-            id: String(followUp?.id || ''),
-            category: String(followUp?.category || 'other').toLowerCase() as
-              | 'descriptive'
-              | 'diagnostic'
-              | 'predictive'
-              | 'prescriptive'
-              | 'other',
-            prompt: String(followUp?.prompt || ''),
-            rationale: followUp?.rationale ? String(followUp.rationale) : undefined,
-          }
-        })
-      : []
-    return { insights, followUps }
-  }
-
-  // Default empty
-  return { insights: [], followUps: [] }
+  const { insights } = mapInsights(json.insights)
+  const followUps = mapFollowUps(json.followUps)
+  return { insights, followUps }
 }
 
 export class LLMAnalyticsService {
@@ -259,21 +227,38 @@ export class LLMAnalyticsService {
     this.openrouter = openrouter ?? new OpenRouterService()
   }
 
-  async suggestPrompts(
-    apiKey: string,
-    model: string,
-    context: string,
-  ): Promise<PromptSuggestion[]> {
+  private async buildSuggestMessages(context: string): Promise<{ system: string; user: string }> {
     const system = await buildSystemInstruction()
     const user = await buildSuggestUser(context)
-    const res = await this.openrouter.chat(apiKey, {
+    return { system, user }
+  }
+
+  private async buildAnalyzeMessages(
+    context: string,
+    prompt: string,
+  ): Promise<{ system: string; user: string }> {
+    const system = await buildSystemInstruction()
+    const user = await buildAnalyzeUser(context, prompt)
+    return { system, user }
+  }
+
+  private async runChat(
+    model: string,
+    system: string,
+    user: string,
+    chatFn: (req: OpenRouterChatRequest) => Promise<OpenRouterChatResponse>,
+  ): Promise<string> {
+    const res = await chatFn({
       model,
       messages: [
         { role: 'system', content: system },
         { role: 'user', content: user },
       ],
     })
-    const content = res.choices?.[0]?.message?.content || ''
+    return res.choices?.[0]?.message?.content || ''
+  }
+
+  private parseSuggestionsFromContent(content: string): PromptSuggestion[] {
     try {
       const parsed = parseLLMJsonPayload(content)
       if (!parsed) throw new Error('Failed to parse JSON')
@@ -282,6 +267,48 @@ export class LLMAnalyticsService {
     } catch {
       return []
     }
+  }
+
+  private parseAnalysisFromContent(content: string): LLMAnalyticsResponse {
+    try {
+      const parsed = parseLLMJsonPayload(content)
+      if (!parsed) throw new Error('Failed to parse JSON')
+      return normalizeResponseShape(parsed)
+    } catch {
+      return {
+        insights: [{ key: 'Model Response', value: content || 'No content' }],
+      }
+    }
+  }
+
+  private async suggestPromptsWithChat(
+    model: string,
+    context: string,
+    chatFn: (req: OpenRouterChatRequest) => Promise<OpenRouterChatResponse>,
+  ): Promise<PromptSuggestion[]> {
+    const { system, user } = await this.buildSuggestMessages(context)
+    const content = await this.runChat(model, system, user, chatFn)
+    return this.parseSuggestionsFromContent(content)
+  }
+
+  private async analyzeWithChat(
+    model: string,
+    prompt: string,
+    context: string,
+    chatFn: (req: OpenRouterChatRequest) => Promise<OpenRouterChatResponse>,
+  ): Promise<LLMAnalyticsResponse> {
+    const { system, user } = await this.buildAnalyzeMessages(context, prompt)
+    const content = await this.runChat(model, system, user, chatFn)
+    return this.parseAnalysisFromContent(content)
+  }
+
+  async suggestPrompts(
+    apiKey: string,
+    model: string,
+    context: string,
+  ): Promise<PromptSuggestion[]> {
+    const chatFn = (req: OpenRouterChatRequest) => this.openrouter.chat(apiKey, req)
+    return this.suggestPromptsWithChat(model, context, chatFn)
   }
 
   async analyze(
@@ -290,26 +317,8 @@ export class LLMAnalyticsService {
     prompt: string,
     context: string,
   ): Promise<LLMAnalyticsResponse> {
-    const system = await buildSystemInstruction()
-    const user = await buildAnalyzeUser(context, prompt)
-    const res = await this.openrouter.chat(apiKey, {
-      model,
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: user },
-      ],
-    })
-
-    const content = res.choices?.[0]?.message?.content || ''
-    try {
-      const parsed = parseLLMJsonPayload(content)
-      if (!parsed) throw new Error('Failed to parse JSON')
-      return normalizeResponseShape(parsed)
-    } catch {
-      return {
-        insights: [{ key: 'Model Response', value: content || 'No content' }],
-      }
-    }
+    const chatFn = (req: OpenRouterChatRequest) => this.openrouter.chat(apiKey, req)
+    return this.analyzeWithChat(model, prompt, context, chatFn)
   }
 
   // Variants that reuse an injected chat function (e.g., from useOpenRouter)
@@ -318,24 +327,7 @@ export class LLMAnalyticsService {
     context: string,
     chat: (req: OpenRouterChatRequest) => Promise<OpenRouterChatResponse>,
   ): Promise<PromptSuggestion[]> {
-    const system = await buildSystemInstruction()
-    const user = await buildSuggestUser(context)
-    const res = await chat({
-      model,
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: user },
-      ],
-    })
-    const content = res.choices?.[0]?.message?.content || ''
-    try {
-      const parsed = parseLLMJsonPayload(content)
-      if (!parsed) throw new Error('Failed to parse JSON')
-      const normalized = normalizeResponseShape(parsed)
-      return normalized.followUps || []
-    } catch {
-      return []
-    }
+    return this.suggestPromptsWithChat(model, context, chat)
   }
 
   async analyzeViaChat(
@@ -344,25 +336,6 @@ export class LLMAnalyticsService {
     context: string,
     chat: (req: OpenRouterChatRequest) => Promise<OpenRouterChatResponse>,
   ): Promise<LLMAnalyticsResponse> {
-    const system = await buildSystemInstruction()
-    const user = await buildAnalyzeUser(context, userPrompt)
-    const res = await chat({
-      model,
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: user },
-      ],
-    })
-
-    const content = res.choices?.[0]?.message?.content || ''
-    try {
-      const parsed = parseLLMJsonPayload(content)
-      if (!parsed) throw new Error('Failed to parse JSON')
-      return normalizeResponseShape(parsed)
-    } catch {
-      return {
-        insights: [{ key: 'Model Response', value: content || 'No content' }],
-      }
-    }
+    return this.analyzeWithChat(model, userPrompt, context, chat)
   }
 }

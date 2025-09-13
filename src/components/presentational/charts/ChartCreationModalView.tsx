@@ -139,8 +139,19 @@ export function ChartCreationModalView(props: ChartCreationModalViewProps) {
                   className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 text-sm"
                 />
                 <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 flex items-center">
-                  <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <svg
+                    className="h-4 w-4 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
                   </svg>
                 </div>
                 {dataColumnSearch && (
@@ -150,8 +161,19 @@ export function ChartCreationModalView(props: ChartCreationModalViewProps) {
                     className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-gray-400 hover:text-gray-600"
                     aria-label="Clear search"
                   >
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 )}
@@ -161,7 +183,9 @@ export function ChartCreationModalView(props: ChartCreationModalViewProps) {
               <div className="space-y-1">
                 {compatibleDataColumns(dataColumnSearch).length === 0 ? (
                   <div className="p-3 text-center text-gray-500 text-sm border border-gray-300 rounded-lg bg-gray-50">
-                    {dataColumnSearch ? `No columns found matching "${dataColumnSearch}"` : 'No compatible columns available'}
+                    {dataColumnSearch
+                      ? `No columns found matching "${dataColumnSearch}"`
+                      : 'No compatible columns available'}
                   </div>
                 ) : (
                   <div className="max-h-40 overflow-y-auto border border-gray-300 rounded-lg">
@@ -171,7 +195,9 @@ export function ChartCreationModalView(props: ChartCreationModalViewProps) {
                       </div>
                     )}
                     {compatibleDataColumns(dataColumnSearch)
-                      .filter((col, index, self) => self.findIndex((c) => c.name === col.name) === index)
+                      .filter(
+                        (col, index, self) => self.findIndex((c) => c.name === col.name) === index,
+                      )
                       .map((col) => (
                         <button
                           key={`${col.name}-${col.index}`}
@@ -181,15 +207,19 @@ export function ChartCreationModalView(props: ChartCreationModalViewProps) {
                             onChangeDataColumnSearch('')
                           }}
                           className={`w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 ${
-                            dataColumn === col.name ? 'bg-primary-50 text-primary-700 font-medium' : 'text-gray-700'
+                            dataColumn === col.name
+                              ? 'bg-primary-50 text-primary-700 font-medium'
+                              : 'text-gray-700'
                           }`}
                         >
                           <div className="flex items-center justify-between">
                             <span>{col.name}</span>
                             <span className="text-xs text-gray-500 ml-2">({col.type})</span>
                           </div>
-                          {col.uniqueCount && (
-                            <div className="text-xs text-gray-400 mt-1">{col.uniqueCount} unique values</div>
+                          {col.uniqueCount > 0 && (
+                            <div className="text-xs text-gray-400 mt-1">
+                              {col.uniqueCount} unique values
+                            </div>
                           )}
                         </button>
                       ))}
@@ -201,7 +231,11 @@ export function ChartCreationModalView(props: ChartCreationModalViewProps) {
               {dataColumn && (
                 <div className="mt-2 p-2 bg-primary-50 border border-primary-200 rounded text-sm text-primary-700">
                   Selected: <strong>{dataColumn}</strong>
-                  <button type="button" onClick={() => onChangeDataColumn('')} className="ml-2 text-primary-500 hover:text-primary-700">
+                  <button
+                    type="button"
+                    onClick={() => onChangeDataColumn('')}
+                    className="ml-2 text-primary-500 hover:text-primary-700"
+                  >
                     (change)
                   </button>
                 </div>
@@ -212,7 +246,9 @@ export function ChartCreationModalView(props: ChartCreationModalViewProps) {
           {/* Label Column Selection (for 2-variable charts) */}
           {selectedConfig?.variables === 2 && onChangeLabelColumn && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Label Column (X-axis)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Label Column (X-axis)
+              </label>
               <select
                 value={labelColumn || ''}
                 onChange={(e) => onChangeLabelColumn(e.target.value)}
@@ -252,7 +288,9 @@ export function ChartCreationModalView(props: ChartCreationModalViewProps) {
           {/* Max Segments (for pie charts) */}
           {selectedConfig?.type === 'pie' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Maximum Segments</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Maximum Segments
+              </label>
               <div className="space-y-1">
                 <input
                   type="number"
@@ -263,7 +301,8 @@ export function ChartCreationModalView(props: ChartCreationModalViewProps) {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
                 />
                 <p className="text-xs text-gray-500">
-                  If your data has more than {maxSegments} categories, the rest will be grouped as &ldquo;Others&rdquo;
+                  If your data has more than {maxSegments} categories, the rest will be grouped as
+                  &ldquo;Others&rdquo;
                 </p>
               </div>
             </div>
@@ -284,7 +323,9 @@ export function ChartCreationModalView(props: ChartCreationModalViewProps) {
 
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Chart Title (optional)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Chart Title (optional)
+            </label>
             <input
               type="text"
               value={title}

@@ -15,7 +15,12 @@ interface Props {
   filteredData: Readonly<DataMatrix>
 }
 
-export default function RangeFilterView({ filter, onChange, columnInfo, filteredData }: Readonly<Props>) {
+export default function RangeFilterView({
+  filter,
+  onChange,
+  columnInfo,
+  filteredData,
+}: Readonly<Props>) {
   const range = (filter.values as RangeFilter) || ({} as RangeFilter)
   const [showEditBins, setShowEditBins] = useState(false)
 
@@ -61,7 +66,7 @@ export default function RangeFilterView({ filter, onChange, columnInfo, filtered
       </div>
 
       {(range.mode || 'continuous') === 'continuous' && (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           <input
             type="number"
             className="border rounded px-2 py-1 w-28"
@@ -90,8 +95,8 @@ export default function RangeFilterView({ filter, onChange, columnInfo, filtered
             const checked = (range.selectedRangeIds || []).includes(r.id)
             const label = `${r.includeMin ? '≥' : '>'}${r.min} & ${r.includeMax ? '≤' : '<'}${r.max} (${r.label})`
             return (
-              <label key={r.id} className="flex items-center space-x-2">
-                <input className="mr-2" type="checkbox" checked={checked} onChange={() => toggleBin(r.id)} />
+              <label key={r.id} className="flex items-center gap-2">
+                <input type="checkbox" checked={checked} onChange={() => toggleBin(r.id)} />
                 <span className="truncate" title={label}>
                   {label}
                 </span>
@@ -168,4 +173,3 @@ function EditBinsModal({
     </Modal>
   )
 }
-

@@ -23,7 +23,7 @@ export default function DateRangeFilterView({ filter, onChange }: Readonly<Props
     onChange({ values: next, active: true, operator: 'between' })
   }
   return (
-    <div className="flex items-center space-x-2 text-sm">
+    <div className="flex items-center gap-2 text-sm">
       <input
         type="date"
         className="border rounded px-2 py-1"
@@ -40,4 +40,3 @@ export default function DateRangeFilterView({ filter, onChange }: Readonly<Props
     </div>
   )
 }
-

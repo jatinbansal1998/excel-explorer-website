@@ -14,12 +14,11 @@ export default function NullFilterView({ filter, onChange }: Readonly<Props>) {
     onChange({ operator: checked ? 'is_null' : 'is_not_null', active: true })
   }
   return (
-    <div className="flex items-center space-x-2 text-sm">
-      <label className="flex items-center space-x-2">
-        <input className="mr-2" type="checkbox" checked={includeNulls} onChange={(e) => toggle(e.target.checked)} />
+    <div className="flex items-center gap-2 text-sm">
+      <label className="flex items-center gap-2">
+        <input type="checkbox" checked={includeNulls} onChange={(e) => toggle(e.target.checked)} />
         <span>Include only nulls</span>
       </label>
     </div>
   )
 }
-

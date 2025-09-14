@@ -35,7 +35,6 @@ export default function FilterItemSwitch({
             type="checkbox"
             checked={filter.active}
             onChange={(e) => onChange({ active: e.target.checked })}
-            className="mr-2"
           />
           <span className="font-medium text-sm text-gray-500 truncate" title={filter.displayName}>
             {filter.displayName}
@@ -45,7 +44,13 @@ export default function FilterItemSwitch({
           </span>
         </div>
         <div>
-          <Button variant="ghost" size="icon" onClick={onReset} aria-label="Reset filter" title="Reset filter">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onReset}
+            aria-label="Reset filter"
+            title="Reset filter"
+          >
             <ArrowPathIcon className="h-4 w-4" />
           </Button>
         </div>
@@ -67,7 +72,12 @@ function renderFilterBody(
       return <SelectFilterView filter={filter} onChange={onChange} />
     case 'range':
       return (
-        <RangeFilterView filter={filter} onChange={onChange} columnInfo={columnInfo} filteredData={filteredData} />
+        <RangeFilterView
+          filter={filter}
+          onChange={onChange}
+          columnInfo={columnInfo}
+          filteredData={filteredData}
+        />
       )
     case 'search':
       return <SearchFilterView filter={filter} onChange={onChange} />
@@ -81,4 +91,3 @@ function renderFilterBody(
       return null
   }
 }
-

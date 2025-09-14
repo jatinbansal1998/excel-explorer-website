@@ -51,7 +51,7 @@ export function DataTableView({
           </div>
           <div className="flex items-center space-x-4">
             {onToggleDataTypes && (
-              <label className="flex items-center space-x-2 text-sm text-gray-600">
+              <label className="flex items-center gap-2 text-sm text-gray-600">
                 <input
                   type="checkbox"
                   checked={showDataTypes}

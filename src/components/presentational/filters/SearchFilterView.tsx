@@ -23,8 +23,8 @@ export default function SearchFilterView({ filter, onChange }: Readonly<Props>) 
         value={search.query}
         onChange={(e) => update({ query: e.target.value })}
       />
-      <div className="flex items-center space-x-4">
-        <label className="flex items-center space-x-2">
+      <div className="flex items-center gap-4">
+        <label className="flex items-center gap-2">
           <input
             type="checkbox"
             checked={search.caseSensitive}
@@ -32,7 +32,7 @@ export default function SearchFilterView({ filter, onChange }: Readonly<Props>) 
           />
           <span>Case sensitive</span>
         </label>
-        <label className="flex items-center space-x-2">
+        <label className="flex items-center gap-2">
           <input
             type="checkbox"
             checked={search.exactMatch}
@@ -44,4 +44,3 @@ export default function SearchFilterView({ filter, onChange }: Readonly<Props>) 
     </div>
   )
 }
-

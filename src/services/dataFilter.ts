@@ -1,37 +1,40 @@
-import { ExcelData } from '@/types/excel'
+import { DataMatrix, DataRow, ExcelData } from '@/types/excel'
 import { parseDateFlexible } from '@/utils/dataTypes'
 import {
+  DateRangeFilter,
   FilterConfig,
+  FilterState,
   FilterValue,
   RangeFilter,
-  DateRangeFilter,
   SearchFilter,
-  FilterState,
 } from '@/types/filter'
 
 export class DataFilter {
   private activeFilters: Map<string, FilterConfig>
-  private initialFilters: Map<string, FilterConfig>
+  private readonly initialFilters: Map<string, FilterConfig>
 
   constructor(filters: FilterConfig[]) {
     this.activeFilters = new Map(filters.map((f) => [f.id, this.cloneFilter(f)]))
     this.initialFilters = new Map(filters.map((f) => [f.id, this.cloneFilter(f)]))
   }
 
-  applyFilters(data: ExcelData): any[][] {
+  applyFilters(data: ExcelData): DataMatrix {
     const rows = data.rows || []
     const active = Array.from(this.activeFilters.values()).filter((f) => f.active)
     if (active.length === 0) return rows
 
-    return rows.filter((row) => {
-      for (let i = 0; i < active.length; i++) {
-        if (!this.evaluateFilter(row, active[i])) return false // early exit
+    const filteredRows = rows.filter((row) => {
+      for (const element of active) {
+        if (!this.evaluateFilter(row, element)) return false // early exit
       }
       return true
     })
+
+    // Convert any remaining null values to empty strings
+    return filteredRows.map((row) => row.map((cell) => cell ?? ''))
   }
 
-  private evaluateFilter(row: any[], filter: FilterConfig): boolean {
+  private evaluateFilter(row: DataRow, filter: FilterConfig): boolean {
     const cellValue = row[filter.columnIndex]
 
     switch (filter.type) {
@@ -44,11 +47,7 @@ export class DataFilter {
       case 'date':
         return this.evaluateDateFilter(cellValue, filter.values as DateRangeFilter, filter.operator)
       case 'boolean':
-        return this.evaluateBooleanFilter(
-          cellValue,
-          filter.values as boolean | null,
-          filter.operator,
-        )
+        return this.evaluateBooleanFilter(cellValue, filter.values as boolean, filter.operator)
       case 'null':
         return this.evaluateNullFilter(cellValue, filter.operator)
       default:
@@ -57,7 +56,7 @@ export class DataFilter {
   }
 
   private evaluateSelectFilter(
-    value: any,
+    value: unknown,
     options: FilterValue[],
     operator: FilterConfig['operator'],
   ): boolean {
@@ -70,7 +69,7 @@ export class DataFilter {
   }
 
   private evaluateRangeFilter(
-    value: any,
+    value: unknown,
     range: RangeFilter,
     operator: FilterConfig['operator'],
   ): boolean {
@@ -107,7 +106,7 @@ export class DataFilter {
   }
 
   private evaluateDateFilter(
-    value: any,
+    value: unknown,
     range: DateRangeFilter,
     operator: FilterConfig['operator'],
   ): boolean {
@@ -122,7 +121,7 @@ export class DataFilter {
   }
 
   private evaluateSearchFilter(
-    value: any,
+    value: unknown,
     search: SearchFilter,
     operator: FilterConfig['operator'],
   ): boolean {
@@ -149,23 +148,33 @@ export class DataFilter {
   }
 
   private evaluateBooleanFilter(
-    value: any,
-    expected: boolean | null,
+    value: unknown,
+    expected: boolean,
     operator: FilterConfig['operator'],
   ): boolean {
     if (expected == null) return true // All
-    const boolVal =
-      typeof value === 'boolean'
-        ? value
-        : value == null
-          ? null
-          : String(value).toLowerCase() === 'true'
-    if (boolVal == null) return false
+    // Coerce null/undefined/'' -> false; strings 'true'/'false' -> booleans; numbers 1/0 accordingly
+    let boolVal: boolean
+    if (typeof value === 'boolean') {
+      boolVal = value
+    } else if (value == null) {
+      boolVal = false
+    } else if (typeof value === 'string') {
+      const s = value.trim().toLowerCase()
+      if (s === '' || s === '0' || s === 'false' || s === 'no') boolVal = false
+      else if (s === '1' || s === 'true' || s === 'yes') boolVal = true
+      else boolVal = false
+    } else if (typeof value === 'number') {
+      boolVal = value === 1
+    } else {
+      boolVal = false
+    }
+
     if (operator === 'not_equals') return boolVal !== expected
     return boolVal === expected
   }
 
-  private evaluateNullFilter(value: any, operator: FilterConfig['operator']): boolean {
+  private evaluateNullFilter(value: unknown, operator: FilterConfig['operator']): boolean {
     const isNull = value == null || value === ''
     if (operator === 'is_not_null') return !isNull
     return isNull // is_null by default
@@ -178,7 +187,7 @@ export class DataFilter {
       ...existing,
       ...updates,
       values: updates.values !== undefined ? updates.values : existing.values,
-      active: updates.active !== undefined ? updates.active : true,
+      active: updates.active ?? true,
     } as FilterConfig
     this.activeFilters.set(filterId, this.cloneFilter(updated))
   }
@@ -229,7 +238,7 @@ export class DataFilter {
     } as FilterConfig
   }
 
-  private cloneValues(type: FilterConfig['type'], values: any): any {
+  private cloneValues(type: FilterConfig['type'], values: unknown): unknown {
     switch (type) {
       case 'select':
         return (values as FilterValue[]).map((v) => ({ ...v }))

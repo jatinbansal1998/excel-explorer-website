@@ -1,13 +1,13 @@
-import { ColumnInfo } from '@/types/excel'
+import { ColumnInfo, DataMatrix } from '@/types/excel'
 import { AggregationType, ChartSuggestion, ChartType } from '@/types/chart'
 
 export class ChartSuggestionEngine {
-  suggestCharts(columns: ColumnInfo[], filteredData: any[][]): ChartSuggestion[] {
+  suggestCharts(columns: ColumnInfo[], _filteredData: DataMatrix): ChartSuggestion[] {
     const suggestions: ChartSuggestion[] = []
 
     const categoricalColumns = columns.filter((c) => c.type === 'string' || c.type === 'boolean')
     const numericColumns = columns.filter((c) => c.type === 'number')
-    const dateColumns = columns.filter((c) => c.type === 'date')
+    const _dateColumns = columns.filter((c) => c.type === 'date')
 
     // Focus on pie charts only for categorical data and numeric ranges
     suggestions.push(...this.suggestCategoricalCharts(categoricalColumns))

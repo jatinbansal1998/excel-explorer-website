@@ -88,9 +88,9 @@ export class BrowserCompatibility {
   private static checkIndexedDB(): boolean {
     return !!(
       window.indexedDB ||
-      (window as any).mozIndexedDB ||
-      (window as any).webkitIndexedDB ||
-      (window as any).msIndexedDB
+      (window as Window & { mozIndexedDB?: unknown }).mozIndexedDB ||
+      (window as Window & { webkitIndexedDB?: unknown }).webkitIndexedDB ||
+      (window as Window & { msIndexedDB?: unknown }).msIndexedDB
     )
   }
 
@@ -233,7 +233,7 @@ export class BrowserCompatibility {
 
   static getDeviceInfo(): DeviceInfo {
     return {
-      deviceMemory: (navigator as any).deviceMemory || null,
+      deviceMemory: (navigator as Navigator & { deviceMemory?: number }).deviceMemory || null,
       hardwareConcurrency: navigator.hardwareConcurrency || null,
       maxTouchPoints: navigator.maxTouchPoints || 0,
       userAgent: navigator.userAgent,
@@ -246,9 +246,21 @@ export class BrowserCompatibility {
 
   static async checkNetworkConnection(): Promise<NetworkInfo> {
     const connection =
-      (navigator as any).connection ||
-      (navigator as any).mozConnection ||
-      (navigator as any).webkitConnection
+        (navigator as Navigator & {
+          connection?: unknown;
+          mozConnection?: unknown;
+          webkitConnection?: unknown
+        }).connection ||
+        (navigator as Navigator & {
+          connection?: unknown;
+          mozConnection?: unknown;
+          webkitConnection?: unknown
+        }).mozConnection ||
+        (navigator as Navigator & {
+          connection?: unknown;
+          mozConnection?: unknown;
+          webkitConnection?: unknown
+        }).webkitConnection
 
     if (!connection) {
       return {
@@ -261,9 +273,9 @@ export class BrowserCompatibility {
 
     return {
       supported: true,
-      effectiveType: connection.effectiveType || 'unknown',
-      downlink: connection.downlink || null,
-      rtt: connection.rtt || null,
+      effectiveType: (connection as { effectiveType?: string }).effectiveType || 'unknown',
+      downlink: (connection as { downlink?: number }).downlink || null,
+      rtt: (connection as { rtt?: number }).rtt || null,
     }
   }
 }

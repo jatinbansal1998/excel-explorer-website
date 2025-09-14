@@ -1,6 +1,14 @@
+// Canonical cell/row types used across the app
+export type CellValue = string | number | boolean | Date
+export type NullableCellValue = CellValue | null
+export type DataRow = CellValue[]
+export type NullableDataRow = NullableCellValue[]
+export type DataMatrix = DataRow[]
+export type NullableDataMatrix = NullableDataRow[]
+
 export interface ExcelData {
   headers: string[]
-  rows: any[][]
+  rows: DataMatrix
   metadata: ExcelMetadata
 }
 
@@ -19,11 +27,11 @@ export interface ColumnInfo {
   name: string
   index: number
   type: DataType
-  uniqueValues: any[]
+  uniqueValues: unknown[]
   uniqueCount: number
   hasNulls: boolean
   nullCount: number
-  sampleValues: any[]
+  sampleValues: unknown[]
   statistics?: ColumnStatistics
 }
 
@@ -34,7 +42,7 @@ export interface ColumnStatistics {
   max?: number | Date
   average?: number
   median?: number
-  mode?: any
+  mode?: unknown
 }
 
 export interface ValidationResult {

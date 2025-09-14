@@ -14,7 +14,7 @@ export interface FilterConfig {
   // - 'date': DateRangeFilter
   // - 'boolean': boolean | null
   // - 'null': boolean (include nulls when true)
-  values: any
+  values: unknown
   operator: FilterOperator
   displayName: string
 }
@@ -40,7 +40,7 @@ export type FilterOperator =
   | 'is_not_null'
 
 export interface FilterValue {
-  value: any
+  value: unknown
   selected: boolean
   count?: number // How many rows have this value
 }
@@ -73,7 +73,7 @@ export interface SearchFilter {
 export interface FilterStateItem {
   id: string
   active: boolean
-  values: any
+  values: unknown
   operator: FilterOperator
 }
 

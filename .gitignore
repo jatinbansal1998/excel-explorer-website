@@ -7,7 +7,19 @@
 .yarn/install-state.gz
 
 # testing
+/.nyc_output/
+/test-results/
+/junit.xml
 /coverage
+
+# Test environment
+.env.test
+.env.local.test
+testing.env.js
+
+# Test cache
+.jest/
+.ts-jest/
 
 # next.js
 /.next/
@@ -38,3 +50,4 @@ next-env.d.ts
 # IDE
 .idea/
 .vscode/
+/.scannerwork/**

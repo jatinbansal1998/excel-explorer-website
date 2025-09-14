@@ -1,8 +1,8 @@
-import { ChartConfig, ChartData, AggregationType, NumericRange } from '@/types/chart'
-import { ColumnInfo } from '@/types/excel'
+import { AggregationType, ChartConfig, ChartData, NumericRange } from '@/types/chart'
+import { CellValue, ColumnInfo, DataMatrix } from '@/types/excel'
 
 export class ChartDataProcessor {
-  prepareChartData(data: any[][], config: ChartConfig, columnInfo: ColumnInfo[]): ChartData {
+  prepareChartData(data: DataMatrix, config: ChartConfig, columnInfo: ColumnInfo[]): ChartData {
     const dataColumnIndex = this.findColumnIndex(config.dataColumn, columnInfo)
     const labelColumnIndex = config.labelColumn
       ? this.findColumnIndex(config.labelColumn, columnInfo)
@@ -22,7 +22,7 @@ export class ChartDataProcessor {
   }
 
   private preparePieData(
-    data: any[][],
+    data: DataMatrix,
     dataColumn: number,
     labelColumn: number | null,
     config: ChartConfig,
@@ -77,13 +77,13 @@ export class ChartDataProcessor {
   }
 
   private aggregateData(
-    data: any[][],
+    data: DataMatrix,
     dataColumn: number,
     labelColumn: number | null,
     aggregation: AggregationType,
     config: ChartConfig,
   ): { label: string; value: number }[] {
-    const groups = new Map<string, any[]>()
+    const groups = new Map<string, unknown[]>()
 
     // Filter out empty rows
     const validData = data.filter(
@@ -96,21 +96,21 @@ export class ChartDataProcessor {
 
     for (const row of validData) {
       let label: string
-      let value: any
+      let value: CellValue
 
       if (labelColumn !== null) {
         // Two-column scenario: label column for labels, data column for values
-        const labelValue = row[labelColumn]
-        const dataValue = row[dataColumn]
+        const labelValue: CellValue = row[labelColumn]
+        const dataValue: CellValue = row[dataColumn]
 
         // Skip rows with null/undefined values
-        if (labelValue == null || dataValue == null) continue
+        if (labelValue == null || dataValue == null || dataValue === '') continue
 
         label = String(labelValue).trim()
         value = dataValue
       } else {
         // Single-column scenario: data column contains the categories to count
-        const dataValue = row[dataColumn]
+        const dataValue: CellValue = row[dataColumn]
 
         // Skip null/undefined values
         if (dataValue == null) continue
@@ -149,7 +149,7 @@ export class ChartDataProcessor {
     return result.sort((a, b) => b.value - a.value)
   }
 
-  private assignToCustomRange(value: number, ranges: NumericRange[]): string {
+  public assignToCustomRange(value: number, ranges: NumericRange[]): string {
     for (const range of ranges) {
       const minOk = range.includeMin ? value >= range.min : value > range.min
       const maxOk = range.includeMax ? value <= range.max : value < range.max
@@ -161,7 +161,7 @@ export class ChartDataProcessor {
     return 'Out of range'
   }
 
-  private createNumericRange(value: number): string {
+  public createNumericRange(value: number): string {
     // Create meaningful ranges for financial data
     if (value < 0) return 'Negative'
     if (value === 0) return 'Zero'
@@ -175,12 +175,12 @@ export class ChartDataProcessor {
     return '1M+'
   }
 
-  private applyAggregation(values: any[], type: AggregationType): number {
+  private applyAggregation(values: unknown[], type: AggregationType): number {
     switch (type) {
       case 'count':
         return values.length
       case 'sum':
-        return values.reduce((sum, v) => sum + (Number(v) || 0), 0)
+        return values.reduce((sum: number, v) => sum + (Number(v) || 0), 0)
       case 'average': {
         const valid = values.map((v) => Number(v)).filter((v) => Number.isFinite(v))
         return valid.length ? valid.reduce((s, v) => s + v, 0) / valid.length : 0

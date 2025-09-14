@@ -1,12 +1,12 @@
-import { useState, useCallback, useEffect } from 'react'
-import { ErrorHandler, ErrorType, AppError } from '@/utils/errorHandling'
+import {useCallback, useEffect, useState} from 'react'
+import {AppError, ErrorHandler, ErrorType} from '@/utils/errorHandling'
 
 export function useErrorHandler() {
   const [error, setError] = useState<AppError | null>(null)
   const [errors, setErrors] = useState<AppError[]>([])
 
   const handleError = useCallback(
-    (error: Error | string, type: ErrorType, context?: Record<string, any>) => {
+      (error: Error | string, type: ErrorType, context?: Record<string, unknown>) => {
       const errorMessage = typeof error === 'string' ? error : error.message
       const originalError = typeof error === 'string' ? undefined : error
 
@@ -79,7 +79,7 @@ export function useAsyncError() {
     async <T>(
       operation: () => Promise<T>,
       errorType: ErrorType = ErrorType.BROWSER_ERROR,
-      context?: Record<string, any>,
+      context?: Record<string, unknown>,
     ): Promise<T | null> => {
       try {
         return await operation()
@@ -105,7 +105,7 @@ export function useFileErrorHandler() {
       fileName?: string,
     ) => {
       let errorType: ErrorType
-      let context: Record<string, any> = { operation }
+        const context: Record<string, unknown> = {operation}
 
       if (fileName) {
         context.fileName = fileName

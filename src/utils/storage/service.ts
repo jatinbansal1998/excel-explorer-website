@@ -1,6 +1,6 @@
 import { DEFAULT_STORAGE_KEYS, type StorageAdapter } from './adapter'
-import { serialize, deserialize, estimateSizeBytes, type SerializedPayload } from './serialization'
-import type { ExcelData } from '@/types/excel'
+import { deserialize, estimateSizeBytes, serialize, type SerializedPayload } from './serialization'
+import type { DataMatrix, ExcelData } from '@/types/excel'
 import type { FilterState } from '@/types/filter'
 import type { ChartConfig } from '@/types/chart'
 
@@ -58,8 +58,8 @@ export interface DatasetChunk {
   startRow: number
   endRow: number
   headers: string[]
-  rows: any[][]
-  metadata?: any
+  rows: DataMatrix
+  metadata?: Record<string, unknown>
 }
 
 interface SessionIndexItem {
@@ -107,7 +107,8 @@ export class StorageService {
 
   async createOrUpdateSession(summary: PersistedSessionSummary): Promise<PersistedSession> {
     const nowIso = new Date().toISOString()
-    let activeId = (await this.local.getItem<string>(DEFAULT_STORAGE_KEYS.activeSessionId)) || null
+    const activeId =
+      (await this.local.getItem<string>(DEFAULT_STORAGE_KEYS.activeSessionId)) || null
     let session: PersistedSession | null = null
 
     if (activeId) {
@@ -262,7 +263,15 @@ export class StorageService {
     await this.cleanupOldSessions()
   }
 
-  private async saveDatasetChunked(sessionId: string, data: ExcelData, limits: any): Promise<void> {
+  private async saveDatasetChunked(
+    sessionId: string,
+    data: ExcelData,
+    limits: {
+      maxSessions: number
+      maxCompressedDatasetBytes: number
+      maxRowsPersisted: number
+    },
+  ): Promise<void> {
     const session = await this.local.getItem<PersistedSession>(this.sessionKey(sessionId))
     if (!session) throw new Error('Session not found')
 
@@ -368,7 +377,12 @@ export class StorageService {
     const payload = await this.idb.getItem<SerializedPayload>(session.datasetKey)
     if (!payload) return null
     const snapshot = deserialize<ExcelDataSnapshot>(payload)
-    return snapshot.excelData
+    // Normalize null/undefined cells to empty string on load
+    const normalized: ExcelData = {
+      ...snapshot.excelData,
+      rows: (snapshot.excelData.rows || []).map((row) => row.map((c) => (c == null ? '' : c))),
+    }
+    return normalized
   }
 
   async loadDatasetProgressive(
@@ -429,7 +443,11 @@ export class StorageService {
     onProgress?.(80, 'Finalizing data...')
     const snapshot = deserialize<ExcelDataSnapshot>(payload)
     onProgress?.(100, 'Complete')
-    return snapshot.excelData
+    const normalized: ExcelData = {
+      ...snapshot.excelData,
+      rows: (snapshot.excelData.rows || []).map((row) => row.map((c) => (c == null ? '' : c))),
+    }
+    return normalized
   }
 
   private async loadChunkedDataset(
@@ -454,7 +472,7 @@ export class StorageService {
 
     // Calculate adaptive chunk size based on available memory
     const adaptiveChunkSize = this.getAdaptiveChunkSize(chunkedInfo)
-    const chunksToLoad = Math.min(chunkedInfo.totalChunks, adaptiveChunkSize.maxConcurrentChunks)
+    // Note: chunksToLoad calculation was removed as it wasn't being used
 
     // Load chunks progressively with memory awareness
     const allChunks: DatasetChunk[] = []
@@ -533,7 +551,7 @@ export class StorageService {
       return false
     }
 
-    const deviceMemory = (navigator as any).deviceMemory || 4
+    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory || 4
     const isLowEnd = deviceMemory < 4
 
     if (isLowEnd) {
@@ -554,7 +572,7 @@ export class StorageService {
     return false
   }
 
-  private getAdaptiveChunkSize(chunkedInfo: ChunkedDatasetInfo) {
+  private getAdaptiveChunkSize(_chunkedInfo: ChunkedDatasetInfo) {
     const isLowEnd = this.deviceCapabilities?.isLowEnd || false
     const deviceMemory = this.deviceCapabilities?.memory || 4
 
@@ -608,13 +626,13 @@ export class StorageService {
     if (typeof gc !== 'undefined') {
       try {
         gc()
-      } catch (error) {
+      } catch {
         // Ignore errors
       }
     }
 
     // Alternative: trigger implicit garbage collection
-    const temp = new Array(1000).fill(null).map(() => ({ large: new Array(1000).fill('data') }))
+    const _temp = new Array(1000).fill(null).map(() => ({ large: new Array(1000).fill('data') }))
     setTimeout(() => {
       // Allow temp to be garbage collected
     }, 0)
@@ -622,19 +640,21 @@ export class StorageService {
 
   private reconstructDatasetFromChunks(allChunks: DatasetChunk[]): ExcelData {
     // Reconstruct the full dataset
-    const allRows = allChunks.flatMap((chunk) => chunk.rows)
+    const allRows = allChunks
+      .flatMap((chunk) => chunk.rows)
+      .map((row) => row.map((cell) => (cell == null ? '' : cell)))
     const headers = allChunks[0]?.headers || []
 
     return {
       headers,
       rows: allRows,
       metadata: {
-        fileName: allChunks[0].metadata?.fileName || 'Unknown',
-        activeSheet: allChunks[0].metadata?.sheetName || 'Sheet1',
+        fileName: (allChunks[0].metadata?.fileName as string) || 'Unknown',
+        activeSheet: (allChunks[0].metadata?.sheetName as string) || 'Sheet1',
         totalRows: allRows.length,
         totalColumns: headers.length,
         fileSize: 0, // Will be calculated later if needed
-        sheetNames: [allChunks[0].metadata?.sheetName || 'Sheet1'],
+        sheetNames: [(allChunks[0].metadata?.sheetName as string) || 'Sheet1'],
         columns: headers.map((name, index) => ({
           name,
           index,
@@ -724,11 +744,11 @@ export class StorageService {
       return
     }
 
-    const deviceMemory = (navigator as any).deviceMemory || 4
+    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory || 4
     const isLowEnd =
       deviceMemory < 4 ||
       !('hardwareConcurrency' in navigator) ||
-      (navigator as any).hardwareConcurrency < 4
+      (navigator as Navigator & { hardwareConcurrency?: number }).hardwareConcurrency < 4
 
     this.deviceCapabilities = { memory: deviceMemory, isLowEnd }
   }

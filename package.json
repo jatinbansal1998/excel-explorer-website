@@ -10,7 +10,15 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit -p tsconfig.json",
     "prepare": "husky",
-    "analyze": "ANALYZE=true npm run build"
+    "analyze": "ANALYZE=true npm run build",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest --testPathPattern=unit",
+    "test:integration": "jest --testPathPattern=integration",
+    "test:e2e": "jest --testPathPattern=e2e",
+    "test:components": "jest --testPathPattern=components",
+    "test:services": "jest --testPathPattern=services"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",
@@ -43,14 +51,29 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@jest/types": "^29.6.3",
     "@next/bundle-analyzer": "^15.5.2",
     "@tailwindcss/postcss": "^4.1.13",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^15.0.7",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^29.5.14",
+    "@types/jest-axe": "^3.5.9",
     "@types/react-dom": "^18.0.0",
     "autoprefixer": "^10.4.21",
     "husky": "^9.1.7",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.7.0",
+    "jest-axe": "^10.0.0",
+    "jest-circus": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jest-environment-node": "^29.7.0",
+    "jest-transform-stub": "^2.0.0",
     "lint-staged": "^16.1.6",
     "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.13"
+    "tailwindcss": "^4.1.13",
+    "ts-jest": "^29.4.1",
+    "whatwg-fetch": "^3.6.20"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

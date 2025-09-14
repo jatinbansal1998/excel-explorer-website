@@ -1,4 +1,4 @@
-export type ChartType = 'pie'
+export type ChartType = 'pie' | 'bar' | 'line' | 'doughnut' | 'scatter'
 
 export interface NumericRange {
   id: string
@@ -25,13 +25,44 @@ export interface ChartOptions {
     }
     tooltip: {
       enabled: boolean
-      callbacks?: unknown
+      callbacks?: Record<string, unknown>
     }
   }
-  scales?: unknown
+  scales?: Record<string, unknown>
   animation?: {
     duration: number
-    easing: string
+    easing:
+      | 'easeOutQuart'
+      | 'linear'
+      | 'easeInQuad'
+      | 'easeOutQuad'
+      | 'easeInOutQuad'
+      | 'easeInCubic'
+      | 'easeOutCubic'
+      | 'easeInOutCubic'
+      | 'easeInQuart'
+      | 'easeInOutQuart'
+      | 'easeInQuint'
+      | 'easeOutQuint'
+      | 'easeInOutQuint'
+      | 'easeInSine'
+      | 'easeOutSine'
+      | 'easeInOutSine'
+      | 'easeInExpo'
+      | 'easeOutExpo'
+      | 'easeInOutExpo'
+      | 'easeInCirc'
+      | 'easeOutCirc'
+      | 'easeInOutCirc'
+      | 'easeInElastic'
+      | 'easeOutElastic'
+      | 'easeInOutElastic'
+      | 'easeInBack'
+      | 'easeOutBack'
+      | 'easeInOutBack'
+      | 'easeInBounce'
+      | 'easeOutBounce'
+      | 'easeInOutBounce'
   }
 }
 

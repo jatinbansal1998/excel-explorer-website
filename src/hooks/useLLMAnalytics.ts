@@ -1,11 +1,11 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { LLMAnalyticsService, buildDatasetContext } from '@/services/llmAnalytics'
-import type { ExcelData } from '@/types/excel'
-import type { LLMAnalyticsResponse, PromptSuggestion } from '@/types/llmAnalytics'
-import { useOpenRouter } from './useOpenRouter'
-import { LocalStorageManager } from '@/utils/localStorage'
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import {buildDatasetContext, LLMAnalyticsService} from '@/services/llmAnalytics'
+import type {ExcelData} from '@/types/excel'
+import type {LLMAnalyticsResponse, PromptSuggestion} from '@/types/llmAnalytics'
+import {useOpenRouter} from './useOpenRouter'
+import {LocalStorageManager} from '@/utils/localStorage'
 
 type AsyncState<T> = { isLoading: boolean; data: T | null; error: string | null }
 
@@ -83,7 +83,7 @@ export function useLLMAnalytics(
 
         setSuggestionsState({ isLoading: false, data: resp, error: null })
         LocalStorageManager.save(suggestionsCacheKey, resp)
-      } catch (e: any) {
+      } catch (e: unknown) {
         // Don't update state if request was aborted
         if (currentController.signal.aborted) {
           return
@@ -92,7 +92,7 @@ export function useLLMAnalytics(
         setSuggestionsState({
           isLoading: false,
           data: null,
-          error: e?.message || 'Failed to get suggestions',
+            error: e instanceof Error ? e.message : 'Failed to get suggestions',
         })
       }
     },
@@ -141,13 +141,13 @@ export function useLLMAnalytics(
 
         setAnalysisState({ isLoading: false, data: parsed, error: null })
         return parsed
-      } catch (e: any) {
+      } catch (e: unknown) {
         // Don't update state if request was aborted
         if (currentController.signal.aborted) {
           return null
         }
 
-        const raw = e?.message || 'Failed to analyze'
+          const raw = e instanceof Error ? e.message : 'Failed to analyze'
         const msg = normalizeOpenRouterError(raw)
         setAnalysisState({ isLoading: false, data: null, error: msg })
         return null

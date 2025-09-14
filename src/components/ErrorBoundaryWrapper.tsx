@@ -4,15 +4,19 @@ import { ErrorBoundary } from './ErrorBoundary'
 interface ErrorBoundaryWrapperProps {
   children: React.ReactNode
   fallback?: React.ReactNode
-  onError?: (error: Error, errorInfo: React.ErrorInfo) => void
+  onError?: (_error: Error, _errorInfo: React.ErrorInfo) => void
 }
 
 /**
  * A wrapper component that provides error boundary protection
- * with customizable fallback UI and error handling
+ * with a customizable fallback UI and error handling
  */
-export function ErrorBoundaryWrapper({ children, fallback, onError }: ErrorBoundaryWrapperProps) {
-  return <ErrorBoundary>{children}</ErrorBoundary>
+export function ErrorBoundaryWrapper({
+  children,
+  fallback,
+  onError: _onError,
+}: Readonly<ErrorBoundaryWrapperProps>) {
+  return <ErrorBoundary fallback={fallback}>{children}</ErrorBoundary>
 }
 
 /**
@@ -20,7 +24,7 @@ export function ErrorBoundaryWrapper({ children, fallback, onError }: ErrorBound
  */
 export function withErrorBoundary<P extends object>(
   Component: React.ComponentType<P>,
-  fallback?: React.ReactNode,
+  _fallback?: React.ReactNode,
 ): React.FC<P> {
   return function WithErrorBoundary(props: P) {
     return (
@@ -47,8 +51,8 @@ export class AsyncErrorBoundary extends React.Component<
     return { hasError: true, error }
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    this.props.onError?.(error, errorInfo)
+  componentDidCatch(_error: Error, _errorInfo: React.ErrorInfo) {
+    this.props.onError?.(_error, _errorInfo)
   }
 
   render() {
@@ -56,7 +60,7 @@ export class AsyncErrorBoundary extends React.Component<
       return (
         this.props.fallback || (
           <div className="p-4 border border-red-200 rounded-lg bg-red-50">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
                 <svg
                   className="w-4 h-4 text-red-600"
@@ -91,7 +95,7 @@ export class AsyncErrorBoundary extends React.Component<
 /**
  * Error boundary specifically for chart components
  */
-export function ChartErrorBoundary({ children }: { children: React.ReactNode }) {
+export function ChartErrorBoundary({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <AsyncErrorBoundary
       fallback={
@@ -126,12 +130,12 @@ export function ChartErrorBoundary({ children }: { children: React.ReactNode }) 
 /**
  * Error boundary for data processing operations
  */
-export function DataProcessingErrorBoundary({ children }: { children: React.ReactNode }) {
+export function DataProcessingErrorBoundary({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <AsyncErrorBoundary
       fallback={
         <div className="p-6 border border-yellow-200 rounded-lg bg-yellow-50">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
               <svg
                 className="w-5 h-5 text-yellow-600"

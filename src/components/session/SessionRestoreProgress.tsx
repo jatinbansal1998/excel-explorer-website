@@ -105,7 +105,7 @@ export function SessionRestoreProgress({
             />
           </div>
 
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             <div className="flex justify-between items-center text-sm text-gray-600">
               <span>Progress</span>
               <div className="text-right">
@@ -136,7 +136,7 @@ export function SessionRestoreProgress({
           </div>
 
           {progress.stage !== 'complete' && (
-            <div className="mt-6 flex justify-center space-x-3">
+            <div className="mt-6 flex justify-center gap-3">
               <button
                 onClick={onCancel}
                 className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
@@ -151,7 +151,7 @@ export function SessionRestoreProgress({
           )}
 
           {progress.stage === 'complete' && (
-            <div className="mt-4 space-y-2">
+            <div className="mt-4 flex flex-col gap-2">
               <p className="text-sm text-green-600 font-medium">
                 🎉 Session restored successfully!
               </p>

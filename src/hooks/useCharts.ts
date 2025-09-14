@@ -1,21 +1,21 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
+  AggregationType,
   ChartConfig,
   ChartSuggestion,
   ChartType,
-  AggregationType,
   NumericRange,
 } from '@/types/chart'
-import { ColumnInfo } from '@/types/excel'
+import { ColumnInfo, DataMatrix } from '@/types/excel'
 import { chartSuggestionEngine } from '@/services/chartSuggestion'
 import { v4 as uuidv4 } from 'uuid'
-import { useSessionPersistence } from './useSessionPersistence'
 import type { UseSessionPersistenceReturn } from './useSessionPersistence'
+import { useSessionPersistence } from './useSessionPersistence'
 
 export function useCharts(
-  filteredData: any[][],
+  filteredData: DataMatrix,
   columnInfo: ColumnInfo[],
   sessionExt?: UseSessionPersistenceReturn,
 ) {
@@ -130,20 +130,20 @@ export function useCharts(
 }
 
 function createChartFromSuggestion(
-  s: ChartSuggestion,
+  _s: ChartSuggestion,
   maxSegments?: number,
   numericRanges?: NumericRange[],
 ): ChartConfig {
   // Configure legend position based on chart type
-  const legendPosition = s.type === 'pie' || s.type === 'doughnut' ? 'right' : 'top'
+  const legendPosition = _s.type === 'pie' || _s.type === 'doughnut' ? 'right' : 'top'
 
   return {
     id: uuidv4(),
-    title: s.title,
-    type: s.type,
-    dataColumn: s.dataColumn,
-    labelColumn: s.labelColumn,
-    aggregation: s.aggregation,
+    title: _s.title,
+    type: _s.type,
+    dataColumn: _s.dataColumn,
+    labelColumn: _s.labelColumn,
+    aggregation: _s.aggregation,
     maxSegments: maxSegments || 10, // Default to 10 if not specified
     numericRanges: numericRanges,
     position: { row: 0, column: 0, width: 1, height: 1 },
@@ -155,7 +155,7 @@ function createChartFromSuggestion(
           display: true,
           position: legendPosition,
         },
-        title: { display: false, text: s.title },
+        title: { display: false, text: _s.title },
         tooltip: { enabled: true },
       },
       animation: { duration: 250, easing: 'easeOutQuart' },

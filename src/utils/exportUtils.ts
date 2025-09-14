@@ -1,17 +1,16 @@
-import { saveAs } from 'file-saver';
-import * as XLSX from 'xlsx';
-import { ErrorHandler, ErrorType } from './errorHandling';
+import {saveAs} from 'file-saver';
+import {ErrorHandler, ErrorType} from './errorHandling';
 
 export interface FilterConfig {
   column: string;
   type: 'text' | 'number' | 'date' | 'list';
-  values: any[];
+    values: unknown[];
   active: boolean;
 }
 
 export class ExportService {
   exportToCSV(
-    data: any[][], 
+      data: unknown[][],
     headers: string[], 
     filename: string
   ): void {
@@ -28,33 +27,21 @@ export class ExportService {
     }
   }
 
-  exportToExcel(
-    data: any[][], 
-    headers: string[], 
-    filename: string,
-    sheetName: string = 'Sheet1'
-  ): void {
+  async exportToExcel(
+      data: unknown[][],
+      headers: string[], 
+      filename: string,
+      sheetName: string = 'Sheet1'
+  ): Promise<void> {
     try {
+      const XLSX = await import('xlsx');
       const workbook = XLSX.utils.book_new();
       const worksheet = XLSX.utils.aoa_to_sheet([headers, ...data]);
-      
-      // Style the header row
-      const headerRange = XLSX.utils.encode_range({
-        s: { c: 0, r: 0 },
-        e: { c: headers.length - 1, r: 0 }
-      });
-      
       XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-      
-      const excelBuffer = XLSX.write(workbook, { 
-        bookType: 'xlsx', 
-        type: 'array' 
-      });
-      
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
       const blob = new Blob([excelBuffer], { 
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
       });
-      
       saveAs(blob, `${filename}.xlsx`);
     } catch (error) {
       throw ErrorHandler.getInstance().createError(
@@ -123,8 +110,8 @@ export class ExportService {
     }
   }
 
-  private convertToCSV(data: any[][], headers: string[]): string {
-    const escapeCSV = (value: any): string => {
+    private convertToCSV(data: unknown[][], headers: string[]): string {
+        const escapeCSV = (value: unknown): string => {
       if (value === null || value === undefined) return '';
       const str = String(value);
       if (str.includes(',') || str.includes('"') || str.includes('\n')) {

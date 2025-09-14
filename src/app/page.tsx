@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, lazy, Suspense } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { FileUploader } from '@/components/FileUploader'
 import { DataTable } from '@/components/DataTable'
 import { useToast } from '@/components/ui/Toast'
@@ -9,9 +9,9 @@ import { useFilters } from '@/hooks/useFilters'
 import { useSessionPersistence } from '@/hooks/useSessionPersistence'
 import { globalProperties } from '@/types/global'
 import {
-  ErrorBoundaryWrapper,
   ChartErrorBoundary,
   DataProcessingErrorBoundary,
+  ErrorBoundaryWrapper,
 } from '@/components/ErrorBoundaryWrapper'
 import { PerformanceMonitor, usePerformanceMonitor } from '@/components/PerformanceMonitor'
 import { SessionRestoreProgress } from '@/components/session/SessionRestoreProgress'
@@ -51,7 +51,7 @@ export default function HomePage() {
       addToast({
         type: 'error',
         title: 'Upload Failed',
-        message: (error as any)?.message || 'There was an error processing your file',
+        message: (error as Error)?.message || 'There was an error processing your file',
       })
     }
   }
@@ -59,18 +59,13 @@ export default function HomePage() {
   const handleRestoreSession = async (restoreFn: () => Promise<void>) => {
     try {
       await restoreFn()
-      addToast({
-        type: 'success',
-        title: 'Session Restored',
-        message: 'Your previous session has been successfully restored.',
-      })
     } catch (error) {
       console.error('Session restoration failed:', error)
       addToast({
         type: 'error',
         title: 'Session Restoration Failed',
         message:
-          (error as any)?.message ||
+          (error as Error)?.message ||
           'Failed to restore session. Please try again or upload a new file.',
         duration: 8000, // Longer duration for session errors
       })
@@ -79,7 +74,7 @@ export default function HomePage() {
 
   return (
     <ErrorBoundaryWrapper>
-      <div className="space-y-3 xl:space-y-2 h-full flex flex-col">
+      <div className="gap-3 xl:gap-2 h-full flex flex-col">
         {session.showRestoreBanner && session.lastSessionSummary && (
           <div className="border border-primary-200 bg-primary-50 text-primary-900 rounded p-3 flex items-center justify-between">
             <div className="text-sm">
@@ -87,7 +82,7 @@ export default function HomePage() {
               {session.lastSessionSummary.fileName} ({session.lastSessionSummary.totalRows} rows ×{' '}
               {session.lastSessionSummary.totalColumns} cols)
             </div>
-            <div className="space-x-2">
+            <div className="flex items-center gap-2">
               <button
                 className="px-3 py-1 text-sm bg-primary-600 hover:bg-primary-700 text-white rounded"
                 onClick={() => handleRestoreSession(session.restoreLastSession)}
@@ -111,7 +106,7 @@ export default function HomePage() {
           />
         </DataProcessingErrorBoundary>
 
-        <div className="space-y-3 xl:space-y-2 flex-1 min-h-0">
+        <div className="flex flex-col gap-3 xl:gap-2 flex-1 min-h-0">
           {/* Section 1: Filters and DataTable */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 xl:gap-2">
             <div className="lg:col-span-1">
@@ -153,7 +148,7 @@ export default function HomePage() {
                   columnInfo={currentData.metadata.columns}
                   session={session}
                   registerExternalApplyChart={(fn) => {
-                    globalProperties.setApplyChartFromAI(fn)
+                    globalProperties.setApplyChartFromAI(fn as (config: unknown) => void)
                   }}
                 />
               </Suspense>
@@ -170,13 +165,13 @@ export default function HomePage() {
                   excelData={currentData}
                   filteredRows={filteredData}
                   filtersActive={filters.some((f) => f.active)}
-                  onApplyChart={(cfg) => {
+                  _onApplyChart={(cfg) => {
                     try {
                       const apply = globalProperties.getApplyChartFromAI()
                       if (typeof apply === 'function') apply(cfg)
                     } catch {}
                   }}
-                  onApplyFilters={(f) => {
+                  _onApplyFilters={(f) => {
                     try {
                       // Import filters when provided. If it's a full FilterState array, call importState.
                       if (Array.isArray(f)) {

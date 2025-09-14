@@ -75,7 +75,7 @@ export function SessionManagerModal({
             ✕
           </button>
         </div>
-        <div className="p-4 space-y-3">
+        <div className="p-4 flex flex-col gap-3">
           <div className="flex items-center gap-2">
             <input
               value={query}
@@ -85,7 +85,7 @@ export function SessionManagerModal({
             />
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) => setSortBy(e.target.value as 'updated' | 'file' | 'rows' | 'cols')}
               className="border rounded px-2 py-2"
             >
               <option value="updated">Last Updated</option>
@@ -95,7 +95,7 @@ export function SessionManagerModal({
             </select>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2 max-h-80 overflow-auto border rounded p-2">
+            <div className="flex flex-col gap-2 max-h-80 overflow-auto border rounded p-2">
               {filtered.length === 0 && <p className="text-sm text-gray-500">No sessions found.</p>}
               {filtered.map((s) => (
                 <SessionListItem
@@ -114,7 +114,7 @@ export function SessionManagerModal({
                   if (!s)
                     return <p className="text-sm text-gray-500">Select a session to preview.</p>
                   return (
-                    <div className="space-y-1">
+                    <div className="flex flex-col gap-1">
                       <p className="text-sm">
                         <span className="font-medium">File:</span>{' '}
                         {s.summary.fileName || 'Untitled'}
@@ -147,7 +147,7 @@ export function SessionManagerModal({
         </div>
         <div className="flex items-center justify-between px-4 py-3 border-t">
           <div className="text-xs text-gray-500">{sessions.length} total</div>
-          <div className="space-x-2">
+          <div className="flex items-center gap-2">
             {onClearAll && (
               <button
                 className="px-3 py-2 text-sm border rounded text-red-600"

@@ -1,3 +1,9 @@
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jatinbansal1998_excel-explorer-website&metric=alert_status&token=5caf65f17e5cf934c17c7c2735d5b426ce04baa6)](https://sonarcloud.io/summary/new_code?id=jatinbansal1998_excel-explorer-website)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=jatinbansal1998_excel-explorer-website&metric=bugs&token=5caf65f17e5cf934c17c7c2735d5b426ce04baa6)](https://sonarcloud.io/summary/new_code?id=jatinbansal1998_excel-explorer-website)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=jatinbansal1998_excel-explorer-website&metric=code_smells&token=5caf65f17e5cf934c17c7c2735d5b426ce04baa6)](https://sonarcloud.io/summary/new_code?id=jatinbansal1998_excel-explorer-website)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=jatinbansal1998_excel-explorer-website&metric=coverage&token=5caf65f17e5cf934c17c7c2735d5b426ce04baa6)](https://sonarcloud.io/summary/new_code?id=jatinbansal1998_excel-explorer-website)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=jatinbansal1998_excel-explorer-website&metric=duplicated_lines_density&token=5caf65f17e5cf934c17c7c2735d5b426ce04baa6)](https://sonarcloud.io/summary/new_code?id=jatinbansal1998_excel-explorer-website)
+
 # Excel Explorer Website
 
 A powerful web application for exploring, analyzing, and visualizing Excel data with advanced filtering, charting, and AI-powered analytics capabilities.
@@ -16,7 +22,7 @@ A powerful web application for exploring, analyzing, and visualizing Excel data 
 
 - **Frontend**: Next.js 14 (App Router) + React 18
 - **Language**: TypeScript (strict mode)
-- **Styling**: Tailwind CSS 3
+- **Styling**: Tailwind CSS 4
 - **Code Quality**: ESLint + Prettier 3
 - **Build**: Static export configured
 
@@ -30,12 +36,14 @@ A powerful web application for exploring, analyzing, and visualizing Excel data 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/jatinbansal1998/excel-explorer-website.git
    cd excel-explorer-website
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
@@ -125,8 +133,14 @@ src/
 
 - **Next.js**: Configured for static export with optimized images
 - **TypeScript**: Strict mode with path aliases (`@/*` → `src/*`)
-- **Tailwind CSS**: Custom configuration with responsive design
+- **Tailwind CSS**: v4 with token-first setup (`@import 'tailwindcss'` in `src/app/globals.css` and design tokens under `@theme`)
 - **ESLint**: Extended Next.js configuration with Prettier integration
+
+### Tailwind v4 Notes
+
+- Use `gap-*` for spacing between flex/grid children (not `space-x-*` / `space-y-*`).
+- Design tokens live in `src/app/globals.css` under `@theme` and map to Tailwind color scales.
+- Utilities are available via the global `@import 'tailwindcss'`; no `@tailwind base/components/utilities` directives.
 
 ## Development
 

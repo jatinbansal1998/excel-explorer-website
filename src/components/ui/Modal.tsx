@@ -1,6 +1,8 @@
-import React, { Fragment } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
+'use client'
+
+import React, {Fragment, useRef} from 'react'
+import {Dialog, Transition} from '@headlessui/react'
+import {XMarkIcon} from '@heroicons/react/24/outline'
 
 interface ModalProps {
   isOpen: boolean
@@ -18,9 +20,11 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
     xl: 'max-w-4xl',
   }
 
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={onClose}>
+      <Dialog as="div" className="relative z-50" onClose={onClose} initialFocus={closeButtonRef}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -52,6 +56,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
                     {title}
                   </Dialog.Title>
                   <button
+                      ref={closeButtonRef}
                     type="button"
                     className="rounded-md text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                     onClick={onClose}

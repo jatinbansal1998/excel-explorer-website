@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { useCharts } from '@/hooks/useCharts'
 import { ColumnInfo, ExcelData } from '@/types/excel'
-import { ChartConfig } from '@/types/chart'
+import { ChartConfig, ChartSuggestion } from '@/types/chart'
 import ChartContainer from './charts/ChartContainer'
 import ChartControls from './charts/ChartControls'
 import { ArcElement, Chart, Legend, PieController, Title, Tooltip } from 'chart.js'
@@ -14,17 +14,13 @@ Chart.register(ArcElement, Tooltip, Legend, Title, PieController)
 interface ChartViewProps {
   filteredData: ExcelData['rows']
   columnInfo: ColumnInfo[]
-  onChartAdd?: (config: ChartConfig) => void
-  onChartRemove?: (chartId: string) => void
-  registerExternalApplyChart?: (fn: (config: ChartConfig) => void) => void
+  registerExternalApplyChart?: (_fn: (_config: ChartConfig) => void) => void
   session?: UseSessionPersistenceReturn
 }
 
 export function ChartView({
   filteredData,
   columnInfo,
-  onChartAdd,
-  onChartRemove,
   registerExternalApplyChart,
   session,
 }: ChartViewProps) {
@@ -42,7 +38,7 @@ export function ChartView({
     // Optionally notify parent when charts change
   }, [charts])
 
-  const handleAddChart = (sugg: any) => {
+  const handleAddChart = (sugg: ChartSuggestion) => {
     addChart(sugg)
   }
 
@@ -66,7 +62,7 @@ export function ChartView({
   }, [registerExternalApplyChart, createManualChart])
 
   return (
-    <div className="section-container p-4 space-y-4">
+    <div className="section-container p-4 flex flex-col gap-4">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Data Visualization</h2>
         <ChartControls

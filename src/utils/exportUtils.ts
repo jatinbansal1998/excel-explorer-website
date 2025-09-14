@@ -1,5 +1,4 @@
 import {saveAs} from 'file-saver';
-import * as XLSX from 'xlsx';
 import {ErrorHandler, ErrorType} from './errorHandling';
 
 export interface FilterConfig {
@@ -28,30 +27,21 @@ export class ExportService {
     }
   }
 
-  exportToExcel(
+  async exportToExcel(
       data: unknown[][],
-    headers: string[], 
-    filename: string,
-    sheetName: string = 'Sheet1'
-  ): void {
+      headers: string[], 
+      filename: string,
+      sheetName: string = 'Sheet1'
+  ): Promise<void> {
     try {
+      const XLSX = await import('xlsx');
       const workbook = XLSX.utils.book_new();
       const worksheet = XLSX.utils.aoa_to_sheet([headers, ...data]);
-      
-      // Style the header row
-        // Note: headerRange is calculated but not currently used for styling
-      
       XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-      
-      const excelBuffer = XLSX.write(workbook, { 
-        bookType: 'xlsx', 
-        type: 'array' 
-      });
-      
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
       const blob = new Blob([excelBuffer], { 
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
       });
-      
       saveAs(blob, `${filename}.xlsx`);
     } catch (error) {
       throw ErrorHandler.getInstance().createError(

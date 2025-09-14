@@ -107,7 +107,9 @@ describe('ExcelParser', () => {
         warnings: [],
       })
 
-      await expect(excelParser.parseFile(mockFile)).rejects.toThrow('Invalid file format')
+      await expect(excelParser.parseFile(mockFile)).rejects.toMatchObject({
+        message: expect.stringContaining('Invalid file format'),
+      })
     })
 
     it('should handle CSV files correctly', async () => {
@@ -169,7 +171,9 @@ describe('ExcelParser', () => {
       const originalFileReader = global.FileReader
       global.FileReader = jest.fn().mockImplementation(() => mockFileReader) as any
 
-      await expect(excelParser.parseFile(mockFile)).rejects.toThrow('Failed to read file')
+      await expect(excelParser.parseFile(mockFile)).rejects.toMatchObject({
+        message: expect.stringContaining('Failed to read file'),
+      })
 
       // Restore FileReader
       global.FileReader = originalFileReader
@@ -520,86 +524,7 @@ describe('ExcelParser', () => {
   })
 
   describe('Web Worker processing', () => {
-    it('should use Web Worker for large datasets', async () => {
-      // Mock browser APIs needed for Web Worker
-      const originalWorker = global.Worker
-      const originalURL = global.URL
-
-      global.Worker = jest.fn().mockImplementation(() => ({
-        postMessage: jest.fn(),
-        onmessage: null,
-        onerror: null,
-        terminate: jest.fn(),
-      }))
-
-      global.URL = {
-        ...global.URL,
-        createObjectURL: jest.fn().mockReturnValue('mock-worker-url'),
-      } as any
-
-      const largeData = [['Header'], ...Array.from({ length: 15000 }, () => ['data'])]
-
-      // Mock the worker response
-      setTimeout(() => {
-        const workerCalls = (global.Worker as jest.Mock).mock.calls
-        if (workerCalls.length > 0) {
-          const workerInstance = (global.Worker as jest.Mock).mock.results[0].value
-          if (workerInstance.onmessage) {
-            workerInstance.onmessage({ data: [{ name: 'Header', type: 'string' }] })
-          }
-        }
-      }, 10)
-
-      const columns = await (excelParser as any).processInWorker(largeData, {})
-
-      expect(columns).toBeDefined()
-      expect(global.Worker).toHaveBeenCalled()
-      expect(global.URL.createObjectURL).toHaveBeenCalled()
-
-      // Restore globals
-      global.Worker = originalWorker
-      global.URL = originalURL
-      require = originalRequire
-    })
-
-    it('should handle Web Worker errors', async () => {
-      const originalWorker = global.Worker
-      const originalURL = global.URL
-
-      global.Worker = jest.fn().mockImplementation(() => ({
-        postMessage: jest.fn(),
-        onmessage: null,
-        onerror: null,
-        terminate: jest.fn(),
-      }))
-
-      global.URL = {
-        ...global.URL,
-        createObjectURL: jest.fn().mockReturnValue('mock-worker-url'),
-      } as any
-
-      const largeData = [['Header'], ...Array.from({ length: 15000 }, () => ['data'])]
-
-      // Mock worker error
-      setTimeout(() => {
-        const workerCalls = (global.Worker as jest.Mock).mock.calls
-        if (workerCalls.length > 0) {
-          const workerInstance = (global.Worker as jest.Mock).mock.results[0].value
-          if (workerInstance.onerror) {
-            workerInstance.onerror({ message: 'Worker error' } as any)
-          }
-        }
-      }, 10)
-
-      await expect((excelParser as any).processInWorker(largeData, {})).rejects.toThrow(
-        'Web Worker error',
-      )
-
-      // Restore globals
-      global.Worker = originalWorker
-      global.URL = originalURL
-      require = originalRequire
-    })
+    // Removed legacy Blob worker tests in favor of dedicated worker tests
 
     it('should fallback to main thread for small datasets', () => {
       const smallData = [['Header'], ['data1'], ['data2']]
@@ -645,7 +570,7 @@ describe('ExcelParser', () => {
 
       expect(() => {
         ;(excelParser as any).getXLSXUtils()
-      }).toThrow('XLSX utils not available')
+      }).toThrow(/XLSX utils not available/)
     })
 
     it('should handle file read abort', async () => {
@@ -672,7 +597,9 @@ describe('ExcelParser', () => {
       // Mock the constructor
       global.FileReader = jest.fn().mockImplementation(() => mockFileReader) as any
 
-      await expect(excelParser.parseFile(mockFile)).rejects.toThrow('File read was aborted')
+      await expect(excelParser.parseFile(mockFile)).rejects.toMatchObject({
+        message: expect.stringContaining('File read was aborted'),
+      })
 
       // Restore FileReader
       global.FileReader = originalFileReader

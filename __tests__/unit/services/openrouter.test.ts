@@ -104,16 +104,20 @@ describe('OpenRouterService', () => {
 
       const result = await openRouterService.listModels(mockApiKey)
 
-      expect(mockFetch).toHaveBeenCalledWith('https://openrouter.ai/api/v1/models', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${mockApiKey}`,
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://charts.jatinbansal.com/',
-          'X-Title': 'Excel Explorer',
-        },
-      })
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://openrouter.ai/api/v1/models',
+        expect.objectContaining({
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${mockApiKey}`,
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://charts.jatinbansal.com/',
+            'X-Title': 'Excel Explorer',
+          },
+          signal: expect.any(AbortSignal),
+        }),
+      )
       expect(result).toEqual(mockModels)
       expect(mockPerformanceMonitor.measureAsync).toHaveBeenCalledWith(
         'openrouter_list_models',
@@ -130,13 +134,17 @@ describe('OpenRouterService', () => {
 
       const result = await openRouterService.listModels()
 
-      expect(mockFetch).toHaveBeenCalledWith('https://openrouter.ai/api/v1/models', {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      })
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://openrouter.ai/api/v1/models',
+        expect.objectContaining({
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          signal: expect.any(AbortSignal),
+        }),
+      )
       expect(result).toEqual(mockModels)
       expect(mockPerformanceMonitor.measureAsync).toHaveBeenCalledWith(
         'openrouter_list_models',
@@ -188,7 +196,9 @@ describe('OpenRouterService', () => {
         text: () => Promise.resolve(JSON.stringify(errorResponse)),
       } as Response)
 
-      await expect(openRouterService.listModels(mockApiKey)).rejects.toThrow('Invalid API key')
+      await expect(openRouterService.listModels(mockApiKey)).rejects.toMatchObject({
+        message: expect.stringContaining('Invalid API key'),
+      })
     })
 
     it('should handle plain text error response', async () => {
@@ -198,9 +208,9 @@ describe('OpenRouterService', () => {
         text: () => Promise.resolve('Internal Server Error'),
       } as Response)
 
-      await expect(openRouterService.listModels(mockApiKey)).rejects.toThrow(
-        'Internal Server Error',
-      )
+      await expect(openRouterService.listModels(mockApiKey)).rejects.toMatchObject({
+        message: expect.stringContaining('Internal Server Error'),
+      })
     })
 
     it('should handle network error', async () => {
@@ -216,7 +226,9 @@ describe('OpenRouterService', () => {
         text: () => Promise.resolve('Invalid JSON {'),
       } as Response)
 
-      await expect(openRouterService.listModels(mockApiKey)).rejects.toThrow('Invalid JSON {')
+      await expect(openRouterService.listModels(mockApiKey)).rejects.toMatchObject({
+        message: expect.stringContaining('Invalid JSON {'),
+      })
     })
   })
 
@@ -305,9 +317,9 @@ describe('OpenRouterService', () => {
         text: () => Promise.resolve(JSON.stringify(errorResponse)),
       } as Response)
 
-      await expect(openRouterService.chat(mockApiKey, mockChatRequest)).rejects.toThrow(
-        'Model not found',
-      )
+      await expect(openRouterService.chat(mockApiKey, mockChatRequest)).rejects.toMatchObject({
+        message: expect.stringContaining('Model not found'),
+      })
     })
 
     it('should handle error response without error object', async () => {
@@ -317,9 +329,9 @@ describe('OpenRouterService', () => {
         text: () => Promise.resolve(JSON.stringify({ message: 'Bad request' })),
       } as Response)
 
-      await expect(openRouterService.chat(mockApiKey, mockChatRequest)).rejects.toThrow(
-        'Bad request',
-      )
+      await expect(openRouterService.chat(mockApiKey, mockChatRequest)).rejects.toMatchObject({
+        message: expect.stringContaining('Bad request'),
+      })
     })
 
     it('should handle plain text error response', async () => {
@@ -329,9 +341,9 @@ describe('OpenRouterService', () => {
         text: () => Promise.resolve('Server Error'),
       } as Response)
 
-      await expect(openRouterService.chat(mockApiKey, mockChatRequest)).rejects.toThrow(
-        'Server Error',
-      )
+      await expect(openRouterService.chat(mockApiKey, mockChatRequest)).rejects.toMatchObject({
+        message: expect.stringContaining('Server Error'),
+      })
     })
 
     it('should handle 200 response with error object', async () => {
@@ -343,9 +355,9 @@ describe('OpenRouterService', () => {
         text: () => Promise.resolve(JSON.stringify(errorResponse)),
       } as Response)
 
-      await expect(openRouterService.chat(mockApiKey, mockChatRequest)).rejects.toThrow(
-        'Provider error',
-      )
+      await expect(openRouterService.chat(mockApiKey, mockChatRequest)).rejects.toMatchObject({
+        message: expect.stringContaining('Provider error'),
+      })
     })
 
     it('should handle empty response body', async () => {

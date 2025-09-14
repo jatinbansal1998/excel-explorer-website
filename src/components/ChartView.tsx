@@ -62,7 +62,7 @@ export function ChartView({
   }, [registerExternalApplyChart, createManualChart])
 
   return (
-    <div className="section-container p-4 space-y-4">
+    <div className="section-container p-4 flex flex-col gap-4">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Data Visualization</h2>
         <ChartControls

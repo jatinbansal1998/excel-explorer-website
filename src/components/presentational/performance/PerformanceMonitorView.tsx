@@ -85,7 +85,7 @@ export default function PerformanceMonitorView({
       {hasAlerts && (
         <div className="p-4 border-b border-gray-200 bg-red-50">
           <h4 className="font-medium text-red-800 mb-2">Performance Alerts</h4>
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             {alerts.slice(0, 3).map((alert, index) => (
               <div key={index} className="flex items-start gap-2">
                 <div
@@ -159,7 +159,7 @@ export default function PerformanceMonitorView({
           </div>
 
           {metrics.length > 0 ? (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               {metrics.slice(0, 10).map((metric, index) => (
                 <div
                   key={index}
@@ -204,7 +204,7 @@ export default function PerformanceMonitorView({
           {summary && summary.operations.length > 0 && (
             <div className="mt-4">
               <h4 className="font-medium text-gray-900 mb-2">Operation Summary</h4>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 {summary.operations.map((op, index) => (
                   <div
                     key={index}

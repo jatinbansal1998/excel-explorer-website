@@ -1,6 +1,6 @@
-import React, {Component, ErrorInfo, PropsWithChildren} from 'react'
-import {Button} from './ui/Button'
-import {ErrorHandler, ErrorType} from '@/utils/errorHandling'
+import React, { Component, ErrorInfo, PropsWithChildren } from 'react'
+import { Button } from './ui/Button'
+import { ErrorHandler, ErrorType } from '@/utils/errorHandling'
 
 interface ErrorBoundaryState {
   hasError: boolean
@@ -8,8 +8,11 @@ interface ErrorBoundaryState {
   errorInfo: ErrorInfo | null
 }
 
-export class ErrorBoundary extends Component<PropsWithChildren<Record<string, unknown>>, ErrorBoundaryState> {
-    constructor(props: PropsWithChildren<Record<string, unknown>>) {
+export class ErrorBoundary extends Component<
+  PropsWithChildren<Record<string, unknown>>,
+  ErrorBoundaryState
+> {
+  constructor(props: PropsWithChildren<Record<string, unknown>>) {
     super(props)
     this.state = { hasError: false, error: null, errorInfo: null }
   }
@@ -74,7 +77,7 @@ export class ErrorBoundary extends Component<PropsWithChildren<Record<string, un
                 <summary className="cursor-pointer text-gray-500 hover:text-gray-700">
                   Technical Details
                 </summary>
-                <div className="mt-2 space-y-2">
+                <div className="mt-2 flex flex-col gap-2">
                   <pre className="text-xs bg-gray-100 p-2 rounded overflow-auto max-h-32">
                     {this.state.error?.toString()}
                   </pre>

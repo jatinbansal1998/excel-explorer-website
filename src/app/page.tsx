@@ -74,7 +74,7 @@ export default function HomePage() {
 
   return (
     <ErrorBoundaryWrapper>
-      <div className="space-y-3 xl:space-y-2 h-full flex flex-col">
+      <div className="gap-3 xl:gap-2 h-full flex flex-col">
         {session.showRestoreBanner && session.lastSessionSummary && (
           <div className="border border-primary-200 bg-primary-50 text-primary-900 rounded p-3 flex items-center justify-between">
             <div className="text-sm">
@@ -106,7 +106,7 @@ export default function HomePage() {
           />
         </DataProcessingErrorBoundary>
 
-        <div className="space-y-3 xl:space-y-2 flex-1 min-h-0">
+        <div className="flex flex-col gap-3 xl:gap-2 flex-1 min-h-0">
           {/* Section 1: Filters and DataTable */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 xl:gap-2">
             <div className="lg:col-span-1">

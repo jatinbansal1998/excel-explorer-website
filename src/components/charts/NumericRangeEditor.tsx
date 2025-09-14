@@ -65,7 +65,7 @@ export function NumericRangeEditor({
 
   return (
     <div className={className}>
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div>
             <h4 className="text-sm font-medium text-gray-700">Numeric Ranges</h4>
@@ -90,7 +90,7 @@ export function NumericRangeEditor({
           </div>
         )}
 
-        <div className="space-y-3 max-h-60 overflow-y-auto">
+        <div className="flex flex-col gap-3 max-h-60 overflow-y-auto">
           {ranges.map((range, index) => (
             <div
               key={range.id}

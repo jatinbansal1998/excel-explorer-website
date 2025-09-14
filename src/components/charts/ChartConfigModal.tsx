@@ -33,7 +33,7 @@ export function ChartConfigModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Chart Configuration">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className="block text-sm font-medium mb-2">Chart Title</label>
           <input

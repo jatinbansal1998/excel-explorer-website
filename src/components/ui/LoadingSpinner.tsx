@@ -23,7 +23,7 @@ export function LoadingSpinner({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-2">
+    <div className="flex flex-col items-center justify-center gap-2">
       <svg
         className={clsx('animate-spin', sizes[size], className)}
         xmlns="http://www.w3.org/2000/svg"

@@ -40,7 +40,7 @@ export function DataTable({
   if (isLoading) {
     return (
       <div className="section-container p-6 flex items-center justify-center h-64">
-        <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col items-center gap-4">
           <LoadingSpinner size="lg" />
           <p className="text-sm text-gray-600">Loading data...</p>
         </div>

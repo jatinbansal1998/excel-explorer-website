@@ -97,7 +97,7 @@ export function ChartCreationModalView(props: ChartCreationModalViewProps) {
           </button>
         </div>
 
-        <form onSubmit={onSubmit} className="p-6 space-y-6">
+        <form onSubmit={onSubmit} className="p-6 flex flex-col gap-6">
           {/* Chart Type Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">Chart Type</label>
@@ -180,7 +180,7 @@ export function ChartCreationModalView(props: ChartCreationModalViewProps) {
               </div>
 
               {/* Improved dropdown */}
-              <div className="space-y-1">
+              <div className="flex flex-col gap-1">
                 {compatibleDataColumns(dataColumnSearch).length === 0 ? (
                   <div className="p-3 text-center text-gray-500 text-sm border border-gray-300 rounded-lg bg-gray-50">
                     {dataColumnSearch
@@ -291,7 +291,7 @@ export function ChartCreationModalView(props: ChartCreationModalViewProps) {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Maximum Segments
               </label>
-              <div className="space-y-1">
+              <div className="flex flex-col gap-1">
                 <input
                   type="number"
                   min="3"

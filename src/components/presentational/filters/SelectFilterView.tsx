@@ -23,7 +23,7 @@ export default function SelectFilterView({ filter, onChange }: Readonly<Props>) 
   }
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <input
         type="text"
         className="border rounded px-2 py-1 w-full text-sm"
@@ -31,7 +31,7 @@ export default function SelectFilterView({ filter, onChange }: Readonly<Props>) 
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
-      <div className="max-h-40 overflow-auto space-y-1">
+      <div className="max-h-40 overflow-auto flex flex-col gap-1">
         {filteredValues.length === 0 && (
           <div className="text-sm text-gray-500">No options match your search</div>
         )}
@@ -41,7 +41,9 @@ export default function SelectFilterView({ filter, onChange }: Readonly<Props>) 
             <span className="truncate" title={String(v.value)}>
               {String(v.value)}
             </span>
-            {typeof v.count === 'number' && <span className="text-xs text-gray-400">({v.count})</span>}
+            {typeof v.count === 'number' && (
+              <span className="text-xs text-gray-400">({v.count})</span>
+            )}
           </label>
         ))}
       </div>

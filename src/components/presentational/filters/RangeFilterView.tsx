@@ -43,7 +43,7 @@ export default function RangeFilterView({
   }
 
   return (
-    <div className="space-y-2 text-sm">
+    <div className="flex flex-col gap-2 text-sm">
       <div className="flex items-center gap-3">
         <label className="flex items-center gap-1">
           <input
@@ -84,7 +84,7 @@ export default function RangeFilterView({
       )}
 
       {range.mode === 'binned' && Array.isArray(range.ranges) && range.ranges.length > 0 && (
-        <div className="max-h-40 overflow-auto space-y-1">
+        <div className="max-h-40 overflow-auto flex flex-col gap-1">
           <div className="flex justify-between items-center pb-1">
             <div className="text-xs text-gray-500">Select one or more bins</div>
             <Button size="sm" variant="outline" onClick={() => setShowEditBins(true)}>
@@ -157,7 +157,7 @@ function EditBinsModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`Edit Bins - ${filter.displayName}`} size="lg">
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <NumericRangeEditor
           ranges={range.ranges || []}
           onRangesChange={handleRangesChange}

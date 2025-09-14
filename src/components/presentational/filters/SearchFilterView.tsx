@@ -15,7 +15,7 @@ export default function SearchFilterView({ filter, onChange }: Readonly<Props>) 
     onChange({ values: next, active: true, operator: next.exactMatch ? 'equals' : 'contains' })
   }
   return (
-    <div className="space-y-2 text-sm">
+    <div className="flex flex-col gap-2 text-sm">
       <input
         type="text"
         className="border rounded px-2 py-1 w-full"

@@ -136,7 +136,7 @@ export function SessionRestoreProgress({
           </div>
 
           {progress.stage !== 'complete' && (
-            <div className="mt-6 flex justify-center space-x-3">
+            <div className="mt-6 flex justify-center gap-3">
               <button
                 onClick={onCancel}
                 className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded hover:bg-gray-50 transition-colors"

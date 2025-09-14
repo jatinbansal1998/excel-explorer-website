@@ -60,7 +60,7 @@ export class AsyncErrorBoundary extends React.Component<
       return (
         this.props.fallback || (
           <div className="p-4 border border-red-200 rounded-lg bg-red-50">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
                 <svg
                   className="w-4 h-4 text-red-600"
@@ -135,7 +135,7 @@ export function DataProcessingErrorBoundary({ children }: Readonly<{ children: R
     <AsyncErrorBoundary
       fallback={
         <div className="p-6 border border-yellow-200 rounded-lg bg-yellow-50">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
               <svg
                 className="w-5 h-5 text-yellow-600"

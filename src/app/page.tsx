@@ -82,7 +82,7 @@ export default function HomePage() {
               {session.lastSessionSummary.fileName} ({session.lastSessionSummary.totalRows} rows ×{' '}
               {session.lastSessionSummary.totalColumns} cols)
             </div>
-            <div className="space-x-2">
+            <div className="flex items-center gap-2">
               <button
                 className="px-3 py-1 text-sm bg-primary-600 hover:bg-primary-700 text-white rounded"
                 onClick={() => handleRestoreSession(session.restoreLastSession)}

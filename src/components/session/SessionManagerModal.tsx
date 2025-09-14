@@ -1,8 +1,8 @@
 'use client'
 
-import React, {useMemo, useState} from 'react'
-import type {PersistedSession} from '@/utils/storage/service'
-import {SessionListItem} from './SessionListItem'
+import React, { useMemo, useState } from 'react'
+import type { PersistedSession } from '@/utils/storage/service'
+import { SessionListItem } from './SessionListItem'
 
 interface SessionManagerModalProps {
   isOpen: boolean
@@ -147,7 +147,7 @@ export function SessionManagerModal({
         </div>
         <div className="flex items-center justify-between px-4 py-3 border-t">
           <div className="text-xs text-gray-500">{sessions.length} total</div>
-          <div className="space-x-2">
+          <div className="flex items-center gap-2">
             {onClearAll && (
               <button
                 className="px-3 py-2 text-sm border rounded text-red-600"

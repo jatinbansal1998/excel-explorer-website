@@ -49,7 +49,7 @@ export function DataTableView({
               Showing {totalRowCount.toLocaleString()} rows × {headers.length} columns
             </p>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-4">
             {onToggleDataTypes && (
               <label className="flex items-center gap-2 text-sm text-gray-600">
                 <input
@@ -105,7 +105,7 @@ export function DataTableView({
                         )}
                       </div>
                     </button>
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center gap-1">
                       {onSort && (
                         <div className="flex flex-col">
                           <ChevronUpIcon

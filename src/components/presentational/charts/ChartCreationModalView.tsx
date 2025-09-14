@@ -336,7 +336,7 @@ export function ChartCreationModalView(props: ChartCreationModalViewProps) {
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>

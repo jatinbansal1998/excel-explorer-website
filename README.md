@@ -22,7 +22,7 @@ A powerful web application for exploring, analyzing, and visualizing Excel data 
 
 - **Frontend**: Next.js 14 (App Router) + React 18
 - **Language**: TypeScript (strict mode)
-- **Styling**: Tailwind CSS 3
+- **Styling**: Tailwind CSS 4
 - **Code Quality**: ESLint + Prettier 3
 - **Build**: Static export configured
 
@@ -133,8 +133,14 @@ src/
 
 - **Next.js**: Configured for static export with optimized images
 - **TypeScript**: Strict mode with path aliases (`@/*` → `src/*`)
-- **Tailwind CSS**: Custom configuration with responsive design
+- **Tailwind CSS**: v4 with token-first setup (`@import 'tailwindcss'` in `src/app/globals.css` and design tokens under `@theme`)
 - **ESLint**: Extended Next.js configuration with Prettier integration
+
+### Tailwind v4 Notes
+
+- Use `gap-*` for spacing between flex/grid children (not `space-x-*` / `space-y-*`).
+- Design tokens live in `src/app/globals.css` under `@theme` and map to Tailwind color scales.
+- Utilities are available via the global `@import 'tailwindcss'`; no `@tailwind base/components/utilities` directives.
 
 ## Development
 

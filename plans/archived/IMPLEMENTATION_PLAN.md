@@ -3,6 +3,7 @@
 ## Technology Stack (Client-Side Only)
 
 ### Core Libraries
+
 - **UI Framework**: Next.js with static export (React-based)
 - **File Processing**: `xlsx` (SheetJS) - Parse Excel files in browser
 - **Charts**: `Chart.js` or `recharts` - Data visualization
@@ -10,6 +11,7 @@
 - **State Management**: React hooks (useState, useContext)
 
 ### Key Dependencies
+
 ```json
 {
   "next": "^14.0.0",
@@ -18,7 +20,7 @@
   "xlsx": "^0.18.5",
   "chart.js": "^4.4.0",
   "react-chartjs-2": "^5.2.0",
-  "tailwindcss": "^3.3.0",
+  "tailwindcss": "^4.1.13",
   "@types/react": "^18.0.0",
   "typescript": "^5.0.0"
 }
@@ -27,6 +29,7 @@
 ## Architecture Overview
 
 ### File Structure
+
 ```
 excel-explorer-website/
 ├── next.config.js          # Next.js config with static export
@@ -67,42 +70,44 @@ excel-explorer-website/
 ## Core Data Flow
 
 ### 1. File Upload & Processing
+
 ```typescript
 interface ExcelData {
-  headers: string[];
-  rows: any[][];
+  headers: string[]
+  rows: any[][]
   metadata: {
-    fileName: string;
-    sheetNames: string[];
-    totalRows: number;
-    columns: ColumnInfo[];
-  };
+    fileName: string
+    sheetNames: string[]
+    totalRows: number
+    columns: ColumnInfo[]
+  }
 }
 
 interface ColumnInfo {
-  name: string;
-  type: 'string' | 'number' | 'date' | 'boolean';
-  uniqueValues: any[];
-  hasNulls: boolean;
+  name: string
+  type: 'string' | 'number' | 'date' | 'boolean'
+  uniqueValues: any[]
+  hasNulls: boolean
 }
 ```
 
 ### 2. Filter System
+
 ```typescript
 interface FilterConfig {
-  column: string;
-  type: 'select' | 'range' | 'search' | 'date';
-  values: any[];
-  active: boolean;
+  column: string
+  type: 'select' | 'range' | 'search' | 'date'
+  values: any[]
+  active: boolean
 }
 
 class DataFilter {
-  private filters: Map<string, FilterConfig>;
-  
+  private filters: Map<string, FilterConfig>
+
   applyFilters(data: ExcelData): any[][] {
     // Apply all active filters to data
   }
-  
+
   generateFilters(columns: ColumnInfo[]): FilterConfig[] {
     // Auto-generate appropriate filters based on column types
   }
@@ -110,18 +115,20 @@ class DataFilter {
 ```
 
 ### 3. Visualization
+
 ```typescript
 interface ChartConfig {
-  type: 'pie' | 'bar' | 'line';
-  dataColumn: string;
-  labelColumn?: string;
-  aggregation: 'count' | 'sum' | 'avg';
+  type: 'pie' | 'bar' | 'line'
+  dataColumn: string
+  labelColumn?: string
+  aggregation: 'count' | 'sum' | 'avg'
 }
 ```
 
 ## Implementation Phases
 
 ### Phase 1: Basic File Processing
+
 - [ ] Next.js project setup with static export configuration
 - [ ] File upload component with React drag & drop
 - [ ] Excel file reading with SheetJS in browser
@@ -129,6 +136,7 @@ interface ChartConfig {
 - [ ] Header extraction and type detection utilities
 
 ### Phase 2: Filtering System
+
 - [ ] Dynamic filter generation based on column types
 - [ ] Multi-select filters for categorical data
 - [ ] Range filters for numeric data
@@ -136,12 +144,14 @@ interface ChartConfig {
 - [ ] Filter state management
 
 ### Phase 3: Data Visualization
+
 - [ ] Pie chart implementation with Chart.js
 - [ ] Chart data preparation from filtered data
 - [ ] Interactive chart updates when filters change
 - [ ] Chart export functionality
 
 ### Phase 4: Enhanced UX
+
 - [ ] Drag & drop file upload
 - [ ] Loading states and progress indicators
 - [ ] Error handling and user feedback
@@ -151,12 +161,14 @@ interface ChartConfig {
 ## Key Features Implementation
 
 ### File Upload Component
+
 - Drag & drop interface
 - File type validation (.xlsx, .xls, .csv)
 - Progress indication during processing
 - Error handling for corrupted files
 
 ### Dynamic Filtering
+
 - **Categorical columns**: Multi-select dropdown
 - **Numeric columns**: Range slider or min/max inputs
 - **Date columns**: Date range picker
@@ -164,6 +176,7 @@ interface ChartConfig {
 - **Null handling**: Option to include/exclude empty values
 
 ### Data Table
+
 - Virtual scrolling for large datasets
 - Sortable columns
 - Pagination controls
@@ -171,6 +184,7 @@ interface ChartConfig {
 - Cell formatting based on data type
 
 ### Chart Generation
+
 - Automatic chart type suggestion based on data
 - Pie charts for categorical aggregation
 - Real-time updates when filters change
@@ -180,28 +194,33 @@ interface ChartConfig {
 ## Technical Considerations
 
 ### Performance
+
 - Process large Excel files in Web Workers
 - Implement virtual scrolling for tables
 - Debounce filter updates
 - Lazy load chart data
 
 ### Browser Compatibility
+
 - Modern browsers with ES6+ support
 - File API and Web Workers support
 - Canvas support for Chart.js
 
 ### Data Security
+
 - All processing happens client-side
 - No data sent to external servers
 - Files processed in browser memory only
 
 ### Error Handling
+
 - Invalid file format detection
 - Large file size warnings
 - Memory usage monitoring
 - Graceful degradation for unsupported features
 
 ## Build Setup
+
 ```json
 {
   "scripts": {
@@ -215,20 +234,22 @@ interface ChartConfig {
 ```
 
 ### Next.js Configuration (next.config.js)
+
 ```javascript
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
   trailingSlash: true,
   images: {
-    unoptimized: true
-  }
+    unoptimized: true,
+  },
 }
 
 module.exports = nextConfig
 ```
 
 ### Development Tools
+
 - **Framework**: Next.js with App Router
 - **TypeScript**: Strict mode enabled
 - **Styling**: Tailwind CSS
@@ -236,6 +257,7 @@ module.exports = nextConfig
 - **Testing**: Jest + React Testing Library
 
 ## Deployment
+
 - Static site deployment (GitHub Pages, Netlify, Vercel)
 - No server requirements
 - CDN for fast global access

@@ -2474,7 +2474,7 @@ Details of new packages, version changes, and integration requirements.
     "typescript": "^5.2.2",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
-    "tailwindcss": "^3.3.3",
+    "tailwindcss": "^4.1.13",
     "chart.js": "^4.4.0",
     "react-chartjs-2": "^5.2.0",
     "xlsx": "^0.18.5",

@@ -1,29 +1,34 @@
 # Plan 03: UI Components & Layout
 
 ## Engineer Assignment
+
 **Primary Engineer**: Frontend/UI Engineer
 **Dependencies**: Plan 01 (Infrastructure) must be completed first
 **Estimated Time**: 3-4 days
 **Can work in parallel with**: Plans 02, 04, 05, 06
 
 ## Overview
+
 Create all user interface components, layout structure, and interactive elements. Focus on responsive design, accessibility, and user experience.
 
 ## Deliverables
 
 ### 1. Core Layout Components
+
 - [ ] Main application layout with sidebar/header
 - [ ] Responsive grid system
 - [ ] Navigation structure
 - [ ] Loading states and error boundaries
 
 ### 2. File Upload Interface
+
 - [ ] Drag & drop file upload component
 - [ ] File selection button alternative
 - [ ] Upload progress indicators
 - [ ] File validation feedback UI
 
 ### 3. Data Display Components
+
 - [ ] Virtual scrolling data table
 - [ ] Column headers with sorting
 - [ ] Cell rendering with type-specific formatting
@@ -31,6 +36,7 @@ Create all user interface components, layout structure, and interactive elements
 - [ ] Empty state and loading placeholders
 
 ### 4. UI Kit Components
+
 - [ ] Reusable button components
 - [ ] Modal dialog system
 - [ ] Loading spinners and progress bars
@@ -38,6 +44,7 @@ Create all user interface components, layout structure, and interactive elements
 - [ ] Form input components
 
 ## Dependencies to Install
+
 ```json
 {
   "@headlessui/react": "^1.7.17",
@@ -51,6 +58,7 @@ Create all user interface components, layout structure, and interactive elements
 ## Component Architecture
 
 ### Layout Structure (src/app/layout.tsx)
+
 ```typescript
 export default function RootLayout({
   children,
@@ -74,6 +82,7 @@ export default function RootLayout({
 ```
 
 ### Main Page Structure (src/app/page.tsx)
+
 ```typescript
 export default function HomePage() {
   return (
@@ -96,19 +105,20 @@ export default function HomePage() {
 ## Components to Implement
 
 ### 1. File Upload (src/components/FileUploader.tsx)
+
 ```typescript
 interface FileUploaderProps {
-  onFileSelect: (file: File) => void;
-  isLoading?: boolean;
-  acceptedTypes?: string[];
-  maxSize?: number;
+  onFileSelect: (file: File) => void
+  isLoading?: boolean
+  acceptedTypes?: string[]
+  maxSize?: number
 }
 
-export function FileUploader({ 
-  onFileSelect, 
-  isLoading, 
+export function FileUploader({
+  onFileSelect,
+  isLoading,
   acceptedTypes,
-  maxSize 
+  maxSize,
 }: FileUploaderProps) {
   // Drag & drop functionality
   // File validation
@@ -118,20 +128,16 @@ export function FileUploader({
 ```
 
 ### 2. Data Table (src/components/DataTable.tsx)
+
 ```typescript
 interface DataTableProps {
-  data: ExcelData;
-  filteredRows: any[][];
-  onSort: (column: string, direction: 'asc' | 'desc') => void;
-  isLoading?: boolean;
+  data: ExcelData
+  filteredRows: any[][]
+  onSort: (column: string, direction: 'asc' | 'desc') => void
+  isLoading?: boolean
 }
 
-export function DataTable({ 
-  data, 
-  filteredRows, 
-  onSort, 
-  isLoading 
-}: DataTableProps) {
+export function DataTable({ data, filteredRows, onSort, isLoading }: DataTableProps) {
   // Virtual scrolling implementation
   // Column sorting
   // Responsive design
@@ -142,36 +148,40 @@ export function DataTable({
 ### 3. UI Kit Components (src/components/ui/)
 
 #### Button Component
+
 ```typescript
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
-  isLoading?: boolean;
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost'
+  size?: 'sm' | 'md' | 'lg'
+  isLoading?: boolean
 }
 ```
 
 #### Modal Component
+
 ```typescript
 interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  children: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  isOpen: boolean
+  onClose: () => void
+  title: string
+  children: React.ReactNode
+  size?: 'sm' | 'md' | 'lg' | 'xl'
 }
 ```
 
 #### Loading Spinner
+
 ```typescript
 interface LoadingSpinnerProps {
-  size?: 'sm' | 'md' | 'lg';
-  className?: string;
+  size?: 'sm' | 'md' | 'lg'
+  className?: string
 }
 ```
 
 ## Styling Guidelines
 
 ### Tailwind Configuration
+
 ```javascript
 // tailwind.config.js additions
 module.exports = {
@@ -188,14 +198,15 @@ module.exports = {
           500: '#3b82f6',
           600: '#2563eb',
           700: '#1d4ed8',
-        }
-      }
+        },
+      },
     },
   },
 }
 ```
 
 ### Design System
+
 ```typescript
 // Color palette
 - Primary: Blue (data focus)
@@ -216,12 +227,14 @@ module.exports = {
 ```
 
 ## Responsive Design Requirements
+
 - [ ] Mobile-first approach
 - [ ] Tablet layout (768px+)
 - [ ] Desktop layout (1024px+)
 - [ ] Large screen optimization (1536px+)
 
 ### Breakpoint Strategy
+
 ```css
 /* Mobile: Default styles */
 /* Tablet: md:* (768px+) */
@@ -235,6 +248,7 @@ module.exports = {
 ```
 
 ## Accessibility Requirements
+
 - [ ] ARIA labels for interactive elements
 - [ ] Keyboard navigation support
 - [ ] Focus management in modals
@@ -243,12 +257,14 @@ module.exports = {
 - [ ] Alternative text for visual elements
 
 ## Component Testing Strategy
+
 - [ ] Storybook setup for component development
 - [ ] Unit tests with React Testing Library
 - [ ] Visual regression testing
 - [ ] Accessibility testing with axe
 
 ## Files to Create
+
 - [ ] `src/components/FileUploader.tsx`
 - [ ] `src/components/DataTable.tsx`
 - [ ] `src/components/ui/Button.tsx`
@@ -262,35 +278,39 @@ module.exports = {
 ## Integration Interfaces
 
 ### Props from Data Team (Plan 02)
+
 ```typescript
 // Data will be provided via these interfaces
 interface DataProps {
-  excelData: ExcelData | null;
-  isLoading: boolean;
-  error: string | null;
+  excelData: ExcelData | null
+  isLoading: boolean
+  error: string | null
 }
 ```
 
 ### Props for Filter Team (Plan 04)
+
 ```typescript
 // UI will expose these callbacks
 interface FilterCallbacks {
-  onFilterChange: (filters: FilterConfig[]) => void;
-  onFilterReset: () => void;
+  onFilterChange: (filters: FilterConfig[]) => void
+  onFilterReset: () => void
 }
 ```
 
 ### Props for Chart Team (Plan 05)
+
 ```typescript
 // UI will provide chart container and controls
 interface ChartContainerProps {
-  data: any[];
-  chartConfig: ChartConfig;
-  onConfigChange: (config: ChartConfig) => void;
+  data: any[]
+  chartConfig: ChartConfig
+  onConfigChange: (config: ChartConfig) => void
 }
 ```
 
 ## Performance Considerations
+
 - [ ] Virtual scrolling for large datasets
 - [ ] Lazy loading for off-screen components
 - [ ] Debounced user interactions
@@ -298,6 +318,7 @@ interface ChartContainerProps {
 - [ ] Efficient CSS with Tailwind purging
 
 ## Validation Criteria
+
 - [ ] All components render without errors
 - [ ] Responsive design works across breakpoints
 - [ ] Accessibility audit passes
@@ -306,6 +327,7 @@ interface ChartContainerProps {
 - [ ] Component API contracts defined for other teams
 
 ## Notes for Integration Teams
+
 - **Data Team**: Component props clearly defined - pass data via established interfaces
 - **Filter Team**: FilterPanel component slot reserved - implement your logic there
 - **Chart Team**: ChartView component slot reserved - integrate your charts there

@@ -2083,7 +2083,7 @@ Details of new packages, version changes, and integration requirements.
   "dependencies": {
     "typescript": "^5.2.2",
     "@types/node": "^20.8.0",
-    "tailwindcss": "^3.3.3",
+    "tailwindcss": "^4.1.13",
     "chart.js": "^4.4.0",
     "react-chartjs-2": "^5.2.0",
     "xlsx": "^0.18.5",

@@ -1,5 +1,3 @@
-import {DataType} from '@/types/excel'
-
 const TRUE_SET = new Set(['true', '1', 'yes', 'y'])
 const FALSE_SET = new Set(['false', '0', 'no', 'n'])
 
@@ -141,48 +139,10 @@ export function isDateLike(v: string | number | Date | boolean): boolean {
     if (ISO_DATE_RE.test(s)) return !isNaN(new Date(s).getTime())
     if (MDY_OR_DMY_RE.test(s)) return true
     const lower = s.toLowerCase()
-    for (let i = 0; i < MONTH_NAMES.length; i++) {
-      if (lower.includes(MONTH_NAMES[i])) return true
+    for (const element of MONTH_NAMES) {
+      if (lower.includes(element)) return true
     }
     return false
   }
   return false
-}
-
-export function detectTypeForValues(values: (string | number | Date | boolean)[]): DataType {
-  let num = 0,
-    bool = 0,
-    date = 0,
-    str = 0
-  for (const v of values) {
-    if (isNullLike(v)) continue
-    if (isBooleanLike(v)) bool++
-    else if (isNumberLike(v)) num++
-    else if (isDateLike(v)) date++
-    else str++
-  }
-  const counts = { number: num, boolean: bool, date: date, string: str } as const
-  const nonZero = Object.entries(counts).filter(([, c]) => c > 0)
-  if (nonZero.length === 0) return 'string'
-  if (nonZero.length === 1) return nonZero[0][0] as DataType
-  // If one dominates (>=80%), choose it; else mixed
-  const total = num + bool + date + str
-  const dominant = nonZero.reduce((a, b) => (a[1] > b[1] ? a : b))
-  return dominant[1] / total >= 0.8 ? (dominant[0] as DataType) : 'mixed'
-}
-
-export function coerceToType(v: string | number | Date | boolean, type: DataType): string | number | boolean | Date | null {
-  if (isNullLike(v)) return null
-  switch (type) {
-    case 'boolean':
-      return coerceBoolean(v)
-    case 'number':
-      return coerceNumber(v)
-    case 'date':
-      return parseDateFlexible(v)
-    case 'string':
-    case 'mixed':
-    default:
-      return typeof v === 'string' ? v : String(v)
-  }
 }

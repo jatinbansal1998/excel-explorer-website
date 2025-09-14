@@ -3,6 +3,7 @@
 ## Testing Strategy Overview
 
 ### Testing Framework Stack
+
 - **Unit Testing**: Jest + React Testing Library
 - **Component Testing**: React Testing Library with @testing-library/jest-dom
 - **Integration Testing**: Jest with mock file API
@@ -45,6 +46,7 @@ src/
 ### 1. Unit Tests
 
 #### Excel Parser Service (`src/services/excelParser.test.ts`)
+
 ```typescript
 describe('ExcelParser', () => {
   test('should parse valid Excel file correctly')
@@ -58,6 +60,7 @@ describe('ExcelParser', () => {
 ```
 
 #### Data Type Detection (`src/utils/dataTypes.test.ts`)
+
 ```typescript
 describe('DataTypes', () => {
   test('should detect numeric columns')
@@ -70,6 +73,7 @@ describe('DataTypes', () => {
 ```
 
 #### File Validation (`src/utils/fileValidation.test.ts`)
+
 ```typescript
 describe('FileValidation', () => {
   test('should accept valid Excel extensions')
@@ -82,6 +86,7 @@ describe('FileValidation', () => {
 ### 2. Component Tests
 
 #### File Uploader (`src/components/__tests__/FileUploader.test.tsx`)
+
 ```typescript
 describe('FileUploader', () => {
   test('should render drag & drop area')
@@ -94,6 +99,7 @@ describe('FileUploader', () => {
 ```
 
 #### Data Table (`src/components/__tests__/DataTable.test.tsx`)
+
 ```typescript
 describe('DataTable', () => {
   test('should render table with headers and data')
@@ -106,6 +112,7 @@ describe('DataTable', () => {
 ```
 
 #### Filter Panel (`src/components/__tests__/FilterPanel.test.tsx`)
+
 ```typescript
 describe('FilterPanel', () => {
   test('should generate appropriate filters for each column type')
@@ -120,6 +127,7 @@ describe('FilterPanel', () => {
 ### 3. Integration Tests
 
 #### Complete Data Flow (`src/__tests__/integration/dataFlow.test.ts`)
+
 ```typescript
 describe('Data Flow Integration', () => {
   test('should process Excel file from upload to table display')
@@ -130,6 +138,7 @@ describe('Data Flow Integration', () => {
 ```
 
 #### Filter System (`src/__tests__/integration/filtering.test.ts`)
+
 ```typescript
 describe('Filtering System', () => {
   test('should filter data across multiple columns')
@@ -142,6 +151,7 @@ describe('Filtering System', () => {
 ### 4. Performance Tests
 
 #### Large Dataset Handling (`src/__tests__/performance/largeData.test.ts`)
+
 ```typescript
 describe('Performance Tests', () => {
   test('should process 10k+ rows without blocking UI', { timeout: 10000 })
@@ -154,6 +164,7 @@ describe('Performance Tests', () => {
 ### 5. Error Handling Tests
 
 #### Error Scenarios (`src/__tests__/errorHandling.test.ts`)
+
 ```typescript
 describe('Error Handling', () => {
   test('should handle corrupted Excel files gracefully')
@@ -167,6 +178,7 @@ describe('Error Handling', () => {
 ## Mock Data & Test Utilities
 
 ### Test Data Files
+
 - `sample.xlsx`: Small valid Excel file with mixed data types
 - `large-dataset.xlsx`: 50k+ rows for performance testing
 - `malformed.xlsx`: Corrupted file for error testing
@@ -177,6 +189,7 @@ describe('Error Handling', () => {
 ### Mock Implementations
 
 #### File API Mock (`src/test-utils/mockFileAPI.ts`)
+
 ```typescript
 export const mockFile = (content: string, name: string, type: string): File => {
   const blob = new Blob([content], { type })
@@ -189,11 +202,9 @@ export const mockFileReader = () => {
 ```
 
 #### Custom Render Utility (`src/test-utils/renderWithProviders.tsx`)
+
 ```typescript
-export const renderWithProviders = (
-  ui: ReactElement,
-  options?: RenderOptions
-) => {
+export const renderWithProviders = (ui: ReactElement, options?: RenderOptions) => {
   // Render with any context providers
 }
 ```
@@ -201,31 +212,29 @@ export const renderWithProviders = (
 ## Test Configuration
 
 ### Jest Configuration (`jest.config.js`)
+
 ```javascript
 module.exports = {
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   moduleNameMapping: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy'
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
-  collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/**/*.test.{ts,tsx}'
-  ],
+  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts', '!src/**/*.test.{ts,tsx}'],
   coverageThreshold: {
     global: {
       branches: 80,
       functions: 80,
       lines: 80,
-      statements: 80
-    }
-  }
+      statements: 80,
+    },
+  },
 }
 ```
 
 ### Test Setup (`src/test-setup.ts`)
+
 ```typescript
 import '@testing-library/jest-dom'
 import 'jest-canvas-mock'
@@ -251,6 +260,7 @@ global.FileReader = class MockFileReader {
 ## Testing Scripts
 
 ### Package.json Scripts
+
 ```json
 {
   "scripts": {
@@ -268,6 +278,7 @@ global.FileReader = class MockFileReader {
 ## Continuous Testing
 
 ### Pre-commit Hooks
+
 ```json
 {
   "husky": {
@@ -277,15 +288,13 @@ global.FileReader = class MockFileReader {
     }
   },
   "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix",
-      "jest --bail --findRelatedTests"
-    ]
+    "*.{ts,tsx}": ["eslint --fix", "jest --bail --findRelatedTests"]
   }
 }
 ```
 
 ### GitHub Actions CI/CD
+
 ```yaml
 name: Test Suite
 on: [push, pull_request]
@@ -303,12 +312,14 @@ jobs:
 ## Test Coverage Goals
 
 ### Coverage Targets
+
 - **Overall Coverage**: 85%+
 - **Critical Components**: 90%+ (FileUploader, DataTable, ExcelParser)
 - **Utility Functions**: 95%+
 - **Error Handling Paths**: 80%+
 
 ### Coverage Reporting
+
 - Generate HTML coverage reports
 - Track coverage trends over time
 - Fail builds if coverage drops below threshold
@@ -316,14 +327,16 @@ jobs:
 ## Manual Testing Checklist
 
 ### Browser Compatibility
+
 - [ ] Chrome (latest)
 - [ ] Firefox (latest)
 - [ ] Safari (latest)
 - [ ] Edge (latest)
 
 ### File Format Support
+
 - [ ] .xlsx files
-- [ ] .xls files  
+- [ ] .xls files
 - [ ] .csv files
 - [ ] Large files (>10MB)
 - [ ] Files with special characters
@@ -331,6 +344,7 @@ jobs:
 - [ ] Password-protected files (should fail gracefully)
 
 ### User Experience
+
 - [ ] Drag & drop functionality
 - [ ] Loading states
 - [ ] Error messages

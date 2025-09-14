@@ -1,23 +1,27 @@
 # Excel Explorer Website - Project Plan
 
 ## Overview
+
 A web application that allows users to upload Excel or Google Sheets files, explore the data with dynamic filtering, and visualize it in tabular and chart formats.
 
 ## Core Features
 
 ### 1. File Upload & Processing
+
 - Support Excel files (.xlsx, .xls)
 - Support Google Sheets import
 - Automatic header detection
 - Data parsing and validation
 
 ### 2. Data Exploration
+
 - Dynamic filtering based on column headers
 - Search functionality
 - Sort by columns
 - Pagination for large datasets
 
 ### 3. Visualization
+
 - Tabular view with responsive design
 - Pie chart visualization
 - Interactive charts with filtering
@@ -26,6 +30,7 @@ A web application that allows users to upload Excel or Google Sheets files, expl
 ## Technical Stack
 
 ### Frontend (Client-Side Only)
+
 - **Framework**: Next.js with static export (React + TypeScript)
 - **Styling**: Tailwind CSS for rapid UI development
 - **Charts**: Chart.js with react-chartjs-2 wrapper
@@ -35,11 +40,13 @@ A web application that allows users to upload Excel or Google Sheets files, expl
 - **Build Tool**: Next.js built-in bundler
 
 ### Deployment
+
 - Static site generation with `next export`
 - No server required - pure client-side processing
 - Deployable to GitHub Pages, Netlify, Vercel, etc.
 
 ## Project Structure
+
 ```
 excel-explorer-website/
 ├── next.config.js          # Next.js config with static export
@@ -130,6 +137,7 @@ excel-explorer-website/
 - **Security**: Client-side processing to avoid data exposure
 
 ## MVP Features (Phase 1)
+
 - Basic file upload
 - Excel file parsing
 - Simple data table display
@@ -137,6 +145,7 @@ excel-explorer-website/
 - Pie chart visualization
 
 ## Future Enhancements (Phase 2)
+
 - Google Sheets integration
 - More chart types (bar, line, scatter)
 - Advanced filtering options

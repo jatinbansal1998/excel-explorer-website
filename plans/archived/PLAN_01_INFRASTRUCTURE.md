@@ -1,34 +1,40 @@
 # Plan 01: Core Infrastructure & Project Setup
 
 ## Engineer Assignment
+
 **Primary Engineer**: Infrastructure/DevOps Engineer
 **Dependencies**: None (can start immediately)
 **Estimated Time**: 1-2 days
 
 ## Overview
+
 Set up the foundational Next.js project with TypeScript, configure build tools, and establish development workflow. This must be completed first as other teams depend on this infrastructure.
 
 ## Deliverables
 
 ### 1. Project Initialization
+
 - [ ] Initialize Next.js project with TypeScript
 - [ ] Configure App Router structure
 - [ ] Set up static export configuration
 - [ ] Create initial folder structure per main plan
 
 ### 2. Development Tools Configuration
+
 - [ ] Configure TypeScript with strict mode
 - [ ] Set up Tailwind CSS with config
 - [ ] Configure ESLint and Prettier
 - [ ] Add development scripts to package.json
 
 ### 3. Build System
+
 - [ ] Configure Next.js for static export
 - [ ] Set up build and export scripts
 - [ ] Configure deployment-ready output
 - [ ] Test static generation workflow
 
 ### 4. Dependencies Installation
+
 ```json
 {
   "next": "^14.0.0",
@@ -37,7 +43,7 @@ Set up the foundational Next.js project with TypeScript, configure build tools, 
   "typescript": "^5.0.0",
   "@types/react": "^18.0.0",
   "@types/node": "^20.0.0",
-  "tailwindcss": "^3.3.0",
+  "tailwindcss": "^4.1.13",
   "eslint": "^8.0.0",
   "eslint-config-next": "^14.0.0",
   "prettier": "^3.0.0"
@@ -45,6 +51,7 @@ Set up the foundational Next.js project with TypeScript, configure build tools, 
 ```
 
 ## File Structure to Create
+
 ```
 excel-explorer-website/
 ├── next.config.js
@@ -69,20 +76,22 @@ excel-explorer-website/
 ## Configuration Files
 
 ### next.config.js
+
 ```javascript
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
   trailingSlash: true,
   images: {
-    unoptimized: true
-  }
+    unoptimized: true,
+  },
 }
 
 module.exports = nextConfig
 ```
 
 ### tsconfig.json
+
 ```json
 {
   "compilerOptions": {
@@ -115,6 +124,7 @@ module.exports = nextConfig
 ```
 
 ### Scripts Configuration
+
 ```json
 {
   "scripts": {
@@ -129,6 +139,7 @@ module.exports = nextConfig
 ```
 
 ## Handoff Requirements
+
 - [ ] Project builds successfully with `npm run build`
 - [ ] Static export generates correctly
 - [ ] TypeScript compilation passes
@@ -137,12 +148,14 @@ module.exports = nextConfig
 - [ ] Documentation of any setup decisions or configurations
 
 ## Notes for Other Engineers
+
 - Base layout and global styles will be minimal - UI team will enhance
 - TypeScript interfaces folder created but empty - Data team will populate
 - Component structure established but components need implementation
 - Build process tested and ready for continuous integration
 
 ## Blockers This Plan Removes
+
 - ✅ Project structure for all teams
 - ✅ TypeScript configuration for type safety
 - ✅ Build system for testing implementations

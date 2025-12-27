@@ -46,19 +46,17 @@ export function useDataTable(
     })
   }, [data?.metadata?.columns])
 
-  // Memoize compound derived state structure to keep referential stability
-  useMemo(
-    () => ({ rows: displayRows, columnTypes, dateColumnHasTime }),
-    [displayRows, columnTypes, dateColumnHasTime],
+  // Memoize virtualization decision based on row count
+  const useVirtualScrolling = useMemo(
+    () => displayRows.length > virtualizationThreshold,
+    [displayRows.length, virtualizationThreshold],
   )
-
-  const useVirtualScrolling = displayRows.length > virtualizationThreshold
 
   const rows = useMemo<DataMatrix>(() => {
     return useVirtualScrolling ? displayRows.slice(0, VIRTUALIZED_SLICE_COUNT) : displayRows
   }, [displayRows, useVirtualScrolling])
 
-  const totalRowCount = displayRows.length
+  const totalRowCount = useMemo(() => displayRows.length, [displayRows.length])
 
   const formatCell = useCallback(
     (value: NullableCellValue, type: DataType, showTime: boolean) =>

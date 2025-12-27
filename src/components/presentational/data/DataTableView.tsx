@@ -20,7 +20,7 @@ export interface DataTableViewProps {
   formatCell: (value: CellValue | null, type: DataType, showTime: boolean) => string
 }
 
-export function DataTableView({
+function DataTableViewComponent({
   headers,
   rows,
   totalRowCount,
@@ -183,3 +183,6 @@ export function DataTableView({
     </div>
   )
 }
+
+// Memoize component to prevent unnecessary re-renders
+export const DataTableView = React.memo(DataTableViewComponent)

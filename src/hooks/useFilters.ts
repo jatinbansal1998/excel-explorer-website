@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { DataMatrix, ExcelData } from '@/types/excel'
 import { FilterConfig, FilterState } from '@/types/filter'
 import { filterGenerator } from '@/services/filterGenerator'
@@ -36,16 +36,21 @@ export function useFilters(excelData: ExcelData | null, sessionExt?: UseSessionP
   }, [session])
 
   // Generate filters when data changes
+  // Use stable references to avoid triple re-runs
+  const columns = excelData?.metadata?.columns
+  const headersRef = useRef(excelData?.headers)
+  headersRef.current = excelData?.headers
+
   useEffect(() => {
-    if (excelData && excelData.metadata?.columns) {
-      const generated = filterGenerator.generateFilters(excelData.metadata.columns)
+    if (columns) {
+      const generated = filterGenerator.generateFilters(columns)
       setFilters(generated)
       engineRef.current = new DataFilter(generated)
     } else {
       setFilters([])
       engineRef.current = null
     }
-  }, [excelData?.metadata?.columns, excelData?.headers, excelData])
+  }, [columns])
 
   // Apply filters when filters or data change
   useEffect(() => {
@@ -76,7 +81,7 @@ export function useFilters(excelData: ExcelData | null, sessionExt?: UseSessionP
 
   // Expose importer for AI apply filters MVP via global shim
 
-  const updateFilter = (filterId: string, updates: Partial<FilterConfig>) => {
+  const updateFilter = useCallback((filterId: string, updates: Partial<FilterConfig>) => {
     if (!engineRef.current) return
     engineRef.current.updateFilter(filterId, updates)
     setFilters((prev) =>
@@ -86,9 +91,9 @@ export function useFilters(excelData: ExcelData | null, sessionExt?: UseSessionP
           : f,
       ),
     )
-  }
+  }, [])
 
-  const resetFilter = (filterId: string) => {
+  const resetFilter = useCallback((filterId: string) => {
     if (!engineRef.current) return
     engineRef.current.resetFilter(filterId)
     // Re-sync from engine state export for this filter
@@ -103,9 +108,9 @@ export function useFilters(excelData: ExcelData | null, sessionExt?: UseSessionP
         return f
       }),
     )
-  }
+  }, [])
 
-  const resetAllFilters = () => {
+  const resetAllFilters = useCallback(() => {
     if (!engineRef.current) return
     engineRef.current.resetAllFilters()
     const exported = engineRef.current.exportFilterState()
@@ -117,13 +122,13 @@ export function useFilters(excelData: ExcelData | null, sessionExt?: UseSessionP
           : f
       }),
     )
-  }
+  }, [])
 
-  const exportState = (): FilterState => {
+  const exportState = useCallback((): FilterState => {
     return engineRef.current ? engineRef.current.exportFilterState() : []
-  }
+  }, [])
 
-  const importState = (state: FilterState) => {
+  const importState = useCallback((state: FilterState) => {
     if (!engineRef.current) return
     engineRef.current.importFilterState(state)
     // Sync filters
@@ -135,7 +140,7 @@ export function useFilters(excelData: ExcelData | null, sessionExt?: UseSessionP
           : f
       }),
     )
-  }
+  }, [])
 
   // Expose importer for AI apply filters MVP via global property manager
   useEffect(() => {
@@ -147,12 +152,15 @@ export function useFilters(excelData: ExcelData | null, sessionExt?: UseSessionP
     }
   }, [])
 
-  const getFilterSummary = () => ({
-    totalFilters: filters.length,
-    activeFilters: filters.filter((f) => f.active).length,
-    filteredRows: filteredData.length,
-    totalRows: excelData?.metadata.totalRows || 0,
-  })
+  const getFilterSummary = useCallback(
+    () => ({
+      totalFilters: filters.length,
+      activeFilters: filters.filter((f) => f.active).length,
+      filteredRows: filteredData.length,
+      totalRows: excelData?.metadata.totalRows || 0,
+    }),
+    [filters, filteredData.length, excelData?.metadata.totalRows],
+  )
 
   return {
     filters,

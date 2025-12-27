@@ -1,6 +1,6 @@
 import React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react'
-import {Modal} from '@/components/ui/Modal'
+import { fireEvent, render, screen } from '@testing-library/react'
+import { Modal } from '@/components/ui/Modal'
 
 // Mock @heroicons/react/24/outline
 jest.mock('@heroicons/react/24/outline', () => ({
@@ -24,12 +24,16 @@ jest.mock('@headlessui/react', () => {
 
   // Mock that respects the show prop for the main Transition
   const MockTransition = ({ children, show, ...props }: any) => {
+    void props
     if (!show) return null
     return <>{children}</>
   }
 
   // Mock for Transition.Child - always render children (the show logic is handled by the parent)
-  const MockTransitionChild = ({ children, ...props }: any) => <>{children}</>
+  const MockTransitionChild = ({ children, ...props }: any) => {
+    void props
+    return <>{children}</>
+  }
   MockTransitionChild.displayName = 'MockTransitionChild'
 
   // Add Child property to MockTransition
@@ -38,11 +42,11 @@ jest.mock('@headlessui/react', () => {
   return {
     ...jest.requireActual('@headlessui/react'),
     Transition: MockTransition,
-      TransitionChild: MockTransitionChild,
+    TransitionChild: MockTransitionChild,
     Dialog: Object.assign(
-        ({children, onClose, as: As = 'dialog', className, ...props}: any) => (
+      ({ children, onClose, as: As = 'dialog', className, ...props }: any) => (
         <As
-            open
+          open
           role="dialog"
           aria-modal="true"
           className={className}
@@ -61,8 +65,8 @@ jest.mock('@headlessui/react', () => {
         Panel: MockDialogPanel,
       },
     ),
-      DialogTitle: MockDialogTitle,
-      DialogPanel: MockDialogPanel,
+    DialogTitle: MockDialogTitle,
+    DialogPanel: MockDialogPanel,
     Fragment: React.Fragment,
   }
 })

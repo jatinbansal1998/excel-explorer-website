@@ -55,7 +55,11 @@ export function testComponentRendering<T>(
   describe(`${component.displayName || component.name} rendering`, () => {
     testCases.forEach(({ name, props, expected }) => {
       it(`should render correctly: ${name}`, async () => {
-        const { container, getByText, queryByText } = await renderComponent(component, props)
+        const {
+          container,
+          getByText,
+          queryByText: _queryByText,
+        } = await renderComponent(component, props)
 
         expect(container).toBeInTheDocument()
 
@@ -192,7 +196,11 @@ export function testComponentStates<T>(
       describe(`State variations: ${name}`, () => {
         states.forEach(({ stateName, stateProps, expected }) => {
           it(`should handle ${stateName} state correctly`, async () => {
-            const { container, getByText, queryByText } = await renderComponent(component, {
+            const {
+              container,
+              getByText,
+              queryByText: _queryByText,
+            } = await renderComponent(component, {
               ...props,
               ...stateProps,
             })

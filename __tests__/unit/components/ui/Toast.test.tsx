@@ -3,7 +3,9 @@ import { render, screen } from '@testing-library/react'
 
 // Mock @headlessui/react Transition component
 jest.mock('@headlessui/react', () => ({
-  Transition: ({ children, show, ...props }: any) => {
+  Transition: ({ children, show: _show, ...props }: any) => {
+    void _show
+    void props
     // Always render children for testing purposes
     return <>{children}</>
   },

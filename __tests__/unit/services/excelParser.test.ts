@@ -15,7 +15,6 @@
 
 import { ExcelParser } from '@/services/excelParser'
 import { validateFile } from '@/utils/fileValidation'
-import { globalProperties } from '@/types/global'
 import { ExcelData, ParseOptions } from '@/types/excel'
 
 // Mock dependencies
@@ -61,7 +60,7 @@ describe('ExcelParser', () => {
     })
 
     mockGlobalProperties.getXLSXUtils.mockReturnValue(mockXLSX.utils)
-    ;(globalProperties as any) = mockGlobalProperties
+    // Note: globalProperties is mocked via jest.mock above
 
     // Mock XLSX require
     require = jest.fn().mockReturnValue(mockXLSX) as any
@@ -139,7 +138,7 @@ describe('ExcelParser', () => {
     it('should report progress during file reading', async () => {
       // Simplified test - just verify that progress callback is supported
       // This test documents the progress reporting capability without complex mocking
-      const mockFile = new File(['content'], 'test.xlsx')
+      const _mockFile = new File(['content'], 'test.xlsx')
 
       // Since this test involves complex XLSX library mocking that's causing issues,
       // we'll verify the functionality indirectly by checking that the method accepts progress callback
@@ -662,9 +661,9 @@ describe('ExcelParser', () => {
 
       // Track if setTimeout is called for UI breathing
       const originalSetTimeout = global.setTimeout
-      let setTimeoutCalled = false
-      global.setTimeout = jest.fn().mockImplementation((callback: any, delay?: any) => {
-        setTimeoutCalled = true
+      let _setTimeoutCalled = false
+      global.setTimeout = jest.fn().mockImplementation((callback: any, _delay?: any) => {
+        _setTimeoutCalled = true
         callback()
         return 1 as any
       }) as any

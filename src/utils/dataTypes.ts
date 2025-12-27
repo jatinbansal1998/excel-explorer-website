@@ -50,7 +50,7 @@ export function coerceNumber(v: unknown): number | null {
 
 const ISO_DATE_RE =
   /^\d{4}-\d{2}-\d{2}(?:[ T]\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?)?(?:Z|[+-]\d{2}:?\d{2})?$/
-const MDY_OR_DMY_RE = /^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})$/
+const MDY_OR_DMY_RE = /^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/
 const MONTH_NAMES = [
   'jan',
   'feb',

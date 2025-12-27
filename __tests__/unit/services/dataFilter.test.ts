@@ -993,7 +993,7 @@ describe('DataFilter', () => {
       // The filter should have the modified value
       const nameFilter: FilterConfig | undefined = filter['activeFilters'].get('name-filter')
       expect(nameFilter?.values).toBeDefined()
-      expect((nameFilter?.values as SearchFilter).query).toBe('modified')
+      expect(nameFilter?.values && (nameFilter.values as SearchFilter).query).toBe('modified')
     })
   })
 

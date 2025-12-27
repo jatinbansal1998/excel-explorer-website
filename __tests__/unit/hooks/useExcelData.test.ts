@@ -56,7 +56,7 @@ describe('useExcelData', () => {
     const mockPerformanceMonitor = {
       measureAsync: jest
         .fn()
-        .mockImplementation((name: string, fn: () => Promise<any>, meta?: any) => fn()),
+        .mockImplementation((name: string, fn: () => Promise<any>, _meta?: any) => fn()),
     }
     MockPerformanceMonitor.getInstance = jest.fn().mockReturnValue(mockPerformanceMonitor)
 
@@ -278,7 +278,7 @@ describe('useExcelData', () => {
     })
 
     it('should handle missing persistence service gracefully', async () => {
-      const { result } = renderHook(() => useExcelData())
+      const { result: _result } = renderHook(() => useExcelData())
       const mockFile = createMockFile('test.xlsx', 'mock content')
       const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
 
@@ -322,7 +322,7 @@ describe('useExcelData', () => {
   describe('performance monitoring', () => {
     it('should measure parse performance', async () => {
       // Create a fresh hook with mocked performance monitor
-      const mockMeasureAsync = jest.fn().mockImplementation((name, fn, meta) => fn())
+      const mockMeasureAsync = jest.fn().mockImplementation((name, fn, _meta) => fn())
       const mockInstance = { measureAsync: mockMeasureAsync }
       MockPerformanceMonitor.getInstance = jest.fn().mockReturnValue(mockInstance as any)
 
@@ -388,7 +388,7 @@ describe('useExcelData', () => {
       )
 
       // Check metadata structure separately (excluding columns which becomes undefined)
-      const { columns, ...expectedMetadata } = initialData.metadata
+      const { columns: _columns, ...expectedMetadata } = initialData.metadata
       expect(resultData!.metadata).toEqual(
         expect.objectContaining({
           ...expectedMetadata,
@@ -517,7 +517,7 @@ describe('useExcelData', () => {
 
   describe('memoization', () => {
     it('should memoize parser instance', () => {
-      const { result, rerender } = renderHook(() => useExcelData())
+      const { result: _result, rerender } = renderHook(() => useExcelData())
 
       const parser1 = MockExcelParser.mock.instances[0]
       rerender()
@@ -527,7 +527,7 @@ describe('useExcelData', () => {
     })
 
     it('should memoize performance monitor instance', () => {
-      const { result, rerender } = renderHook(() => useExcelData())
+      const { result: _result2, rerender } = renderHook(() => useExcelData())
 
       const monitor1 = MockPerformanceMonitor.getInstance()
       rerender()

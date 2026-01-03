@@ -1,12 +1,16 @@
-import {useCallback, useEffect, useRef, useState} from 'react'
-import {PerformanceMetric, PerformanceMonitor, PerformanceSummary,} from '@/utils/performanceMonitor'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  PerformanceMetric,
+  PerformanceMonitor,
+  PerformanceSummary,
+} from '@/utils/performanceMonitor'
 
 export function usePerformance() {
   const [metrics, setMetrics] = useState<PerformanceMetric[]>([])
   const [summary, setSummary] = useState<PerformanceSummary | null>(null)
   const performanceMonitor = useRef(PerformanceMonitor.getInstance())
 
-    const startTiming = useCallback((name: string, metadata?: Record<string, unknown>) => {
+  const startTiming = useCallback((name: string, metadata?: Record<string, unknown>) => {
     performanceMonitor.current.startTiming(name, metadata)
   }, [])
 
@@ -19,7 +23,7 @@ export function usePerformance() {
   }, [])
 
   const measureSync = useCallback(
-      <T>(name: string, operation: () => T, metadata?: Record<string, unknown>): T => {
+    <T>(name: string, operation: () => T, metadata?: Record<string, unknown>): T => {
       return performanceMonitor.current.measure(name, operation, metadata)
     },
     [],
@@ -192,7 +196,7 @@ export function useFilePerformance() {
   const { measureAsync, logMemoryUsage } = usePerformance()
 
   const measureFileRead = useCallback(
-      async (fileName: string, fileSize: number, operation: () => Promise<unknown>) => {
+    async (fileName: string, fileSize: number, operation: () => Promise<unknown>) => {
       logMemoryUsage(`before-file-read-${fileName}`)
 
       const result = await measureAsync('file-read', operation, { fileName, fileSize })
@@ -204,7 +208,7 @@ export function useFilePerformance() {
   )
 
   const measureFileParse = useCallback(
-      async (fileName: string, fileType: string, operation: () => Promise<unknown>) => {
+    async (fileName: string, fileType: string, operation: () => Promise<unknown>) => {
       logMemoryUsage(`before-file-parse-${fileName}`)
 
       const result = await measureAsync('file-parse', operation, { fileName, fileType })
@@ -252,8 +256,11 @@ export function usePerformanceAlerts() {
 
     const newAlerts: PerformanceAlert[] = []
 
-    // Check for slow operations
+    // Check for slow operations (exclude LLM operations which are expected to be slow)
     summary.operations.forEach((op) => {
+      // Skip openrouter_ operations - LLM calls are expected to take several seconds
+      if (op.name.startsWith('openrouter_')) return
+
       if (op.averageTime > 2000) {
         // 2 seconds
         newAlerts.push({

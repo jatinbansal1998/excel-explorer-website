@@ -14,6 +14,8 @@ interface DataTableProps {
   onDeleteColumn?: (_columnIndex: number) => void
   showDataTypes?: boolean
   onToggleDataTypes?: (_show: boolean) => void
+  collapsed?: boolean
+  onCollapseChange?: (_collapsed: boolean) => void
 }
 
 export function DataTable({
@@ -26,6 +28,8 @@ export function DataTable({
   onDeleteColumn,
   showDataTypes = false,
   onToggleDataTypes,
+  collapsed = false,
+  onCollapseChange,
 }: Readonly<DataTableProps>) {
   const {
     headers,
@@ -94,6 +98,8 @@ export function DataTable({
       onDeleteColumn={onDeleteColumn}
       onToggleDataTypes={onToggleDataTypes}
       formatCell={formatCell}
+      collapsed={collapsed}
+      onCollapseChange={onCollapseChange}
     />
   )
 }

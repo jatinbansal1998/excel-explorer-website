@@ -3,6 +3,8 @@
 import React, { useMemo, useState } from 'react'
 import type { PersistedSession } from '@/utils/storage/service'
 import { SessionListItem } from './SessionListItem'
+import { Modal } from '@/components/ui/Modal'
+import { Button } from '@/components/ui/Button'
 
 interface SessionManagerModalProps {
   isOpen: boolean
@@ -55,120 +57,97 @@ export function SessionManagerModal({
     return arr
   }, [sessions, query, sortBy])
 
-  if (!isOpen) return null
+  const footer = (
+    <>
+      <div className="text-xs text-gray-500 mr-auto">{sessions.length} total</div>
+      {onClearAll && (
+        <Button
+          variant="outline"
+          onClick={onClearAll}
+          className="text-red-600 border-red-300 hover:bg-red-50"
+        >
+          Clear all
+        </Button>
+      )}
+      <Button variant="outline" onClick={onClose}>
+        Cancel
+      </Button>
+      <Button disabled={!selected} onClick={() => selected && onRestore(selected)}>
+        Restore
+      </Button>
+    </>
+  )
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div
-        role="dialog"
-        aria-modal="true"
-        className="relative bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 section-container"
-      >
-        <div className="flex items-center justify-between px-4 py-3 border-b">
-          <h2 className="text-lg font-semibold">Manage Sessions</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-600 hover:text-gray-800"
-            aria-label="Close"
+    <Modal isOpen={isOpen} onClose={onClose} title="Manage Sessions" size="lg" footer={footer}>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-2">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by file, sheet, or column"
+            className="flex-1 border rounded-md px-3 py-2"
+          />
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as 'updated' | 'file' | 'rows' | 'cols')}
+            className="border rounded-md px-2 py-2"
           >
-            ✕
-          </button>
+            <option value="updated">Last Updated</option>
+            <option value="file">File Name</option>
+            <option value="rows">Rows</option>
+            <option value="cols">Columns</option>
+          </select>
         </div>
-        <div className="p-4 flex flex-col gap-3">
-          <div className="flex items-center gap-2">
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by file, sheet, or column"
-              className="flex-1 border rounded px-3 py-2"
-            />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'updated' | 'file' | 'rows' | 'cols')}
-              className="border rounded px-2 py-2"
-            >
-              <option value="updated">Last Updated</option>
-              <option value="file">File Name</option>
-              <option value="rows">Rows</option>
-              <option value="cols">Columns</option>
-            </select>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-2 max-h-80 overflow-auto border rounded-lg p-2 bg-gray-50">
+            {filtered.length === 0 && <p className="text-sm text-gray-500">No sessions found.</p>}
+            {filtered.map((s) => (
+              <SessionListItem
+                key={s.id}
+                session={s}
+                isActive={selected === s.id}
+                onSelect={(id) => setSelected(id)}
+                onDelete={onDelete}
+              />
+            ))}
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-2 max-h-80 overflow-auto border rounded p-2">
-              {filtered.length === 0 && <p className="text-sm text-gray-500">No sessions found.</p>}
-              {filtered.map((s) => (
-                <SessionListItem
-                  key={s.id}
-                  session={s}
-                  isActive={selected === s.id}
-                  onSelect={(id) => setSelected(id)}
-                  onDelete={onDelete}
-                />
-              ))}
-            </div>
-            <div className="border rounded p-3 min-h-[12rem]">
-              {selected ? (
-                (() => {
-                  const s = sessions.find((x) => x.id === selected)
-                  if (!s)
-                    return <p className="text-sm text-gray-500">Select a session to preview.</p>
-                  return (
-                    <div className="flex flex-col gap-1">
-                      <p className="text-sm">
-                        <span className="font-medium">File:</span>{' '}
-                        {s.summary.fileName || 'Untitled'}
-                      </p>
-                      <p className="text-sm">
-                        <span className="font-medium">Sheet:</span> {s.summary.sheetName}
-                      </p>
-                      <p className="text-sm">
-                        <span className="font-medium">Rows:</span> {s.summary.totalRows} •{' '}
-                        <span className="font-medium">Cols:</span> {s.summary.totalColumns}
-                      </p>
-                      <p className="text-sm">
-                        <span className="font-medium">Updated:</span>{' '}
-                        {new Date(s.updatedAt).toLocaleString()}
-                      </p>
-                      {s.summary.columns && s.summary.columns.length > 0 && (
-                        <div className="text-xs text-gray-600">
-                          <p className="font-medium">Columns:</p>
-                          <p className="break-words">{s.summary.columns.join(', ')}</p>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })()
-              ) : (
-                <p className="text-sm text-gray-500">Select a session to preview.</p>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center justify-between px-4 py-3 border-t">
-          <div className="text-xs text-gray-500">{sessions.length} total</div>
-          <div className="flex items-center gap-2">
-            {onClearAll && (
-              <button
-                className="px-3 py-2 text-sm border rounded text-red-600"
-                onClick={onClearAll}
-              >
-                Clear all
-              </button>
+          <div className="border rounded-lg p-4 min-h-[12rem] bg-gray-50">
+            {selected ? (
+              (() => {
+                const s = sessions.find((x) => x.id === selected)
+                if (!s) return <p className="text-sm text-gray-500">Select a session to preview.</p>
+                return (
+                  <div className="flex flex-col gap-2">
+                    <p className="text-sm">
+                      <span className="font-medium">File:</span> {s.summary.fileName || 'Untitled'}
+                    </p>
+                    <p className="text-sm">
+                      <span className="font-medium">Sheet:</span> {s.summary.sheetName}
+                    </p>
+                    <p className="text-sm">
+                      <span className="font-medium">Rows:</span> {s.summary.totalRows} •{' '}
+                      <span className="font-medium">Cols:</span> {s.summary.totalColumns}
+                    </p>
+                    <p className="text-sm">
+                      <span className="font-medium">Updated:</span>{' '}
+                      {new Date(s.updatedAt).toLocaleString()}
+                    </p>
+                    {s.summary.columns && s.summary.columns.length > 0 && (
+                      <div className="text-xs text-gray-600 mt-2">
+                        <p className="font-medium">Columns:</p>
+                        <p className="break-words">{s.summary.columns.join(', ')}</p>
+                      </div>
+                    )}
+                  </div>
+                )
+              })()
+            ) : (
+              <p className="text-sm text-gray-500">Select a session to preview.</p>
             )}
-            <button className="px-3 py-2 text-sm border rounded" onClick={onClose}>
-              Cancel
-            </button>
-            <button
-              className="px-3 py-2 text-sm bg-primary-600 text-white rounded disabled:opacity-60"
-              disabled={!selected}
-              onClick={() => selected && onRestore(selected)}
-            >
-              Restore
-            </button>
           </div>
         </div>
       </div>
-    </div>
+    </Modal>
   )
 }

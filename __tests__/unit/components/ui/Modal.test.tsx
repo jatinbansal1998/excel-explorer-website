@@ -106,7 +106,7 @@ describe('Modal Component', () => {
 
       const title = screen.getByRole('heading', { name: 'Test Modal' })
       expect(title).toBeInTheDocument()
-      expect(title).toHaveClass('text-lg', 'font-medium', 'leading-6', 'text-gray-900')
+      expect(title).toHaveClass('text-lg', 'font-semibold', 'leading-6', 'text-gray-900')
     })
 
     test('renders modal content', () => {
@@ -121,7 +121,7 @@ describe('Modal Component', () => {
 
       const closeButton = screen.getByRole('button', { name: 'Close' })
       expect(closeButton).toBeInTheDocument()
-      expect(closeButton).toHaveClass('rounded-md', 'text-gray-400', 'hover:text-gray-600')
+      expect(closeButton).toHaveClass('rounded-lg', 'text-gray-400', 'hover:text-gray-600')
     })
 
     test('renders XMarkIcon in close button', () => {
@@ -174,10 +174,9 @@ describe('Modal Component', () => {
         'overflow-hidden',
         'rounded-xl',
         'bg-white',
-        'p-4',
         'text-left',
         'align-middle',
-        'shadow-md',
+        'shadow-xl',
         'transition-all',
         'section-container',
       )
@@ -186,17 +185,17 @@ describe('Modal Component', () => {
     test('applies correct header container classes', () => {
       render(<Modal {...defaultProps} />)
 
-      const headerContainer = document.querySelector('.flex.items-center.justify-between.mb-4')
+      const headerContainer = document.querySelector('.flex.items-center.justify-between.px-5.py-4')
       expect(headerContainer).toBeInTheDocument()
-      expect(headerContainer).toHaveClass('flex', 'items-center', 'justify-between', 'mb-4')
+      expect(headerContainer).toHaveClass('flex', 'items-center', 'justify-between', 'px-5', 'py-4')
     })
 
     test('applies correct content container classes', () => {
       render(<Modal {...defaultProps} />)
 
-      const contentContainer = document.querySelector('.max-h-\\[70vh\\].overflow-y-auto.pr-1')
+      const contentContainer = document.querySelector('.max-h-\\[65vh\\].overflow-y-auto.px-5.py-4')
       expect(contentContainer).toBeInTheDocument()
-      expect(contentContainer).toHaveClass('max-h-[70vh]', 'overflow-y-auto', 'pr-1')
+      expect(contentContainer).toHaveClass('max-h-[65vh]', 'overflow-y-auto', 'px-5', 'py-4')
     })
   })
 
@@ -263,7 +262,7 @@ describe('Modal Component', () => {
 
       const title = screen.getByRole('heading', { name: 'Test Modal' })
       expect(title).toBeInTheDocument()
-      expect(title).toHaveClass('text-lg', 'font-medium', 'leading-6', 'text-gray-900')
+      expect(title).toHaveClass('text-lg', 'font-semibold', 'leading-6', 'text-gray-900')
     })
   })
 
@@ -284,7 +283,7 @@ describe('Modal Component', () => {
       const modal = screen.getByRole('dialog')
       expect(modal).toBeInTheDocument()
 
-      const contentContainer = document.querySelector('.max-h-\\[70vh\\].overflow-y-auto.pr-1')
+      const contentContainer = document.querySelector('.max-h-\\[65vh\\].overflow-y-auto.px-5.py-4')
       expect(contentContainer).toBeInTheDocument()
       expect(contentContainer).toBeEmptyDOMElement()
     })
@@ -295,7 +294,7 @@ describe('Modal Component', () => {
       const modal = screen.getByRole('dialog')
       expect(modal).toBeInTheDocument()
 
-      const contentContainer = document.querySelector('.max-h-\\[70vh\\].overflow-y-auto.pr-1')
+      const contentContainer = document.querySelector('.max-h-\\[65vh\\].overflow-y-auto.px-5.py-4')
       expect(contentContainer).toBeInTheDocument()
       expect(contentContainer).toBeEmptyDOMElement()
     })
@@ -332,7 +331,7 @@ describe('Modal Component', () => {
 
       const title = screen.getByRole('heading', { name: longTitle })
       expect(title).toBeInTheDocument()
-      expect(title).toHaveClass('text-lg', 'font-medium', 'leading-6', 'text-gray-900')
+      expect(title).toHaveClass('text-lg', 'font-semibold', 'leading-6', 'text-gray-900')
     })
 
     test('renders with HTML content in children', () => {
@@ -419,7 +418,7 @@ describe('Modal Component', () => {
     test('header section contains title and close button', () => {
       render(<Modal {...defaultProps} />)
 
-      const headerContainer = document.querySelector('.flex.items-center.justify-between.mb-4')
+      const headerContainer = document.querySelector('.flex.items-center.justify-between.px-5.py-4')
       expect(headerContainer).toBeInTheDocument()
 
       const title = screen.getByRole('heading', { name: 'Test Modal' })
@@ -432,7 +431,7 @@ describe('Modal Component', () => {
     test('content section contains children', () => {
       render(<Modal {...defaultProps} />)
 
-      const contentContainer = document.querySelector('.max-h-\\[70vh\\].overflow-y-auto.pr-1')
+      const contentContainer = document.querySelector('.max-h-\\[65vh\\].overflow-y-auto.px-5.py-4')
       expect(contentContainer).toBeInTheDocument()
 
       const content = screen.getByText('Modal Content')

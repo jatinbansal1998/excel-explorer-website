@@ -31,6 +31,9 @@ const AnalyticsPanel = lazy(() =>
 
 export default function HomePage() {
   const [showDataTypes, setShowDataTypes] = useState(false)
+  const [dataTableCollapsed, setDataTableCollapsed] = useState(false)
+  const [chartViewCollapsed, setChartViewCollapsed] = useState(false)
+  const [analyticsCollapsed, setAnalyticsCollapsed] = useState(false)
   const { addToast } = useToast()
   const session = useSessionPersistence({ enabled: true })
   const { parseFile, currentData, isLoading, progress, deleteColumn } = useExcelData(session)
@@ -132,6 +135,8 @@ export default function HomePage() {
                   onDeleteColumn={(idx) => deleteColumn(idx)}
                   showDataTypes={showDataTypes}
                   onToggleDataTypes={setShowDataTypes}
+                  collapsed={dataTableCollapsed}
+                  onCollapseChange={setDataTableCollapsed}
                 />
               </DataProcessingErrorBoundary>
             </div>
@@ -150,6 +155,8 @@ export default function HomePage() {
                   registerExternalApplyChart={(fn) => {
                     globalProperties.setApplyChartFromAI(fn as (config: unknown) => void)
                   }}
+                  collapsed={chartViewCollapsed}
+                  onCollapseChange={setChartViewCollapsed}
                 />
               </Suspense>
             </ChartErrorBoundary>
@@ -185,6 +192,8 @@ export default function HomePage() {
                       console.warn('Failed to apply filters from AI:', err)
                     }
                   }}
+                  collapsed={analyticsCollapsed}
+                  onCollapseChange={setAnalyticsCollapsed}
                 />
               </Suspense>
             </DataProcessingErrorBoundary>

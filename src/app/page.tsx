@@ -169,7 +169,9 @@ export default function HomePage() {
                     try {
                       const apply = globalProperties.getApplyChartFromAI()
                       if (typeof apply === 'function') apply(cfg)
-                    } catch {}
+                    } catch (err) {
+                      console.warn('Failed to apply chart from AI:', err)
+                    }
                   }}
                   _onApplyFilters={(f) => {
                     try {
@@ -179,7 +181,9 @@ export default function HomePage() {
                         const importer = globalProperties.getImportFiltersFromAI()
                         if (typeof importer === 'function') importer(f)
                       }
-                    } catch {}
+                    } catch (err) {
+                      console.warn('Failed to apply filters from AI:', err)
+                    }
                   }}
                 />
               </Suspense>

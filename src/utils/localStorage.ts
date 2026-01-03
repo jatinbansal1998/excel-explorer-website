@@ -101,9 +101,15 @@ export class LocalStorageManager {
   static clear(): boolean {
     if (!this.isBrowser()) return false
     try {
-      Object.keys(localStorage)
-        .filter((key) => key.startsWith(this.PREFIX))
-        .forEach((key) => localStorage.removeItem(key))
+      // Collect keys first, then remove (avoids mutation during iteration)
+      const keysToRemove: string[] = []
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key?.startsWith(this.PREFIX)) {
+          keysToRemove.push(key)
+        }
+      }
+      keysToRemove.forEach((key) => localStorage.removeItem(key))
       return true
     } catch (error) {
       console.error('Failed to clear localStorage:', error)
@@ -148,7 +154,7 @@ export class LocalStorageManager {
   private static getStorageQuota(): number {
     // Most browsers allow ~5-10MB for localStorage
     // We'll use a conservative estimate
-      return 5 * 1024 * 1024 // 5MB estimate
+    return 5 * 1024 * 1024 // 5MB estimate
   }
 
   private static getStorageUsed(): number {

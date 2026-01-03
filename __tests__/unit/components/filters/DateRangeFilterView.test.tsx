@@ -1,6 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { render, fireEvent } from '@testing-library/react'
 import DateRangeFilterView from '@/components/presentational/filters/DateRangeFilterView'
 import type { FilterConfig } from '@/types/filter'
 
@@ -20,8 +19,6 @@ function makeFilter(): FilterConfig {
 }
 
 describe('DateRangeFilterView', () => {
-  const user = userEvent.setup()
-
   it('updates date values and calls onChange with operator between', async () => {
     const onChange = jest.fn()
     render(<DateRangeFilterView filter={makeFilter()} onChange={onChange} />)

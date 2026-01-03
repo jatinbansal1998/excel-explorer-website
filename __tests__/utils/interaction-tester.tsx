@@ -50,8 +50,14 @@ export async function testUserInteractions<T>(
 
     testCases.forEach(({ name, props, interactions, expected }) => {
       it(`should handle interactions: ${name}`, async () => {
-        const { container, getByRole, getByLabelText, getByTestId, getByText, queryByText } =
-          await renderComponent(component, props)
+        const {
+          container,
+          getByRole,
+          getByLabelText,
+          getByTestId,
+          getByText,
+          queryByText: _queryByText,
+        } = await renderComponent(component, props)
 
         // Perform interactions
         for (const interaction of interactions) {

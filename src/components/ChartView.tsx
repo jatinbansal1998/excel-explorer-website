@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useCharts } from '@/hooks/useCharts'
 import { ColumnInfo, ExcelData } from '@/types/excel'
 import { ChartConfig, ChartSuggestion } from '@/types/chart'
@@ -38,9 +38,12 @@ export function ChartView({
     // Optionally notify parent when charts change
   }, [charts])
 
-  const handleAddChart = (sugg: ChartSuggestion) => {
-    addChart(sugg)
-  }
+  const handleAddChart = useCallback(
+    (sugg: ChartSuggestion) => {
+      addChart(sugg)
+    },
+    [addChart],
+  )
 
   useEffect(() => {
     if (!registerExternalApplyChart) return

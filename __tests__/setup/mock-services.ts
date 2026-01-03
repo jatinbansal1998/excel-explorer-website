@@ -2,7 +2,7 @@ import { createMockExcelData } from '../fixtures/test-data/mock-excel-data'
 
 export function createMockExcelParser() {
   return {
-    parseFile: jest.fn().mockImplementation((file: File) => {
+    parseFile: jest.fn().mockImplementation((_file: File) => {
       return Promise.resolve(createMockExcelData())
     }),
     detectColumnTypes: jest.fn().mockReturnValue([]),
@@ -12,7 +12,7 @@ export function createMockExcelParser() {
       totalColumns: 5,
     }),
     validateFile: jest.fn().mockResolvedValue({ isValid: true, errors: [] }),
-    parseSheet: jest.fn().mockImplementation((workbook: any, sheetName: string) => {
+    parseSheet: jest.fn().mockImplementation((_workbook: any, _sheetName: string) => {
       return Promise.resolve(createMockExcelData())
     }),
   }
@@ -20,7 +20,7 @@ export function createMockExcelParser() {
 
 export function createMockDataFilter() {
   return {
-    applyFilters: jest.fn().mockImplementation((data: any, filters: any[]) => {
+    applyFilters: jest.fn().mockImplementation((data: any, _filters: any[]) => {
       return Promise.resolve(data)
     }),
     generateFilter: jest.fn().mockReturnValue({
@@ -34,7 +34,7 @@ export function createMockDataFilter() {
 
 export function createMockChartDataProcessor() {
   return {
-    processForChart: jest.fn().mockImplementation((data: any, config: any) => {
+    processForChart: jest.fn().mockImplementation((_data: any, _config: any) => {
       return Promise.resolve({
         labels: ['A', 'B', 'C'],
         datasets: [

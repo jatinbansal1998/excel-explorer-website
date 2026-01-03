@@ -1,6 +1,6 @@
 import React from 'react'
-import {render, screen} from '@testing-library/react'
-import {LoadingSpinner} from '@/components/ui/LoadingSpinner'
+import { render, screen } from '@testing-library/react'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 // Local helpers to reduce duplication across tests
 const spinnerSel = 'svg.animate-spin'
@@ -22,7 +22,7 @@ function getProgressFill(): HTMLElement | null {
 function expectProgressWidth(percent: string) {
   const fill = getProgressFill()
   expect(fill).toBeInTheDocument()
-  expect(fill).toHaveStyle({width: percent})
+  expect(fill).toHaveStyle({ width: percent })
 }
 
 describe('LoadingSpinner Component', () => {
@@ -42,7 +42,7 @@ describe('LoadingSpinner Component', () => {
       const sizes = ['sm', 'md', 'lg'] as const
 
       sizes.forEach((size) => {
-        const {unmount} = render(<LoadingSpinner size={size}/>)
+        const { unmount } = render(<LoadingSpinner size={size} />)
         const spinner = getSpinner()
 
         expect(spinner).toBeInTheDocument()
@@ -161,7 +161,6 @@ describe('LoadingSpinner Component', () => {
 
       expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
     })
-
 
     it('should render progress bar with custom message', () => {
       render(<LoadingSpinner showProgress progress={75} message="Processing..." />)
@@ -284,20 +283,14 @@ describe('LoadingSpinner Component', () => {
 
       const container = getSpinner()?.closest('div')
       expect(container).toBeInTheDocument()
-      expect(container).toHaveClass(
-        'flex',
-        'flex-col',
-        'items-center',
-        'justify-center',
-        'space-y-2',
-      )
+      expect(container).toHaveClass('flex', 'flex-col', 'items-center', 'justify-center', 'gap-2')
     })
 
     it('should maintain proper spacing between spinner and message', () => {
       render(<LoadingSpinner message="Test message" />)
 
       const container = getSpinner()?.closest('div')
-      expect(container).toHaveClass('space-y-2')
+      expect(container).toHaveClass('gap-2')
 
       const spinner = getSpinner()
       const message = screen.getByRole('paragraph')
@@ -310,7 +303,7 @@ describe('LoadingSpinner Component', () => {
       render(<LoadingSpinner showProgress progress={50} />)
 
       const container = getSpinner()?.closest('div')
-      expect(container).toHaveClass('space-y-2')
+      expect(container).toHaveClass('gap-2')
 
       const spinner = getSpinner()
       const progressBar = getProgressBar()
@@ -328,7 +321,6 @@ describe('LoadingSpinner Component', () => {
       expect(spinner).toBeInTheDocument()
       expect(spinner).toHaveClass('animate-spin', 'h-6', 'w-6') // default classes still apply
     })
-
 
     it('should handle negative progress values', () => {
       render(<LoadingSpinner showProgress progress={-10} />)

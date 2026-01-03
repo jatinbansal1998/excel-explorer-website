@@ -32,30 +32,40 @@ jest.mock('@/components/ui/Button', () => ({
 }))
 
 jest.mock('@/components/charts/ChartCreationModal', () => ({
-  ChartCreationModal: ({ isOpen, onClose, onCreateChart, columnInfo, filteredData }: any) => (
-    <div data-testid="chart-creation-modal" data-open={isOpen}>
-      {isOpen && (
-        <div>
-          <button data-testid="modal-close" onClick={onClose}>
-            Close
-          </button>
-          <button
-            data-testid="modal-create"
-            onClick={() =>
-              onCreateChart({
-                type: 'pie',
-                dataColumn: 'test_column',
-                aggregation: 'count',
-                title: 'Test Chart',
-              })
-            }
-          >
-            Create
-          </button>
-        </div>
-      )}
-    </div>
-  ),
+  ChartCreationModal: ({
+    isOpen,
+    onClose,
+    onCreateChart,
+    columnInfo: _columnInfo,
+    filteredData: _filteredData,
+  }: any) => {
+    void _columnInfo
+    void _filteredData
+    return (
+      <div data-testid="chart-creation-modal" data-open={isOpen}>
+        {isOpen && (
+          <div>
+            <button data-testid="modal-close" onClick={onClose}>
+              Close
+            </button>
+            <button
+              data-testid="modal-create"
+              onClick={() =>
+                onCreateChart({
+                  type: 'pie',
+                  dataColumn: 'test_column',
+                  aggregation: 'count',
+                  title: 'Test Chart',
+                })
+              }
+            >
+              Create
+            </button>
+          </div>
+        )}
+      </div>
+    )
+  },
 }))
 
 // Mock Heroicons

@@ -73,14 +73,14 @@ export class TestServiceManager {
 
   private createMockOpenRouterService() {
     return {
-      generateAnalytics: jest.fn().mockImplementation((prompt: string) => {
+      generateAnalytics: jest.fn().mockImplementation((_prompt: string) => {
         return Promise.resolve({
           insights: ['Test insight 1', 'Test insight 2'],
           suggestions: ['Test suggestion 1'],
           confidence: 0.85,
         })
       }),
-      generateChartSuggestions: jest.fn().mockImplementation((data: any) => {
+      generateChartSuggestions: jest.fn().mockImplementation((_data: any) => {
         return Promise.resolve([
           { type: 'pie', column: 'City', confidence: 0.9 },
           { type: 'bar', column: 'Age', confidence: 0.8 },

@@ -12,6 +12,8 @@ import {
 export class DataFilter {
   private activeFilters: Map<string, FilterConfig>
   private readonly initialFilters: Map<string, FilterConfig>
+  // Cache for pre-computed select filter sets
+  private selectFilterCache: Map<string, Set<unknown>> = new Map()
 
   constructor(filters: FilterConfig[]) {
     this.activeFilters = new Map(filters.map((f) => [f.id, this.cloneFilter(f)]))
@@ -22,6 +24,18 @@ export class DataFilter {
     const rows = data.rows || []
     const active = Array.from(this.activeFilters.values()).filter((f) => f.active)
     if (active.length === 0) return rows
+
+    // Pre-compute Sets for select filters to avoid recreation per-row
+    this.selectFilterCache.clear()
+    for (const filter of active) {
+      if (filter.type === 'select') {
+        const options = filter.values as FilterValue[]
+        const selected = options.filter((v) => v.selected).map((v) => v.value)
+        if (selected.length > 0) {
+          this.selectFilterCache.set(filter.id, new Set(selected))
+        }
+      }
+    }
 
     const filteredRows = rows.filter((row) => {
       for (const element of active) {
@@ -39,7 +53,12 @@ export class DataFilter {
 
     switch (filter.type) {
       case 'select':
-        return this.evaluateSelectFilter(cellValue, filter.values as FilterValue[], filter.operator)
+        return this.evaluateSelectFilter(
+          cellValue,
+          filter.id,
+          filter.values as FilterValue[],
+          filter.operator,
+        )
       case 'range':
         return this.evaluateRangeFilter(cellValue, filter.values as RangeFilter, filter.operator)
       case 'search':
@@ -57,13 +76,15 @@ export class DataFilter {
 
   private evaluateSelectFilter(
     value: unknown,
+    filterId: string,
     options: FilterValue[],
     operator: FilterConfig['operator'],
   ): boolean {
-    const selected = options.filter((v) => v.selected).map((v) => v.value)
-    if (selected.length === 0) return true // nothing selected means pass-through
-    const set = new Set(selected)
-    const contains = set.has(value)
+    // Use cached set if available
+    const cachedSet = this.selectFilterCache.get(filterId)
+    if (!cachedSet) return true // nothing selected means pass-through
+
+    const contains = cachedSet.has(value)
     if (operator === 'not_equals') return !contains
     return contains // default equals/in-set
   }

@@ -3,7 +3,7 @@ export interface PerformanceMetric {
   startTime: number
   endTime?: number
   duration?: number
-    metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>
 }
 
 export class PerformanceMonitor {
@@ -18,7 +18,7 @@ export class PerformanceMonitor {
     return this.instance
   }
 
-    startTiming(name: string, metadata?: Record<string, unknown>): void {
+  startTiming(name: string, metadata?: Record<string, unknown>): void {
     const metric: PerformanceMetric = {
       name,
       startTime: performance.now(),
@@ -49,25 +49,23 @@ export class PerformanceMonitor {
     return metric
   }
 
-  measureAsync<T>(
+  async measureAsync<T>(
     name: string,
     operation: () => Promise<T>,
     metadata?: Record<string, unknown>,
   ): Promise<T> {
-    return new Promise(async (resolve, reject) => {
-      this.startTiming(name, metadata)
-      try {
-        const result = await operation()
-        this.endTiming(name)
-        resolve(result)
-      } catch (error) {
-        this.endTiming(name)
-        reject(error)
-      }
-    })
+    this.startTiming(name, metadata)
+    try {
+      const result = await operation()
+      this.endTiming(name)
+      return result
+    } catch (error) {
+      this.endTiming(name)
+      throw error
+    }
   }
 
-    measure<T>(name: string, operation: () => T, metadata?: Record<string, unknown>): T {
+  measure<T>(name: string, operation: () => T, metadata?: Record<string, unknown>): T {
     this.startTiming(name, metadata)
     try {
       const result = operation()
@@ -107,7 +105,7 @@ export class PerformanceMonitor {
   // Memory monitoring
   getMemoryUsage(): MemoryInfo | null {
     if ('memory' in performance) {
-        return (performance as Record<string, unknown>).memory as MemoryInfo
+      return (performance as Record<string, unknown>).memory as MemoryInfo
     }
     return null
   }

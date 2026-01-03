@@ -645,7 +645,7 @@ describe('ChartConfigModal', () => {
 
       const inputs = screen.getAllByRole('textbox')
       const titleInput = inputs[0]
-      const saveButton = screen.getByRole('button', { name: /save chart/i })
+      const _saveButton = screen.getByRole('button', { name: /save chart/i })
 
       // Focus on title input directly (since modal close button gets first focus)
       titleInput.focus()
